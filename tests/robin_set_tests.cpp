@@ -40,7 +40,6 @@
 
 BOOST_AUTO_TEST_SUITE(test_robin_set)
 
-//TODO test operator==
 using test_types = boost::mpl::list<tsl::robin_set<std::int64_t>,
                                     tsl::robin_set<std::string>,
                                     tsl::robin_set<self_reference_member_test>,
