@@ -55,24 +55,25 @@ using test_types = boost::mpl::list<
                         tsl::robin_map<copy_only_test, copy_only_test, mod_hash<9>>,
                         tsl::robin_map<self_reference_member_test, self_reference_member_test, mod_hash<9>>,
                         
+                        // other GrowthPolicy
                         tsl::robin_map<move_only_test, move_only_test, mod_hash<9>, std::equal_to<move_only_test>,
-                                      std::allocator<std::pair<move_only_test, move_only_test>>, 
+                                      std::allocator<std::pair<move_only_test, move_only_test>>, true,
                                       tsl::power_of_two_growth_policy_rh<4>>,
                         tsl::robin_map<move_only_test, move_only_test, mod_hash<9>, std::equal_to<move_only_test>,
-                                      std::allocator<std::pair<move_only_test, move_only_test>>, 
+                                      std::allocator<std::pair<move_only_test, move_only_test>>, false,
                                       tsl::prime_growth_policy_rh>,
                         tsl::robin_map<move_only_test, move_only_test, mod_hash<9>, std::equal_to<move_only_test>,
-                                      std::allocator<std::pair<move_only_test, move_only_test>>, 
+                                      std::allocator<std::pair<move_only_test, move_only_test>>, false,
                                       tsl::mod_growth_policy_rh<>>,
                                       
                         tsl::robin_map<copy_only_test, copy_only_test, mod_hash<9>, std::equal_to<copy_only_test>,
-                                      std::allocator<std::pair<copy_only_test, copy_only_test>>, 
+                                      std::allocator<std::pair<copy_only_test, copy_only_test>>, false,
                                       tsl::power_of_two_growth_policy_rh<4>>,
                         tsl::robin_map<copy_only_test, copy_only_test, mod_hash<9>, std::equal_to<copy_only_test>,
-                                      std::allocator<std::pair<copy_only_test, copy_only_test>>, 
+                                      std::allocator<std::pair<copy_only_test, copy_only_test>>, true,
                                       tsl::prime_growth_policy_rh>,
                         tsl::robin_map<copy_only_test, copy_only_test, mod_hash<9>, std::equal_to<copy_only_test>,
-                                      std::allocator<std::pair<copy_only_test, copy_only_test>>, 
+                                      std::allocator<std::pair<copy_only_test, copy_only_test>>, true,
                                       tsl::mod_growth_policy_rh<>>
                     >;
                                     
