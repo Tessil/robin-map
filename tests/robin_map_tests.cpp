@@ -48,6 +48,7 @@ BOOST_AUTO_TEST_SUITE(test_robin_map)
 
 using test_types = boost::mpl::list<
                         tsl::robin_map<std::int64_t, std::int64_t>,
+                        tsl::robin_map<std::string, std::string>,
                         // Test with hash having a lot of collisions
                         tsl::robin_map<std::int64_t, std::int64_t, mod_hash<9>>,
                         tsl::robin_map<std::string, std::string, mod_hash<9>>,
