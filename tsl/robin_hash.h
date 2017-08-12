@@ -1309,7 +1309,7 @@ private:
     
 public:
     static const size_type DEFAULT_INIT_BUCKETS_SIZE = 16;
-    static constexpr float DEFAULT_MAX_LOAD_FACTOR = 0.5f;
+    static constexpr float DEFAULT_MAX_LOAD_FACTOR = 0.67f;
     
 private:
     static const distance_type REHASH_ON_HIGH_NB_PROBES__NPROBES = 128;
