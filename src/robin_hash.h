@@ -1188,21 +1188,22 @@ private:
             dist_from_init_bucket++;
         }
         
-        
         if(grow_on_high_load()) {
             return insert_impl(key, hash, std::forward<Args>(value_type_args)...);
         }
+ 
         
         if(m_buckets[ibucket].empty()) {
             m_buckets[ibucket].set_value_of_empty_bucket(dist_from_init_bucket, bucket_entry::truncate_hash(hash),
                                                          std::forward<Args>(value_type_args)...);
-            m_nb_elements++;
         }
         else {
             insert_value(ibucket, dist_from_init_bucket, bucket_entry::truncate_hash(hash), 
                          std::forward<Args>(value_type_args)...);
         }
         
+        
+        m_nb_elements++;
         /*
          * The value will be inserted in ibucket in any case, either because it was
          * empty or by stealing the bucket (robin hood). 
@@ -1221,36 +1222,32 @@ private:
     void insert_value(std::size_t ibucket, distance_type dist_from_init_bucket, 
                       truncated_hash_type hash, value_type&& value) 
     {
-        while(true) {
+        m_buckets[ibucket].swap_with_value_in_bucket(dist_from_init_bucket, hash, value);
+        ibucket = next_bucket(ibucket);
+        dist_from_init_bucket++;
+        
+        while(!m_buckets[ibucket].empty()) {
             if(dist_from_init_bucket > m_buckets[ibucket].dist_from_init_bucket()) {
-                if(m_buckets[ibucket].empty()) {
-                    m_buckets[ibucket].set_value_of_empty_bucket(dist_from_init_bucket, hash, std::move(value));
-                    m_nb_elements++;
-                    
-                    return;
-                }
-                else {
-                    m_buckets[ibucket].swap_with_value_in_bucket(dist_from_init_bucket, hash, value);
-                }
-                
-                
-                if(dist_from_init_bucket >= REHASH_ON_HIGH_NB_PROBES__NPROBES && !m_grow_on_next_insert &&
-                   load_factor() >= REHASH_ON_HIGH_NB_PROBES__MIN_LOAD_FACTOR) 
-                {
-                    /**
-                     * The number of probes is really high, rehash the map on the next insert.
-                     * Difficult to do now as rehash may throw.
-                     */
-                    m_grow_on_next_insert = true;
-                }
+                m_buckets[ibucket].swap_with_value_in_bucket(dist_from_init_bucket, hash, value);
             }
             
             ibucket = next_bucket(ibucket);
             dist_from_init_bucket++;
         }
+        
+        m_buckets[ibucket].set_value_of_empty_bucket(dist_from_init_bucket, hash, std::move(value));
+        
+        
+        if(dist_from_init_bucket >= REHASH_ON_HIGH_NB_PROBES__NPROBES &&
+           load_factor() >= REHASH_ON_HIGH_NB_PROBES__MIN_LOAD_FACTOR) 
+        {
+            /**
+                * The number of probes is really high, rehash the map on the next insert.
+                * Difficult to do now as rehash may throw.
+                */
+            m_grow_on_next_insert = true;
+        }
     }
-    
-    
     
     
     void rehash_impl(size_type count) {
