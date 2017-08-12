@@ -39,7 +39,7 @@
 #include <vector>
 
 #include "utils.h"
-#include "robin_map.h"
+#include "tsl/robin_map.h"
 
 
 BOOST_AUTO_TEST_SUITE(test_robin_map)

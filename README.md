@@ -8,7 +8,7 @@ Two classes are provided: `tsl::robin_map` and `tsl::robin_set`.
 
 
 ### Installation
-To use robin-map, just add the [src/](src/) directory to your include path. It is a **header-only** library.
+To use robin-map, just add the project to your include path. It is a **header-only** library.
 
 The code should work with any C++11 standard-compliant compiler and has been tested with GCC 4.8.4, Clang 3.5.0 and Visual Studio 2015.
 
