@@ -1,4 +1,6 @@
-## A C++ implementation of a fast hash map using robin hood hashing
+[![Build Status](https://travis-ci.org/Tessil/robin-map.svg?branch=master)](https://travis-ci.org/Tessil/robin-map) [![Build status](https://ci.appveyor.com/api/projects/status/lo79n4ya4nta79q4/branch/master?svg=true)](https://ci.appveyor.com/project/Tessil/robin-map/branch/master)
+
+## A C++ implementation of a fast hash map and hash set using robin hood hashing
 
 **The library is still in alpha stage.**
 
