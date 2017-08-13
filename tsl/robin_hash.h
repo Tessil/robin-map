@@ -541,6 +541,9 @@ private:
                                          &&
                                          (sizeof(std::size_t) == sizeof(truncated_hash_type) ||
                                           std::is_same<GrowthPolicy, tsl::power_of_two_growth_policy_rh<2>>::value)
+                                         &&
+                                          // Don't store the hash for primitive types with default hash.
+                                          (!std::is_arithmetic<key_type>::value || !std::is_same<Hash, std::hash<key_type>>::value)
                                        );
                                         
     /**
