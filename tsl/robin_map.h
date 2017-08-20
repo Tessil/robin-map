@@ -647,11 +647,19 @@ public:
         lhs.swap(rhs);
     }
     
-    
 private:
     ht m_ht;
 };
 
-}
+
+template<class Key, 
+         class T, 
+         class Hash = std::hash<Key>,
+         class KeyEqual = std::equal_to<Key>,
+         class Allocator = std::allocator<std::pair<Key, T>>,
+         bool StoreHash = false>
+using robin_pg_map = robin_map<Key, T, Hash, KeyEqual, Allocator, StoreHash, tsl::prime_growth_policy_rh>;
+
+} // end namespace tsl
 
 #endif

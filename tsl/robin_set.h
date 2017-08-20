@@ -518,6 +518,14 @@ private:
     ht m_ht;    
 };
 
+
+template<class Key, 
+         class Hash = std::hash<Key>,
+         class KeyEqual = std::equal_to<Key>,
+         class Allocator = std::allocator<Key>,
+         bool StoreHash = false>
+using robin_pg_set = robin_set<Key, Hash, KeyEqual, Allocator, StoreHash, tsl::prime_growth_policy_rh>;
+
 } // end namespace tsl
 
 #endif
