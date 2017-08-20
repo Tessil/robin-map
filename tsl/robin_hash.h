@@ -480,6 +480,12 @@ private:
 };
 
 
+template<typename U>
+struct is_power_of_two_policy: std::false_type {};
+
+template<std::size_t GrowthFactor>
+struct is_power_of_two_policy<tsl::power_of_two_growth_policy_rh<GrowthFactor>>: std::true_type {};
+
 
 /**
  * Internal common class used by robin_map and robin_set. 
@@ -489,7 +495,7 @@ private:
  * KeySelect should be a FunctionObject which takes a ValueType in parameter and returns a reference to the key.
  * 
  * ValueSelect should be a FunctionObject which takes a ValueType in parameter and returns a reference to the value.
- * ValueSelect should be void if there is no value (in set for example).
+ * ValueSelect should be void if there is no value (in a set for example).
  * 
  * The strong exception guarantee only holds if the expression 
  * 'std::is_nothrow_swappable<ValueType>::value && std::is_nothrow_move_constructible<ValueType>::value' is true.
@@ -509,6 +515,7 @@ private:
     template<typename U>
     using has_mapped_type = typename std::integral_constant<bool, !std::is_same<U, void>::value>;
     
+
 public:
     template<bool is_const>
     class robin_iterator;
@@ -540,7 +547,7 @@ private:
                                           sizeof(tsl::detail_robin_hash::bucket_entry<value_type, false>))
                                          &&
                                          (sizeof(std::size_t) == sizeof(truncated_hash_type) ||
-                                          std::is_same<GrowthPolicy, tsl::power_of_two_growth_policy_rh<2>>::value)
+                                          is_power_of_two_policy<GrowthPolicy>::value)
                                          &&
                                           // Don't store the hash for primitive types with default hash.
                                           (!std::is_arithmetic<key_type>::value || !std::is_same<Hash, std::hash<key_type>>::value)
@@ -563,7 +570,7 @@ private:
         if(STORE_HASH && sizeof(std::size_t) == sizeof(truncated_hash_type)) {
             return true;
         }
-        else if(STORE_HASH && std::is_same<GrowthPolicy, tsl::power_of_two_growth_policy_rh<2>>::value) {
+        else if(STORE_HASH && is_power_of_two_policy<GrowthPolicy>::value) {
             tsl_assert(bucket_count > 0);
             return (bucket_count - 1) <= std::numeric_limits<truncated_hash_type>::max();
         }
@@ -1122,6 +1129,14 @@ private:
         return GrowthPolicy::bucket_for_hash(hash);
     }
     
+    template<class U = GrowthPolicy, typename std::enable_if<is_power_of_two_policy<U>::value>::type* = nullptr>
+    std::size_t next_bucket(std::size_t index) const noexcept {
+        tsl_assert(index < bucket_count());
+        
+        return (index + 1) & this->m_mask;
+    }
+    
+    template<class U = GrowthPolicy, typename std::enable_if<!is_power_of_two_policy<U>::value>::type* = nullptr>
     std::size_t next_bucket(std::size_t index) const noexcept {
         tsl_assert(index < bucket_count());
         
