@@ -38,7 +38,7 @@ namespace tsl {
 
     
 /**
- * Implementation of a hash map using open-adressing and the robin hood hashing algorithm.
+ * Implementation of a hash map using open-adressing and the robin hood hashing algorithm with backward shift deletion.
  * 
  * For operations modifying the hash map (insert, erase, rehash, ...), the strong exception guarantee 
  * is only guaranteed when the expression 'std::is_nothrow_swappable<std::pair<Key, T>>::value &&
@@ -48,7 +48,7 @@ namespace tsl {
  * 'std::is_nothrow_move_constructible<std::pair<Key, T>>::value' criterion (and will thus guarantee the 
  * strong exception for the map).
  * 
- * When StoreHash is true, 32 bits of the hash is stored alongside the values. It can improve 
+ * When StoreHash is true, 32 bits of the hash are stored alongside the values. It can improve 
  * the performance during lookups if the KeyEqual function takes time (or engenders a cache-miss for example) 
  * as we then compare the stored hashes before comparing the keys. When tsl::power_of_two_growth_policy_rh is used
  * as GrowthPolicy, it may also speed-up the rehash process as we can avoid to recalculate the hash. 
@@ -652,6 +652,9 @@ private:
 };
 
 
+/**
+ * Same as tsl::robin_map<Key, T, Hash, KeyEqual, Allocator, StoreHash, tsl::prime_growth_policy_rh>.
+ */
 template<class Key, 
          class T, 
          class Hash = std::hash<Key>,
