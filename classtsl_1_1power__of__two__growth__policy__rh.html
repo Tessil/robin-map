@@ -43,6 +43,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pro-static-attribs">Static Protected Attributes</a> &#124;
 <a href="classtsl_1_1power__of__two__growth__policy__rh-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">tsl::power_of_two_growth_policy_rh&lt; GrowthFactor &gt; Class Template Reference</div>  </div>
@@ -61,12 +63,23 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9c549394e9c1f36c12a419286eab48b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bceb5fd556949bcad53bc34f995e048"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html#a0bceb5fd556949bcad53bc34f995e048">max_bucket_count</a> () const</td></tr>
 <tr class="separator:a0bceb5fd556949bcad53bc34f995e048"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a2d07421b9f87a65f01a20423f446c770"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html#a2d07421b9f87a65f01a20423f446c770">m_mask</a></td></tr>
+<tr class="separator:a2d07421b9f87a65f01a20423f446c770"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
+Static Protected Attributes</h2></td></tr>
+<tr class="memitem:ae08350663fdc797d99d482f28057c99b"><td class="memItemLeft" align="right" valign="top">static const std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html#ae08350663fdc797d99d482f28057c99b">MIN_BUCKETS_SIZE</a> = 2</td></tr>
+<tr class="separator:ae08350663fdc797d99d482f28057c99b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;std::size_t GrowthFactor&gt;<br />
 class tsl::power_of_two_growth_policy_rh&lt; GrowthFactor &gt;</h3>
 
-<p>Grow the map by a factor of two keeping bucket_count to a power of two. It allows the map to use a mask operation instead of a modulo operation to map a hash to a bucket. </p>
+<p>Grow the map by a multiple of two keeping bucket_count to a power of two. It allows the map to use a mask operation instead of a modulo operation to map a hash to a bucket.</p>
+<p>GrowthFactor must be a power of two &gt;= 2. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a6597141fd1be148384e1117f25c03aa0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6597141fd1be148384e1117f25c03aa0">&#9670;&nbsp;</a></span>power_of_two_growth_policy_rh()</h2>
@@ -183,8 +196,57 @@ template&lt;std::size_t GrowthFactor&gt; </div>
 
 </div>
 </div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a2d07421b9f87a65f01a20423f446c770"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d07421b9f87a65f01a20423f446c770">&#9670;&nbsp;</a></span>m_mask</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;std::size_t GrowthFactor&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html">tsl::power_of_two_growth_policy_rh</a>&lt; GrowthFactor &gt;::m_mask</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae08350663fdc797d99d482f28057c99b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae08350663fdc797d99d482f28057c99b">&#9670;&nbsp;</a></span>MIN_BUCKETS_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;std::size_t GrowthFactor&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::size_t <a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html">tsl::power_of_two_growth_policy_rh</a>&lt; GrowthFactor &gt;::MIN_BUCKETS_SIZE = 2</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/<a class="el" href="robin__hash_8h_source.html">robin_hash.h</a></li>
+<li>tsl/<a class="el" href="robin__hash_8h_source.html">robin_hash.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

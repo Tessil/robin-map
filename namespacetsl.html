@@ -39,7 +39,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
 <div class="title">tsl Namespace Reference</div>  </div>
 </div><!--header-->
@@ -62,6 +63,15 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__set.html">robin_set</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a591166350e793bb66904afc3b8cf3613"><td class="memTemplParams" colspan="2">template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false&gt; </td></tr>
+<tr class="memitem:a591166350e793bb66904afc3b8cf3613"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetsl.html#a591166350e793bb66904afc3b8cf3613">robin_pg_map</a> = <a class="el" href="classtsl_1_1robin__map.html">robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, <a class="el" href="classtsl_1_1prime__growth__policy__rh.html">tsl::prime_growth_policy_rh</a> &gt;</td></tr>
+<tr class="separator:a591166350e793bb66904afc3b8cf3613"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78943a53ce16004067ba8e87cba580c6"><td class="memTemplParams" colspan="2">template&lt;class Key , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;Key&gt;, bool StoreHash = false&gt; </td></tr>
+<tr class="memitem:a78943a53ce16004067ba8e87cba580c6"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetsl.html#a78943a53ce16004067ba8e87cba580c6">robin_pg_set</a> = <a class="el" href="classtsl_1_1robin__set.html">robin_set</a>&lt; Key, Hash, KeyEqual, Allocator, StoreHash, <a class="el" href="classtsl_1_1prime__growth__policy__rh.html">tsl::prime_growth_policy_rh</a> &gt;</td></tr>
+<tr class="separator:a78943a53ce16004067ba8e87cba580c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>MIT License</p>
@@ -69,7 +79,40 @@ Classes</h2></td></tr>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
 <p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
 <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Typedef Documentation</h2>
+<a id="a591166350e793bb66904afc3b8cf3613"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a591166350e793bb66904afc3b8cf3613">&#9670;&nbsp;</a></span>robin_pg_map</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacetsl.html#a591166350e793bb66904afc3b8cf3613">tsl::robin_pg_map</a> = typedef <a class="el" href="classtsl_1_1robin__map.html">robin_map</a>&lt;Key, T, Hash, KeyEqual, Allocator, StoreHash, <a class="el" href="classtsl_1_1prime__growth__policy__rh.html">tsl::prime_growth_policy_rh</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a78943a53ce16004067ba8e87cba580c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78943a53ce16004067ba8e87cba580c6">&#9670;&nbsp;</a></span>robin_pg_set</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;Key&gt;, bool StoreHash = false&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacetsl.html#a78943a53ce16004067ba8e87cba580c6">tsl::robin_pg_set</a> = typedef <a class="el" href="classtsl_1_1robin__set.html">robin_set</a>&lt;Key, Hash, KeyEqual, Allocator, StoreHash, <a class="el" href="classtsl_1_1prime__growth__policy__rh.html">tsl::prime_growth_policy_rh</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
