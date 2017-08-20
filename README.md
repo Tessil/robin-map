@@ -12,7 +12,7 @@ A **benchmark** of `tsl::robin_map` against other hashmaps may be found [here](h
 - Header-only library, just include the project to your include path and you are ready to go.
 - Fast hash table, see the [benchmark](https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html) for some numbers.
 - Support for move-only and non-default constructible key/value.
-- Support for heterogeneous lookups (e.g. if you have a map that uses `std::unique_ptr<int>` as key, you could use an `int*` or a `std::uintptr_t` as key parameter to `find`, see [example](https://github.com/Tessil/robin-map#heterogeneous-lookup)).
+- Support for heterogeneous lookups (e.g. if you have a map that uses `std::unique_ptr<int>` as key, you could use an `int*` or a `std::uintptr_t` as key parameter to `find`, see [example](https://github.com/Tessil/robin-map#heterogeneous-lookups)).
 - No need to reserve any sentinel value from the keys.
 - Possibility to store the hash value alongside the stored key-value for faster rehash and lookup if the hash or the key equal functions are expensive to compute. Note that hash may be stored even if not asked explicitly when the library can detect that it will have no impact on the size of the structure in memory due to alignment. See the [StoreHash](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) template parameter for details.
 - If the hash is known before a lookup, it is possible to pass it as parameter to speed-up the lookup.
