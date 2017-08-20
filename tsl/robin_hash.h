@@ -59,8 +59,10 @@ namespace tsl {
 
 
 /**
- * Grow the map by a factor of two keeping bucket_count to a power of two. It allows
+ * Grow the map by a multiple of two keeping bucket_count to a power of two. It allows
  * the map to use a mask operation instead of a modulo operation to map a hash to a bucket.
+ * 
+ * GrowthFactor must be a power of two >= 2.
  */
 template<std::size_t GrowthFactor>
 class power_of_two_growth_policy_rh {
@@ -129,9 +131,9 @@ private:
         return value != 0 && (value & (value - 1)) == 0;
     }
     
-private:
+protected:
     static const std::size_t MIN_BUCKETS_SIZE = 2;
-    static_assert(is_power_of_two(GrowthFactor), "GrowthFactor must be a power of two.");
+    static_assert(is_power_of_two(GrowthFactor) && GrowthFactor >= 2, "GrowthFactor must be a power of two >= 2.");
     
     std::size_t m_mask;
 };
@@ -223,6 +225,23 @@ static constexpr const std::array<std::size_t(*)(std::size_t), 39> MOD_PRIME = {
 /**
  * Grow the map by using prime numbers as size. Slower than tsl::power_of_two_growth_policy_rh in general 
  * but will probably distribute the values around better in the buckets with a poor hash function.
+ * 
+ * To allow the compiler to optimize the modulo operation, a lookup table is used with constant primes numbers.
+ * With a switch the code would look like:
+ * 
+ * switch(iprime) { // iprime is the current prime of the hash table
+ *     case 0: hash % 5ul;
+ *             break;
+ *     case 1: hash % 17ul;
+ *             break;
+ *     case 2: hash % 29ul;
+ *             break;
+ *     ...
+ * }    
+ * 
+ * Due to the constant variable in the modulo the compiler is able to optimize the operation
+ * by a serie of multiplications, substractions and shifts. 
+ * The 'hash % 5' could become something like 'hash - (hash * 0xCCCCCCCD) >> 34)*5' in a 64 bits environement.
  */
 class prime_growth_policy_rh {
 public:
@@ -457,6 +476,7 @@ public:
     static truncated_hash_type truncate_hash(std::size_t hash) {
         return truncated_hash_type(hash);
     }
+    
 private:
     void destroy_value() noexcept {
         try {
