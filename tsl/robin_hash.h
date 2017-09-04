@@ -26,7 +26,6 @@
 
 
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <climits>
 #include <cmath>
@@ -36,12 +35,12 @@
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <ratio>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "robin_growth_policy.h"
 
 
 
@@ -56,236 +55,6 @@
 
 
 namespace tsl {
-
-
-/**
- * Grow the map by a multiple of two keeping bucket_count to a power of two. It allows
- * the map to use a mask operation instead of a modulo operation to map a hash to a bucket.
- * 
- * GrowthFactor must be a power of two >= 2.
- */
-template<std::size_t GrowthFactor>
-class power_of_two_growth_policy_rh {
-public:
-    /**
-     * Called on map creation and rehash. The number of buckets requested is passed by parameter.
-     * This number is a minimum, the policy may update this value with a higher value if needed.
-     */
-    power_of_two_growth_policy_rh(std::size_t& min_bucket_count_in_out) {
-        if(min_bucket_count_in_out > max_bucket_count()) {
-            throw std::length_error("The map exceeds its maxmimum size.");
-        }
-        
-        static_assert(MIN_BUCKETS_SIZE > 0, "");
-        const std::size_t min_bucket_count = MIN_BUCKETS_SIZE;
-        
-        min_bucket_count_in_out = std::max(min_bucket_count, min_bucket_count_in_out);
-        min_bucket_count_in_out = round_up_to_power_of_two(min_bucket_count_in_out);
-        m_mask = min_bucket_count_in_out - 1;
-    }
-    
-    /**
-     * Return the bucket [0, bucket_count()) to which the hash belongs.
-     */
-    std::size_t bucket_for_hash(std::size_t hash) const {
-        return hash & m_mask;
-    }
-    
-    /**
-     * Return the bucket count to uses when the bucket array grows on rehash.
-     */
-    std::size_t next_bucket_count() const {
-        if((m_mask + 1) > max_bucket_count() / GrowthFactor) {
-            throw std::length_error("The map exceeds its maxmimum size.");
-        }
-        
-        return (m_mask + 1) * GrowthFactor;
-    }
-    
-    /**
-     * Return the maximum number of buckets supported by the policy.
-     */
-    std::size_t max_bucket_count() const {
-        return std::numeric_limits<std::size_t>::max() / GrowthFactor + 1;
-    }
-    
-private:
-    static std::size_t round_up_to_power_of_two(std::size_t value) {
-        if(value == 0) {
-            return 1;
-        }
-        
-        if(is_power_of_two(value)) {
-            return value;
-        }
-            
-        --value;
-        for(std::size_t i = 1; i < sizeof(std::size_t) * CHAR_BIT; i *= 2) {
-            value |= value >> i;
-        }
-        
-        return value + 1;
-    }
-    
-    static constexpr bool is_power_of_two(std::size_t value) {
-        return value != 0 && (value & (value - 1)) == 0;
-    }
-    
-protected:
-    static const std::size_t MIN_BUCKETS_SIZE = 2;
-    static_assert(is_power_of_two(GrowthFactor) && GrowthFactor >= 2, "GrowthFactor must be a power of two >= 2.");
-    
-    std::size_t m_mask;
-};
-
-/**
- * Grow the map by GrowthFactor::num/GrowthFactor::den and use a modulo to map a hash
- * to a bucket. Slower but it can be usefull if you want a slower growth.
- */
-template<class GrowthFactor = std::ratio<3, 2>>
-class mod_growth_policy_rh {
-public:
-    mod_growth_policy_rh(std::size_t& min_bucket_count_in_out) {
-        if(min_bucket_count_in_out > max_bucket_count()) {
-            throw std::length_error("The map exceeds its maxmimum size.");
-        }
-        
-        static_assert(MIN_BUCKETS_SIZE > 0, "");
-        const std::size_t min_bucket_count = MIN_BUCKETS_SIZE;
-        
-        min_bucket_count_in_out = std::max(min_bucket_count, min_bucket_count_in_out);
-        m_bucket_count = min_bucket_count_in_out;
-    }
-    
-    std::size_t bucket_for_hash(std::size_t hash) const {
-        tsl_assert(m_bucket_count != 0);
-        return hash % m_bucket_count;
-    }
-    
-    std::size_t next_bucket_count() const {
-        if(m_bucket_count == max_bucket_count()) {
-            throw std::length_error("The map exceeds its maxmimum size.");
-        }
-        
-        const double next_bucket_count = std::ceil(double(m_bucket_count) * REHASH_SIZE_MULTIPLICATION_FACTOR);
-        if(!std::isnormal(next_bucket_count)) {
-            throw std::length_error("The map exceeds its maxmimum size.");
-        }
-        
-        if(next_bucket_count > double(max_bucket_count())) {
-            return max_bucket_count();
-        }
-        else {
-            return std::size_t(next_bucket_count);
-        }
-    }
-    
-    std::size_t max_bucket_count() const {
-        return MAX_BUCKET_COUNT;
-    }
-    
-private:
-    static const std::size_t MIN_BUCKETS_SIZE = 2;
-    static constexpr double REHASH_SIZE_MULTIPLICATION_FACTOR = 1.0*GrowthFactor::num/GrowthFactor::den;
-    static const std::size_t MAX_BUCKET_COUNT = 
-            std::size_t(double(
-                    std::numeric_limits<std::size_t>::max()/REHASH_SIZE_MULTIPLICATION_FACTOR
-            ));
-            
-    static_assert(REHASH_SIZE_MULTIPLICATION_FACTOR >= 1.1, "Growth factor should be >= 1.1.");
-    
-    std::size_t m_bucket_count;
-};
-
-
-
-namespace detail_robin_hash {
-
-static constexpr const std::array<std::size_t, 39> PRIMES = {{
-    5ul, 17ul, 29ul, 37ul, 53ul, 67ul, 79ul, 97ul, 131ul, 193ul, 257ul, 389ul, 521ul, 769ul, 1031ul, 1543ul, 2053ul, 
-    3079ul, 6151ul, 12289ul, 24593ul, 49157ul, 98317ul, 196613ul, 393241ul, 786433ul, 1572869ul, 3145739ul, 
-    6291469ul, 12582917ul, 25165843ul, 50331653ul, 100663319ul, 201326611ul, 402653189ul, 805306457ul, 
-    1610612741ul, 3221225473ul, 4294967291ul
-}};
-
-template<unsigned int IPrime>
-static std::size_t mod(std::size_t hash) { return hash % PRIMES[IPrime]; }
-
-// MOD_PRIME[iprime](hash) returns hash % PRIMES[iprime]. This table allows for faster modulo as the
-// compiler can optimize the modulo code better with a constant known at the compilation.
-static constexpr const std::array<std::size_t(*)(std::size_t), 39> MOD_PRIME = {{ 
-    &mod<0>, &mod<1>, &mod<2>, &mod<3>, &mod<4>, &mod<5>, &mod<6>, &mod<7>, &mod<8>, &mod<9>, &mod<10>, 
-    &mod<11>, &mod<12>, &mod<13>, &mod<14>, &mod<15>, &mod<16>, &mod<17>, &mod<18>, &mod<19>, &mod<20>, 
-    &mod<21>, &mod<22>, &mod<23>, &mod<24>, &mod<25>, &mod<26>, &mod<27>, &mod<28>, &mod<29>, &mod<30>, 
-    &mod<31>, &mod<32>, &mod<33>, &mod<34>, &mod<35>, &mod<36>, &mod<37> , &mod<38>
-}};
-
-}
-
-/**
- * Grow the map by using prime numbers as size. Slower than tsl::power_of_two_growth_policy_rh in general 
- * but will probably distribute the values around better in the buckets with a poor hash function.
- * 
- * To allow the compiler to optimize the modulo operation, a lookup table is used with constant primes numbers.
- * 
- * With a switch the code would look like:
- * \code
- * switch(iprime) { // iprime is the current prime of the hash table
- *     case 0: hash % 5ul;
- *             break;
- *     case 1: hash % 17ul;
- *             break;
- *     case 2: hash % 29ul;
- *             break;
- *     ...
- * }    
- * \endcode
- * 
- * Due to the constant variable in the modulo the compiler is able to optimize the operation
- * by a series of multiplications, substractions and shifts. 
- * 
- * The 'hash % 5' could become something like 'hash - (hash * 0xCCCCCCCD) >> 34) * 5' in a 64 bits environement.
- */
-class prime_growth_policy_rh {
-public:
-    prime_growth_policy_rh(std::size_t& min_bucket_count_in_out) {
-        auto it_prime = std::lower_bound(tsl::detail_robin_hash::PRIMES.begin(), 
-                                         tsl::detail_robin_hash::PRIMES.end(), min_bucket_count_in_out);
-        if(it_prime == tsl::detail_robin_hash::PRIMES.end()) {
-            throw std::length_error("The map exceeds its maxmimum size.");
-        }
-        
-        m_iprime = static_cast<unsigned int>(std::distance(tsl::detail_robin_hash::PRIMES.begin(), it_prime));
-        min_bucket_count_in_out = *it_prime;
-    }
-    
-    std::size_t bucket_for_hash(std::size_t hash) const {
-        return bucket_for_hash_iprime(hash, m_iprime);
-    }
-    
-    std::size_t next_bucket_count() const {
-        if(m_iprime + 1 >= tsl::detail_robin_hash::PRIMES.size()) {
-            throw std::length_error("The map exceeds its maxmimum size.");
-        }
-        
-        return tsl::detail_robin_hash::PRIMES[m_iprime + 1];
-    }   
-    
-    std::size_t max_bucket_count() const {
-        return tsl::detail_robin_hash::PRIMES.back();
-    }
-    
-private:  
-    std::size_t bucket_for_hash_iprime(std::size_t hash, unsigned int iprime) const {
-        tsl_assert(iprime < tsl::detail_robin_hash::MOD_PRIME.size());
-        return tsl::detail_robin_hash::MOD_PRIME[iprime](hash);
-    }
-    
-private:
-    unsigned int m_iprime;
-};
-
-
     
 namespace detail_robin_hash {
 
@@ -300,6 +69,14 @@ struct has_is_transparent: std::false_type {
 
 template<typename T>
 struct has_is_transparent<T, typename make_void<typename T::is_transparent>::type>: std::true_type {
+};
+
+template<typename U>
+struct is_power_of_two_policy: std::false_type {
+};
+
+template<std::size_t GrowthFactor>
+struct is_power_of_two_policy<tsl::power_of_two_growth_policy_rh<GrowthFactor>>: std::true_type {
 };
 
 
@@ -502,12 +279,6 @@ private:
     storage m_value;
 };
 
-
-template<typename U>
-struct is_power_of_two_policy: std::false_type {};
-
-template<std::size_t GrowthFactor>
-struct is_power_of_two_policy<tsl::power_of_two_growth_policy_rh<GrowthFactor>>: std::true_type {};
 
 
 /**
@@ -828,8 +599,7 @@ public:
     
     template<typename P>
     std::pair<iterator, bool> insert(P&& value) {
-        const std::size_t hash = hash_key(KeySelect()(value));
-        return insert_impl(KeySelect()(value), hash, std::forward<P>(value));
+        return insert_impl(KeySelect()(value), std::forward<P>(value));
     }
     
     template<typename P>
@@ -898,12 +668,10 @@ public:
     
     
     template<class K, class... Args>
-    std::pair<iterator, bool> try_emplace(K&& key, Args&&... args) { 
-        const std::size_t hash = hash_key(key);
-        
-        return insert_impl(key, hash, std::piecewise_construct, 
-                                      std::forward_as_tuple(std::forward<K>(key)), 
-                                      std::forward_as_tuple(std::forward<Args>(args)...));
+    std::pair<iterator, bool> try_emplace(K&& key, Args&&... args) {
+        return insert_impl(key, std::piecewise_construct, 
+                                std::forward_as_tuple(std::forward<K>(key)), 
+                                std::forward_as_tuple(std::forward<Args>(args)...));
     }
     
     template<class K, class... Args>
@@ -1094,7 +862,7 @@ public:
     }
     
     /*
-     *  Hash policy 
+     * Hash policy 
      */
     float load_factor() const {
         return float(m_nb_elements)/float(bucket_count());
@@ -1214,7 +982,9 @@ private:
     }
     
     template<class K, class... Args>
-    std::pair<iterator, bool> insert_impl(const K& key, std::size_t hash, Args&&... value_type_args) {
+    std::pair<iterator, bool> insert_impl(const K& key, Args&&... value_type_args) {
+        const std::size_t hash = hash_key(key);
+        
         std::size_t ibucket = bucket_for_hash(hash); 
         distance_type dist_from_init_bucket = 0;
         
