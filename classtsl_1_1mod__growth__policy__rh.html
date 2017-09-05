@@ -49,14 +49,14 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="robin__hash_8h_source.html">robin_hash.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a944f3d6586df830e46f1ff9d00b620e1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1mod__growth__policy__rh.html#a944f3d6586df830e46f1ff9d00b620e1">mod_growth_policy_rh</a> (std::size_t &amp;min_bucket_count_in_out)</td></tr>
 <tr class="separator:a944f3d6586df830e46f1ff9d00b620e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3966217cd30eac2f585475037e03706"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1mod__growth__policy__rh.html#ad3966217cd30eac2f585475037e03706">bucket_for_hash</a> (std::size_t hash) const</td></tr>
-<tr class="separator:ad3966217cd30eac2f585475037e03706"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb21fba9ade511b2f66eb0f84e8fd09b"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1mod__growth__policy__rh.html#adb21fba9ade511b2f66eb0f84e8fd09b">bucket_for_hash</a> (std::size_t hash) const noexcept</td></tr>
+<tr class="separator:adb21fba9ade511b2f66eb0f84e8fd09b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47b70da7d3872873fae2553c1123fbc3"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1mod__growth__policy__rh.html#a47b70da7d3872873fae2553c1123fbc3">next_bucket_count</a> () const</td></tr>
 <tr class="separator:a47b70da7d3872873fae2553c1123fbc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af45fca16093fb435788b9418ab567354"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1mod__growth__policy__rh.html#af45fca16093fb435788b9418ab567354">max_bucket_count</a> () const</td></tr>
@@ -66,7 +66,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><h3>template&lt;class GrowthFactor = std::ratio&lt;3, 2&gt;&gt;<br />
 class tsl::mod_growth_policy_rh&lt; GrowthFactor &gt;</h3>
 
-<p>Grow the map by GrowthFactor::num/GrowthFactor::den and use a modulo to map a hash to a bucket. Slower but it can be usefull if you want a slower growth. </p>
+<p>Grow the hash table by GrowthFactor::num / GrowthFactor::den and use a modulo to map a hash to a bucket. Slower but it can be usefull if you want a slower growth. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a944f3d6586df830e46f1ff9d00b620e1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a944f3d6586df830e46f1ff9d00b620e1">&#9670;&nbsp;</a></span>mod_growth_policy_rh()</h2>
@@ -97,8 +97,8 @@ template&lt;class GrowthFactor  = std::ratio&lt;3, 2&gt;&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ad3966217cd30eac2f585475037e03706"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3966217cd30eac2f585475037e03706">&#9670;&nbsp;</a></span>bucket_for_hash()</h2>
+<a id="adb21fba9ade511b2f66eb0f84e8fd09b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb21fba9ade511b2f66eb0f84e8fd09b">&#9670;&nbsp;</a></span>bucket_for_hash()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -118,7 +118,7 @@ template&lt;class GrowthFactor  = std::ratio&lt;3, 2&gt;&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -180,7 +180,7 @@ template&lt;class GrowthFactor  = std::ratio&lt;3, 2&gt;&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>tsl/<a class="el" href="robin__hash_8h_source.html">robin_hash.h</a></li>
+<li>tsl/<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

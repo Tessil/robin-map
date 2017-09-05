@@ -51,14 +51,14 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="robin__hash_8h_source.html">robin_hash.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a6597141fd1be148384e1117f25c03aa0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html#a6597141fd1be148384e1117f25c03aa0">power_of_two_growth_policy_rh</a> (std::size_t &amp;min_bucket_count_in_out)</td></tr>
 <tr class="separator:a6597141fd1be148384e1117f25c03aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6a7df66588bf7788d7b0a019db41f53"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html#aa6a7df66588bf7788d7b0a019db41f53">bucket_for_hash</a> (std::size_t hash) const</td></tr>
-<tr class="separator:aa6a7df66588bf7788d7b0a019db41f53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad47b087e66c712046ef5416b81c95ca1"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html#ad47b087e66c712046ef5416b81c95ca1">bucket_for_hash</a> (std::size_t hash) const noexcept</td></tr>
+<tr class="separator:ad47b087e66c712046ef5416b81c95ca1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c549394e9c1f36c12a419286eab48b3"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html#a9c549394e9c1f36c12a419286eab48b3">next_bucket_count</a> () const</td></tr>
 <tr class="separator:a9c549394e9c1f36c12a419286eab48b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bceb5fd556949bcad53bc34f995e048"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html#a0bceb5fd556949bcad53bc34f995e048">max_bucket_count</a> () const</td></tr>
@@ -78,7 +78,7 @@ Static Protected Attributes</h2></td></tr>
 <div class="textblock"><h3>template&lt;std::size_t GrowthFactor&gt;<br />
 class tsl::power_of_two_growth_policy_rh&lt; GrowthFactor &gt;</h3>
 
-<p>Grow the map by a multiple of two keeping bucket_count to a power of two. It allows the map to use a mask operation instead of a modulo operation to map a hash to a bucket.</p>
+<p>Grow the hash table by a factor of GrowthFactor keeping the bucket count to a power of two. It allows the table to use a mask operation instead of a modulo operation to map a hash to a bucket.</p>
 <p>GrowthFactor must be a power of two &gt;= 2. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a6597141fd1be148384e1117f25c03aa0"></a>
@@ -106,13 +106,13 @@ template&lt;std::size_t GrowthFactor&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Called on map creation and rehash. The number of buckets requested is passed by parameter. This number is a minimum, the policy may update this value with a higher value if needed. </p>
+<p>Called on the hash table creation and on rehash. The number of buckets for the table is passed in parameter. This number is a minimum, the policy may update this value with a higher value if needed (but not lower). </p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aa6a7df66588bf7788d7b0a019db41f53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6a7df66588bf7788d7b0a019db41f53">&#9670;&nbsp;</a></span>bucket_for_hash()</h2>
+<a id="ad47b087e66c712046ef5416b81c95ca1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad47b087e66c712046ef5416b81c95ca1">&#9670;&nbsp;</a></span>bucket_for_hash()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -132,7 +132,7 @@ template&lt;std::size_t GrowthFactor&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -192,7 +192,7 @@ template&lt;std::size_t GrowthFactor&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Return the bucket count to uses when the bucket array grows on rehash. </p>
+<p>Return the bucket count to use when the bucket array grows on rehash. </p>
 
 </div>
 </div>
@@ -246,7 +246,7 @@ template&lt;std::size_t GrowthFactor&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>tsl/<a class="el" href="robin__hash_8h_source.html">robin_hash.h</a></li>
+<li>tsl/<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

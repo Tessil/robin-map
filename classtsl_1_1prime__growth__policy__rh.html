@@ -49,21 +49,21 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="robin__hash_8h_source.html">robin_hash.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a3b3302550251fc923215823822675e70"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1prime__growth__policy__rh.html#a3b3302550251fc923215823822675e70">prime_growth_policy_rh</a> (std::size_t &amp;min_bucket_count_in_out)</td></tr>
 <tr class="separator:a3b3302550251fc923215823822675e70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a724b4bfb98e9d9dc9a542a7ee329fd5e"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1prime__growth__policy__rh.html#a724b4bfb98e9d9dc9a542a7ee329fd5e">bucket_for_hash</a> (std::size_t hash) const</td></tr>
-<tr class="separator:a724b4bfb98e9d9dc9a542a7ee329fd5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad34576e5e8c89cd855dfdab532608fce"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1prime__growth__policy__rh.html#ad34576e5e8c89cd855dfdab532608fce">bucket_for_hash</a> (std::size_t hash) const noexcept</td></tr>
+<tr class="separator:ad34576e5e8c89cd855dfdab532608fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1867fc2a32831b1a90914d2f4dbeaf1"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1prime__growth__policy__rh.html#ac1867fc2a32831b1a90914d2f4dbeaf1">next_bucket_count</a> () const</td></tr>
 <tr class="separator:ac1867fc2a32831b1a90914d2f4dbeaf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0f16f8fa8a97d74b4f03ebee30bc9c9"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1prime__growth__policy__rh.html#aa0f16f8fa8a97d74b4f03ebee30bc9c9">max_bucket_count</a> () const</td></tr>
 <tr class="separator:aa0f16f8fa8a97d74b4f03ebee30bc9c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Grow the map by using prime numbers as size. Slower than <a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html">tsl::power_of_two_growth_policy_rh</a> in general but will probably distribute the values around better in the buckets with a poor hash function.</p>
+<div class="textblock"><p>Grow the hash table by using prime numbers as bucket count. Slower than <a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html">tsl::power_of_two_growth_policy_rh</a> in general but will probably distribute the values around better in the buckets with a poor hash function.</p>
 <p>To allow the compiler to optimize the modulo operation, a lookup table is used with constant primes numbers.</p>
 <p>With a switch the code would look like: </p><div class="fragment"><div class="line"><span class="keywordflow">switch</span>(iprime) { <span class="comment">// iprime is the current prime of the hash table</span></div><div class="line">    <span class="keywordflow">case</span> 0: hash % 5ul;</div><div class="line">            <span class="keywordflow">break</span>;</div><div class="line">    <span class="keywordflow">case</span> 1: hash % 17ul;</div><div class="line">            <span class="keywordflow">break</span>;</div><div class="line">    <span class="keywordflow">case</span> 2: hash % 29ul;</div><div class="line">            <span class="keywordflow">break</span>;</div><div class="line">    ...</div><div class="line">}    </div></div><!-- fragment --><p>Due to the constant variable in the modulo the compiler is able to optimize the operation by a series of multiplications, substractions and shifts.</p>
 <p>The 'hash % 5' could become something like 'hash - (hash * 0xCCCCCCCD) &gt;&gt; 34) * 5' in a 64 bits environement. </p>
@@ -95,8 +95,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a724b4bfb98e9d9dc9a542a7ee329fd5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a724b4bfb98e9d9dc9a542a7ee329fd5e">&#9670;&nbsp;</a></span>bucket_for_hash()</h2>
+<a id="ad34576e5e8c89cd855dfdab532608fce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad34576e5e8c89cd855dfdab532608fce">&#9670;&nbsp;</a></span>bucket_for_hash()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -114,7 +114,7 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -172,7 +172,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>tsl/<a class="el" href="robin__hash_8h_source.html">robin_hash.h</a></li>
+<li>tsl/<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
