@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <array>
+#include <climits>
 #include <cmath>
 #include <cstddef>
 #include <iterator>
@@ -66,7 +67,7 @@ public:
     /**
      * Return the bucket [0, bucket_count()) to which the hash belongs.
      */
-    std::size_t bucket_for_hash(std::size_t hash) const {
+    std::size_t bucket_for_hash(std::size_t hash) const noexcept {
         return hash & m_mask;
     }
     
@@ -137,7 +138,7 @@ public:
         m_bucket_count = min_bucket_count_in_out;
     }
     
-    std::size_t bucket_for_hash(std::size_t hash) const {
+    std::size_t bucket_for_hash(std::size_t hash) const noexcept {
         return hash % m_bucket_count;
     }
     
@@ -238,7 +239,7 @@ public:
         min_bucket_count_in_out = *it_prime;
     }
     
-    std::size_t bucket_for_hash(std::size_t hash) const {
+    std::size_t bucket_for_hash(std::size_t hash) const noexcept {
         return tsl::detail_robin_hash::MOD_PRIME[m_iprime](hash);
     }
     

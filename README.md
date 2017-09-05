@@ -55,7 +55,7 @@ struct custom_policy {
     custom_policy(std::size_t& min_bucket_count_in_out);
     
     // Return the bucket for the corresponding hash
-    std::size_t bucket_for_hash(std::size_t hash) const;
+    std::size_t bucket_for_hash(std::size_t hash) const noexcept;
     
     // Return the number of buckets that should be used on next growth
     std::size_t next_bucket_count() const;
