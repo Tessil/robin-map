@@ -41,30 +41,30 @@ namespace tsl {
  * Implementation of a hash map using open-adressing and the robin hood hashing algorithm with backward shift deletion.
  * 
  * For operations modifying the hash map (insert, erase, rehash, ...), the strong exception guarantee 
- * is only guaranteed when the expression 'std::is_nothrow_swappable<std::pair<Key, T>>::value &&
- * std::is_nothrow_move_constructible<std::pair<Key, T>>::value' is true, otherwise if an exception
+ * is only guaranteed when the expression `std::is_nothrow_swappable<std::pair<Key, T>>::value &&
+ * std::is_nothrow_move_constructible<std::pair<Key, T>>::value` is true, otherwise if an exception
  * is thrown during the swap or the move, the hash map may end up in a undefined state. Per the standard
- * a Key or T with a noexcept copy constructor and no move constructor also satisfies the 
- * 'std::is_nothrow_move_constructible<std::pair<Key, T>>::value' criterion (and will thus guarantee the 
+ * a `Key` or `T` with a noexcept copy constructor and no move constructor also satisfies the 
+ * `std::is_nothrow_move_constructible<std::pair<Key, T>>::value` criterion (and will thus guarantee the 
  * strong exception for the map).
  * 
- * When StoreHash is true, 32 bits of the hash are stored alongside the values. It can improve 
- * the performance during lookups if the KeyEqual function takes time (or engenders a cache-miss for example) 
- * as we then compare the stored hashes before comparing the keys. When tsl::power_of_two_growth_policy_rh is used
- * as GrowthPolicy, it may also speed-up the rehash process as we can avoid to recalculate the hash. 
+ * When `StoreHash` is true, 32 bits of the hash are stored alongside the values. It can improve 
+ * the performance during lookups if the `KeyEqual` function takes time (if it engenders a cache-miss for example) 
+ * as we then compare the stored hashes before comparing the keys. When `tsl::power_of_two_growth_policy_rh` is used
+ * as `GrowthPolicy`, it may also speed-up the rehash process as we can avoid to recalculate the hash. 
  * When it is detected that storing the hash will not incur any memory penality due to alignement (i.e. 
- * sizeof(tsl::detail_robin_hash::bucket_entry<ValueType, true>) == 
- * sizeof(tsl::detail_robin_hash::bucket_entry<ValueType, false>)) and tsl::power_of_two_growth_policy_rh is
- * used, the hash will be stored even if StoreHash is false so that we can speed-up the rehash (but it will
- * not be used on lookups unless StoreHash is true).
+ * `sizeof(tsl::detail_robin_hash::bucket_entry<ValueType, true>) == 
+ * sizeof(tsl::detail_robin_hash::bucket_entry<ValueType, false>)`) and `tsl::power_of_two_growth_policy_rh` is
+ * used, the hash will be stored even if `StoreHash` is false so that we can speed-up the rehash (but it will
+ * not be used on lookups unless `StoreHash` is true).
  * 
- * GrowthPolicy defines how the map grows and consequently how a hash value is mapped to a bucket. 
- * By default the map uses tsl::power_of_two_growth_policy_rh. This policy keeps the number of buckets 
+ * `GrowthPolicy` defines how the map grows and consequently how a hash value is mapped to a bucket. 
+ * By default the map uses `tsl::power_of_two_growth_policy_rh`. This policy keeps the number of buckets 
  * to a power of two and uses a mask to map the hash to a bucket instead of the slow modulo.
  * Other growth policies are available and you may define your own growth policy, 
- * check tsl::power_of_two_growth_policy_rh for the interface.
+ * check `tsl::power_of_two_growth_policy_rh` for the interface.
  * 
- * If the destructor of Key or T throws an exception, the behaviour of the class is undefined.
+ * If the destructor of `Key` or `T` throws an exception, the behaviour of the class is undefined.
  * 
  * Iterators invalidation:
  *  - clear, operator=, reserve, rehash: always invalidate the iterators.
@@ -653,7 +653,7 @@ private:
 
 
 /**
- * Same as tsl::robin_map<Key, T, Hash, KeyEqual, Allocator, StoreHash, tsl::prime_growth_policy_rh>.
+ * Same as `tsl::robin_map<Key, T, Hash, KeyEqual, Allocator, StoreHash, tsl::prime_growth_policy_rh>`.
  */
 template<class Key, 
          class T, 
