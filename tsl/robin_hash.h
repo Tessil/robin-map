@@ -82,6 +82,9 @@ struct is_power_of_two_policy<tsl::power_of_two_growth_policy_rh<GrowthFactor>>:
 
 using truncated_hash_type = std::uint_least32_t;
 
+/**
+ * Helper class that store a truncated hash if StoreHash is true and nothing otherwise.
+ */
 template<bool StoreHash>
 class bucket_entry_hash {
 public:
@@ -120,8 +123,20 @@ private:
 
 
 /**
- * dist_from_init_bucket() is >= 0 iff the bucket_entry is not empty.
- * If the bucket_entry is empty, dist_from_init_bucket() is < 0.
+ * Each bucket entry has:
+ * - A value of type `ValueType`.
+ * - An integer to store how far the value of the bucket, if any, is from its ideal bucket 
+ *   (ex: if the current bucket 5 has the value 'foo' and `hash('foo') % nb_buckets` == 3,
+ *        `dist_from_ideal_bucket()` will return 2 as the current value of the bucket is two
+ *        buckets away from its ideal bucket)
+ *   If there is no value in the bucket (i.e. `empty()` is true) `dist_from_ideal_bucket()` will be < 0.
+ * - A marker which tells us if the bucket is the last bucket of the bucket array (useful for the 
+ *   iterator of the hash table).
+ * - If `StoreHash` is true, 32 bits of the hash of the value, if any, are also stored in the bucket. 
+ *   If the size of the hash is more than 32 bits, it is truncated. We don't store the full hash
+ *   as storing the hash is a potential opportunity to use the unused space due to the alignement
+ *   of the bucket_entry structure. We can thus potentially store the hash without any extra space 
+ *   (which would not be possible with 64 bits of the hash).
  */
 template<typename ValueType, bool StoreHash>
 class bucket_entry: public bucket_entry_hash<StoreHash> {
@@ -149,6 +164,10 @@ public:
         }
     }
     
+    /**
+     * Never really used, but still necessary as we must call resize on an empty `std::vector<bucket_entry>`.
+     * and we need to support move-only types. See robin_hash constructor for details.
+     */
     bucket_entry(bucket_entry&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value): 
             bucket_hash(std::move(other)),
             m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET), 
@@ -272,19 +291,20 @@ private:
 
 
 /**
- * Internal common class used by robin_map and robin_set. 
+ * Internal common class used by `robin_map` and `robin_set`. 
  * 
- * ValueType is what will be stored by robin_hash (usually std::pair<Key, T> for map and Key for set).
+ * ValueType is what will be stored by `robin_hash` (usually `std::pair<Key, T>` for map and `Key` for set).
  * 
- * KeySelect should be a FunctionObject which takes a ValueType in parameter and returns a reference to the key.
+ * `KeySelect` should be a `FunctionObject` which takes a `ValueType` in parameter and returns a 
+ *  reference to the key.
  * 
- * ValueSelect should be a FunctionObject which takes a ValueType in parameter and returns a reference to the value.
- * ValueSelect should be void if there is no value (in a set for example).
+ * `ValueSelect` should be a `FunctionObject` which takes a `ValueType` in parameter and returns a 
+ *  reference to the value. `ValueSelect` should be void if there is no value (in a set for example).
  * 
  * The strong exception guarantee only holds if the expression 
- * 'std::is_nothrow_swappable<ValueType>::value && std::is_nothrow_move_constructible<ValueType>::value' is true.
+ * `std::is_nothrow_swappable<ValueType>::value && std::is_nothrow_move_constructible<ValueType>::value` is true.
  * 
- * Behaviour is undefined if the destructor of ValueType throws.
+ * Behaviour is undefined if the destructor of `ValueType` throws.
  */
 template<class ValueType,
          class KeySelect,
@@ -321,9 +341,8 @@ public:
     
 private:
     /**
-     * Either store hash because we are asked by the StoreHash template parameter
-     * or store the hash because it doesn't cost us anything in size
-     * and can be used to speed up rehash.
+     * Either store the hash because we are asked by the `StoreHash` template parameter
+     * or store the hash because it doesn't cost us anything in size and can be used to speed up rehash.
      */
     static constexpr bool STORE_HASH = StoreHash || 
                                        (
@@ -482,8 +501,14 @@ public:
             throw std::length_error("The map exceeds its maxmimum size.");
         }
         
-        // Can't directly construct with the appropriate size in the initializer 
-        // as m_buckets(bucket_count, alloc) is not supported by GCC 4.8
+        /*
+         * We can't use the `vector(size_type count, const Allocator& alloc)` constructor
+         * as it's only available in C++14 and we need to support C++11. We thus must resize after using
+         * the `vector(const Allocator& alloc)` constructor.
+         * 
+         * We can't use `vector(size_type count, const T& value, const Allocator& alloc)` as it requires the
+         * value T to be copyable.
+         */
         m_buckets.resize(m_bucket_count);
         
         tsl_assert(!m_buckets.empty());
@@ -679,7 +704,10 @@ public:
         return try_emplace(std::forward<K>(key), std::forward<Args>(args)...).first;
     }
     
-    
+    /**
+     * Here to avoid `template<class K> size_type erase(const K& key)` being used when
+     * we use a iterator instead of a const_iterator.
+     */
     iterator erase(iterator pos) {
         erase_from_bucket(pos);
         
@@ -961,6 +989,12 @@ private:
         pos.m_iterator->clear();
         m_nb_elements--;
         
+        /**
+         * Backward shift, swap the empty bucket, previous_ibucket, with the values on its right, ibucket,
+         * until we cross another empty bucket or if the other bucket has a distance_from_ideal_bucket == 0.
+         * 
+         * We try to move the values closer to their ideal bucket.
+         */
         std::size_t previous_ibucket = std::size_t(std::distance(m_buckets.begin(), pos.m_iterator));
         std::size_t ibucket = next_bucket(previous_ibucket);
         

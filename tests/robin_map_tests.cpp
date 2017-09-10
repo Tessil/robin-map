@@ -497,8 +497,8 @@ BOOST_AUTO_TEST_CASE(test_modify_value) {
     const std::size_t nb_values = 100;
     auto map = utils::get_filled_hash_map<tsl::robin_map<std::int64_t, std::int64_t>>(nb_values);
     
-    for(auto it = map.begin(); it != map.end(); ++it) {
-        if(it->first % 2 == 0) {
+    for(auto it = map.begin(); it != map.end(); it++) {
+        if(it.key() % 2 == 0) {
             it.value() = -1;
         }
     }
