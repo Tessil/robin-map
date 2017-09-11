@@ -9,6 +9,7 @@ Four classes are provided: `tsl::robin_map`, `tsl::robin_set`, `tsl::robin_pg_ma
 A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html). This page also gives some advices on which hash table structure you should try for your use case (useful if you are a bit lost with the multiple hash tables implementations in the `tsl` namespace).
 
 ### Key features
+
 - Header-only library, just include the project to your include path and you are ready to go.
 - Fast hash table, see the [benchmark](https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html) for some numbers.
 - Support for move-only and non-default constructible key/value.
@@ -19,6 +20,7 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 - API closely similar to `std::unordered_map` and `std::unordered_set`.
 
 ### Differences compare to `std::unordered_map`
+
 `tsl::robin_map` tries to have an interface similar to `std::unordered_map`, but some differences exist.
 - The **strong exception guarantee only holds** if the following statement is true `std::is_nothrow_swappable<value_type>::value && std::is_nothrow_move_constructible<value_type>::value` (where `value_type` is `Key` for `tsl::robin_set` and `std::pair<Key, T>` for `tsl::robin_map`). Otherwise if an exception is thrown during the swap or the move, the structure may end up in a undefined state. Note that per the standard, a `value_type` with a noexcept copy constructor and no move constructor also satisfies this condition and will thus guarantee the strong exception guarantee for the structure (see [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) for details).
 - Iterator invalidation doesn't behave in the same way, any operation modifying the hash table invalidate them (see [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) for details).
@@ -66,6 +68,7 @@ struct custom_policy {
 ```
 
 ### Installation
+
 To use robin-map, just add the project to your include path. It is a **header-only** library.
 
 The code should work with any C++11 standard-compliant compiler and has been tested with GCC 4.8.4, Clang 3.5.0 and Visual Studio 2015.
@@ -83,12 +86,14 @@ make
 ```
 
 ### Usage
+
 The API can be found [here](https://tessil.github.io/robin-map/). 
 
 All methods are not documented yet, but they replicate the behavior of the ones in `std::unordered_map` and `std::unordered_set`, except if specified otherwise.
 
 
 ### Example
+
 ```c++
 #include <cstdint>
 #include <iostream>
