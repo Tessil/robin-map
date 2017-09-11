@@ -242,12 +242,12 @@ Static Public Attributes</h2></td></tr>
 <div class="textblock"><h3>template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt;<br />
 class tsl::detail_robin_hash::robin_hash&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;</h3>
 
-<p>Internal common class used by <a class="el" href="classtsl_1_1robin__map.html">robin_map</a> and <a class="el" href="classtsl_1_1robin__set.html">robin_set</a>.</p>
-<p>ValueType is what will be stored by <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">robin_hash</a> (usually std::pair&lt;Key, T&gt; for map and Key for set).</p>
-<p>KeySelect should be a FunctionObject which takes a ValueType in parameter and returns a reference to the key.</p>
-<p>ValueSelect should be a FunctionObject which takes a ValueType in parameter and returns a reference to the value. ValueSelect should be void if there is no value (in a set for example).</p>
-<p>The strong exception guarantee only holds if the expression 'std::is_nothrow_swappable&lt;ValueType&gt;::value &amp;&amp; std::is_nothrow_move_constructible&lt;ValueType&gt;::value' is true.</p>
-<p>Behaviour is undefined if the destructor of ValueType throws. </p>
+<p>Internal common class used by <code><a class="el" href="classtsl_1_1robin__map.html">robin_map</a></code> and <code><a class="el" href="classtsl_1_1robin__set.html">robin_set</a></code>.</p>
+<p>ValueType is what will be stored by <code><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">robin_hash</a></code> (usually <code>std::pair&lt;Key, T&gt;</code> for map and <code>Key</code> for set).</p>
+<p><code>KeySelect</code> should be a <code>FunctionObject</code> which takes a <code>ValueType</code> in parameter and returns a reference to the key.</p>
+<p><code>ValueSelect</code> should be a <code>FunctionObject</code> which takes a <code>ValueType</code> in parameter and returns a reference to the value. <code>ValueSelect</code> should be void if there is no value (in a set for example).</p>
+<p>The strong exception guarantee only holds if the expression <code>std::is_nothrow_swappable&lt;ValueType&gt;::value &amp;&amp; std::is_nothrow_move_constructible&lt;ValueType&gt;::value</code> is true.</p>
+<p>Behaviour is undefined if the destructor of <code>ValueType</code> throws. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aeda2cef10fe15ff7953e6aa0433ada6a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeda2cef10fe15ff7953e6aa0433ada6a">&#9670;&nbsp;</a></span>allocator_type</h2>
@@ -1259,6 +1259,7 @@ template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, cla
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Here to avoid <code>template&lt;class K&gt; size_type <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#aba55625f7cec2f0a0ac3b2a5a203553f">erase(const K&amp; key)</a></code> being used when we use a iterator instead of a const_iterator. </p>
 <p>Erase bucket used a backward shift after clearing the bucket. Check if there is a new value in the bucket, if not get the next non-empty.</p>
 
 </div>

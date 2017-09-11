@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>robin-map: tsl::detail_robin_hash::robin_hash&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::robin_iterator&lt; is_const &gt; Class Template Reference</title>
+<title>robin-map: tsl::detail_robin_hash::robin_hash&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::robin_iterator&lt; IsConst &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -44,11 +44,10 @@ $(function() {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">tsl::detail_robin_hash::robin_hash&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::robin_iterator&lt; is_const &gt; Class Template Reference</div>  </div>
+<div class="title">tsl::detail_robin_hash::robin_hash&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::robin_iterator&lt; IsConst &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -56,44 +55,39 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a67d24e3e23feeeaba8c0bde928542ffa"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a67d24e3e23feeeaba8c0bde928542ffa">iterator_category</a> = std::forward_iterator_tag</td></tr>
-<tr class="separator:a67d24e3e23feeeaba8c0bde928542ffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54525f21d3f6a2a5688e6de0bd2b946f"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a54525f21d3f6a2a5688e6de0bd2b946f">value_type</a> = const typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a7040c9dfa801bb5b4e8c0333a8df43f0">robin_hash::value_type</a></td></tr>
-<tr class="separator:a54525f21d3f6a2a5688e6de0bd2b946f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9732b0176693dcfe7f9018e22cdaa624"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a9732b0176693dcfe7f9018e22cdaa624">difference_type</a> = std::ptrdiff_t</td></tr>
-<tr class="separator:a9732b0176693dcfe7f9018e22cdaa624"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2bd5cb3db9c7efee0a983f1680c0b80"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#ab2bd5cb3db9c7efee0a983f1680c0b80">reference</a> = <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a54525f21d3f6a2a5688e6de0bd2b946f">value_type</a> &amp;</td></tr>
-<tr class="separator:ab2bd5cb3db9c7efee0a983f1680c0b80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abea5f65b68c81c161ff20309f9682832"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#abea5f65b68c81c161ff20309f9682832">pointer</a> = <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a54525f21d3f6a2a5688e6de0bd2b946f">value_type</a> *</td></tr>
-<tr class="separator:abea5f65b68c81c161ff20309f9682832"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9da421ec9a856cd89fc69541c7a2393d"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a9da421ec9a856cd89fc69541c7a2393d">iterator_category</a> = std::forward_iterator_tag</td></tr>
+<tr class="separator:a9da421ec9a856cd89fc69541c7a2393d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6060ff62e056e8c5a1b2e2a355f135b9"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a6060ff62e056e8c5a1b2e2a355f135b9">value_type</a> = const typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a7040c9dfa801bb5b4e8c0333a8df43f0">robin_hash::value_type</a></td></tr>
+<tr class="separator:a6060ff62e056e8c5a1b2e2a355f135b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfec9c200a64d8cd148b00013c678045"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#abfec9c200a64d8cd148b00013c678045">difference_type</a> = std::ptrdiff_t</td></tr>
+<tr class="separator:abfec9c200a64d8cd148b00013c678045"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a316d2ecc600f2e7a971f634ffd9746d0"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a316d2ecc600f2e7a971f634ffd9746d0">reference</a> = <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a6060ff62e056e8c5a1b2e2a355f135b9">value_type</a> &amp;</td></tr>
+<tr class="separator:a316d2ecc600f2e7a971f634ffd9746d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf5aea911258759be15de8dacee57bab"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#adf5aea911258759be15de8dacee57bab">pointer</a> = <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a6060ff62e056e8c5a1b2e2a355f135b9">value_type</a> *</td></tr>
+<tr class="separator:adf5aea911258759be15de8dacee57bab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a64b717d49de64ef9e5e08a54d56c0c33"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a64b717d49de64ef9e5e08a54d56c0c33">robin_iterator</a> () noexcept</td></tr>
-<tr class="separator:a64b717d49de64ef9e5e08a54d56c0c33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ac4ac6171af943c90ae50ca681732f4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a4ac4ac6171af943c90ae50ca681732f4">robin_iterator</a> (const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; false &gt; &amp;other) noexcept</td></tr>
-<tr class="separator:a4ac4ac6171af943c90ae50ca681732f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16c861d511c4f1272af5bc70d48ee157"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a283312016dcb08dd7e64bfebb94a284b">robin_hash::key_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a16c861d511c4f1272af5bc70d48ee157">key</a> () const</td></tr>
-<tr class="separator:a16c861d511c4f1272af5bc70d48ee157"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9deb8e62ddf938b475c1f0eefbfcb5f"><td class="memTemplParams" colspan="2">template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&lt; U &gt;::value &amp;&amp;is_const &gt;::type *  = nullptr&gt; </td></tr>
-<tr class="memitem:ab9deb8e62ddf938b475c1f0eefbfcb5f"><td class="memTemplItemLeft" align="right" valign="top">const U::value_type &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#ab9deb8e62ddf938b475c1f0eefbfcb5f">value</a> () const</td></tr>
-<tr class="separator:ab9deb8e62ddf938b475c1f0eefbfcb5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9814359030e3373828b6d267ee229e38"><td class="memTemplParams" colspan="2">template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&lt; U &gt;::value &amp;&amp;!is_const &gt;::type *  = nullptr&gt; </td></tr>
-<tr class="memitem:a9814359030e3373828b6d267ee229e38"><td class="memTemplItemLeft" align="right" valign="top">U::value_type &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a9814359030e3373828b6d267ee229e38">value</a> ()</td></tr>
-<tr class="separator:a9814359030e3373828b6d267ee229e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45ef0ea3fbf76ab9589739c65389f8a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#ab2bd5cb3db9c7efee0a983f1680c0b80">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a45ef0ea3fbf76ab9589739c65389f8a8">operator*</a> () const</td></tr>
-<tr class="separator:a45ef0ea3fbf76ab9589739c65389f8a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee64d51545dca8df5ad6c3f2c90b9b4f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#abea5f65b68c81c161ff20309f9682832">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#aee64d51545dca8df5ad6c3f2c90b9b4f">operator-&gt;</a> () const</td></tr>
-<tr class="separator:aee64d51545dca8df5ad6c3f2c90b9b4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe8131a4c43f8378355402e1e29cf92c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#afe8131a4c43f8378355402e1e29cf92c">operator++</a> ()</td></tr>
-<tr class="separator:afe8131a4c43f8378355402e1e29cf92c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9adb243d36593b274a13e332637f9a49"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a9adb243d36593b274a13e332637f9a49">operator++</a> (int)</td></tr>
-<tr class="separator:a9adb243d36593b274a13e332637f9a49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:abeb1b43598d6655d4fcdbc9abdcf925f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a7040c9dfa801bb5b4e8c0333a8df43f0">robin_hash::value_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#abeb1b43598d6655d4fcdbc9abdcf925f">key_value_ref</a> () noexcept</td></tr>
-<tr class="separator:abeb1b43598d6655d4fcdbc9abdcf925f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a862a0a45e286de338c07e0984a46c132"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a862a0a45e286de338c07e0984a46c132">robin_iterator</a> () noexcept</td></tr>
+<tr class="separator:a862a0a45e286de338c07e0984a46c132"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1b214e88638f03f36e0debbe0048629"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#ad1b214e88638f03f36e0debbe0048629">robin_iterator</a> (const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; false &gt; &amp;other) noexcept</td></tr>
+<tr class="separator:ad1b214e88638f03f36e0debbe0048629"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8258d1ca5b1a039991ed591208a8e1cc"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a283312016dcb08dd7e64bfebb94a284b">robin_hash::key_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a8258d1ca5b1a039991ed591208a8e1cc">key</a> () const</td></tr>
+<tr class="separator:a8258d1ca5b1a039991ed591208a8e1cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84a31899b7ab0c15d636ae42ee14b41f"><td class="memTemplParams" colspan="2">template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&lt; U &gt;::value &amp;&amp;IsConst &gt;::type *  = nullptr&gt; </td></tr>
+<tr class="memitem:a84a31899b7ab0c15d636ae42ee14b41f"><td class="memTemplItemLeft" align="right" valign="top">const U::value_type &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a84a31899b7ab0c15d636ae42ee14b41f">value</a> () const</td></tr>
+<tr class="separator:a84a31899b7ab0c15d636ae42ee14b41f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49b29f615bd8a152005b8c404febb1d7"><td class="memTemplParams" colspan="2">template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&lt; U &gt;::value &amp;&amp;!IsConst &gt;::type *  = nullptr&gt; </td></tr>
+<tr class="memitem:a49b29f615bd8a152005b8c404febb1d7"><td class="memTemplItemLeft" align="right" valign="top">U::value_type &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a49b29f615bd8a152005b8c404febb1d7">value</a> ()</td></tr>
+<tr class="separator:a49b29f615bd8a152005b8c404febb1d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cca763bd956955cf69677cf21798a48"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a316d2ecc600f2e7a971f634ffd9746d0">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a1cca763bd956955cf69677cf21798a48">operator*</a> () const</td></tr>
+<tr class="separator:a1cca763bd956955cf69677cf21798a48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee4b23b321f08602ebc67d881f147a6c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#adf5aea911258759be15de8dacee57bab">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#aee4b23b321f08602ebc67d881f147a6c">operator-&gt;</a> () const</td></tr>
+<tr class="separator:aee4b23b321f08602ebc67d881f147a6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd5ad8d7a40b9c0121c649ec272930a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#acd5ad8d7a40b9c0121c649ec272930a7">operator++</a> ()</td></tr>
+<tr class="separator:acd5ad8d7a40b9c0121c649ec272930a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b75d06ce894ce951b8469fc72f534e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a3b75d06ce894ce951b8469fc72f534e2">operator++</a> (int)</td></tr>
+<tr class="separator:a3b75d06ce894ce951b8469fc72f534e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -104,91 +98,99 @@ Friends</h2></td></tr>
 <tr class="memitem:a89ed5c170efa7bfdc6d6af412198361f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a89ed5c170efa7bfdc6d6af412198361f">operator!=</a> (const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> &amp;lhs, const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> &amp;rhs)</td></tr>
 <tr class="separator:a89ed5c170efa7bfdc6d6af412198361f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a9732b0176693dcfe7f9018e22cdaa624"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9732b0176693dcfe7f9018e22cdaa624">&#9670;&nbsp;</a></span>difference_type</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt;<br />
+template&lt;bool IsConst&gt;<br />
+class tsl::detail_robin_hash::robin_hash&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::robin_iterator&lt; IsConst &gt;</h3>
+
+<p>The '<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a1cca763bd956955cf69677cf21798a48">operator*()</a>' and '<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#aee4b23b321f08602ebc67d881f147a6c">operator-&gt;()</a>' methods return a const reference and const pointer respectively to the stored value type.</p>
+<p>In case of a map, to get a mutable reference to the value associated to a key (the '.second' in the stored pair), you have to call '<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a49b29f615bd8a152005b8c404febb1d7">value()</a>'.</p>
+<p>The main reason for this is that if we returned a <code>std::pair&lt;Key, T&gt;&amp;</code> instead of a <code>const std::pair&lt;Key, T&gt;&amp;</code>, the user may modify the key which will put the map in a undefined state. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="abfec9c200a64d8cd148b00013c678045"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfec9c200a64d8cd148b00013c678045">&#9670;&nbsp;</a></span>difference_type</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a9732b0176693dcfe7f9018e22cdaa624">difference_type</a> =  std::ptrdiff_t</td>
+          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#abfec9c200a64d8cd148b00013c678045">difference_type</a> =  std::ptrdiff_t</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a67d24e3e23feeeaba8c0bde928542ffa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a67d24e3e23feeeaba8c0bde928542ffa">&#9670;&nbsp;</a></span>iterator_category</h2>
+<a id="a9da421ec9a856cd89fc69541c7a2393d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9da421ec9a856cd89fc69541c7a2393d">&#9670;&nbsp;</a></span>iterator_category</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a67d24e3e23feeeaba8c0bde928542ffa">iterator_category</a> =  std::forward_iterator_tag</td>
+          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a9da421ec9a856cd89fc69541c7a2393d">iterator_category</a> =  std::forward_iterator_tag</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="abea5f65b68c81c161ff20309f9682832"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abea5f65b68c81c161ff20309f9682832">&#9670;&nbsp;</a></span>pointer</h2>
+<a id="adf5aea911258759be15de8dacee57bab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf5aea911258759be15de8dacee57bab">&#9670;&nbsp;</a></span>pointer</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#abea5f65b68c81c161ff20309f9682832">pointer</a> =  <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a54525f21d3f6a2a5688e6de0bd2b946f">value_type</a>*</td>
+          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#adf5aea911258759be15de8dacee57bab">pointer</a> =  <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a6060ff62e056e8c5a1b2e2a355f135b9">value_type</a>*</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="ab2bd5cb3db9c7efee0a983f1680c0b80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab2bd5cb3db9c7efee0a983f1680c0b80">&#9670;&nbsp;</a></span>reference</h2>
+<a id="a316d2ecc600f2e7a971f634ffd9746d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a316d2ecc600f2e7a971f634ffd9746d0">&#9670;&nbsp;</a></span>reference</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#ab2bd5cb3db9c7efee0a983f1680c0b80">reference</a> =  <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a54525f21d3f6a2a5688e6de0bd2b946f">value_type</a>&amp;</td>
+          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a316d2ecc600f2e7a971f634ffd9746d0">reference</a> =  <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a6060ff62e056e8c5a1b2e2a355f135b9">value_type</a>&amp;</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a54525f21d3f6a2a5688e6de0bd2b946f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54525f21d3f6a2a5688e6de0bd2b946f">&#9670;&nbsp;</a></span>value_type</h2>
+<a id="a6060ff62e056e8c5a1b2e2a355f135b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6060ff62e056e8c5a1b2e2a355f135b9">&#9670;&nbsp;</a></span>value_type</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a54525f21d3f6a2a5688e6de0bd2b946f">value_type</a> =  const typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a7040c9dfa801bb5b4e8c0333a8df43f0">robin_hash::value_type</a></td>
+          <td class="memname">using <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a6060ff62e056e8c5a1b2e2a355f135b9">value_type</a> =  const typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a7040c9dfa801bb5b4e8c0333a8df43f0">robin_hash::value_type</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -196,21 +198,21 @@ template&lt;bool is_const&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a64b717d49de64ef9e5e08a54d56c0c33"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64b717d49de64ef9e5e08a54d56c0c33">&#9670;&nbsp;</a></span>robin_iterator() <span class="overload">[1/2]</span></h2>
+<a id="a862a0a45e286de338c07e0984a46c132"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a862a0a45e286de338c07e0984a46c132">&#9670;&nbsp;</a></span>robin_iterator() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> </td>
+          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -225,21 +227,21 @@ template&lt;bool is_const&gt; </div>
 
 </div>
 </div>
-<a id="a4ac4ac6171af943c90ae50ca681732f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ac4ac6171af943c90ae50ca681732f4">&#9670;&nbsp;</a></span>robin_iterator() <span class="overload">[2/2]</span></h2>
+<a id="ad1b214e88638f03f36e0debbe0048629"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1b214e88638f03f36e0debbe0048629">&#9670;&nbsp;</a></span>robin_iterator() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> </td>
+          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; false &gt; &amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
@@ -256,21 +258,21 @@ template&lt;bool is_const&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a16c861d511c4f1272af5bc70d48ee157"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a16c861d511c4f1272af5bc70d48ee157">&#9670;&nbsp;</a></span>key()</h2>
+<a id="a8258d1ca5b1a039991ed591208a8e1cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8258d1ca5b1a039991ed591208a8e1cc">&#9670;&nbsp;</a></span>key()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a283312016dcb08dd7e64bfebb94a284b">robin_hash::key_type</a>&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::key </td>
+          <td class="memname">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a283312016dcb08dd7e64bfebb94a284b">robin_hash::key_type</a>&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::key </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -285,50 +287,21 @@ template&lt;bool is_const&gt; </div>
 
 </div>
 </div>
-<a id="abeb1b43598d6655d4fcdbc9abdcf925f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abeb1b43598d6655d4fcdbc9abdcf925f">&#9670;&nbsp;</a></span>key_value_ref()</h2>
+<a id="a1cca763bd956955cf69677cf21798a48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cca763bd956955cf69677cf21798a48">&#9670;&nbsp;</a></span>operator*()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a7040c9dfa801bb5b4e8c0333a8df43f0">robin_hash::value_type</a>&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::key_value_ref </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a45ef0ea3fbf76ab9589739c65389f8a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45ef0ea3fbf76ab9589739c65389f8a8">&#9670;&nbsp;</a></span>operator*()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
-<div class="memtemplate">
-template&lt;bool is_const&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#ab2bd5cb3db9c7efee0a983f1680c0b80">reference</a> <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::operator* </td>
+          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#a316d2ecc600f2e7a971f634ffd9746d0">reference</a> <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::operator* </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -343,21 +316,21 @@ template&lt;bool is_const&gt; </div>
 
 </div>
 </div>
-<a id="afe8131a4c43f8378355402e1e29cf92c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe8131a4c43f8378355402e1e29cf92c">&#9670;&nbsp;</a></span>operator++() <span class="overload">[1/2]</span></h2>
+<a id="acd5ad8d7a40b9c0121c649ec272930a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd5ad8d7a40b9c0121c649ec272930a7">&#9670;&nbsp;</a></span>operator++() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::operator++ </td>
+          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::operator++ </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -372,21 +345,21 @@ template&lt;bool is_const&gt; </div>
 
 </div>
 </div>
-<a id="a9adb243d36593b274a13e332637f9a49"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9adb243d36593b274a13e332637f9a49">&#9670;&nbsp;</a></span>operator++() <span class="overload">[2/2]</span></h2>
+<a id="a3b75d06ce894ce951b8469fc72f534e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b75d06ce894ce951b8469fc72f534e2">&#9670;&nbsp;</a></span>operator++() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::operator++ </td>
+          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a> <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::operator++ </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -402,21 +375,21 @@ template&lt;bool is_const&gt; </div>
 
 </div>
 </div>
-<a id="aee64d51545dca8df5ad6c3f2c90b9b4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee64d51545dca8df5ad6c3f2c90b9b4f">&#9670;&nbsp;</a></span>operator->()</h2>
+<a id="aee4b23b321f08602ebc67d881f147a6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee4b23b321f08602ebc67d881f147a6c">&#9670;&nbsp;</a></span>operator->()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#abea5f65b68c81c161ff20309f9682832">pointer</a> <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::operator-&gt; </td>
+          <td class="memname"><a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html#adf5aea911258759be15de8dacee57bab">pointer</a> <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::operator-&gt; </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -431,23 +404,23 @@ template&lt;bool is_const&gt; </div>
 
 </div>
 </div>
-<a id="ab9deb8e62ddf938b475c1f0eefbfcb5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab9deb8e62ddf938b475c1f0eefbfcb5f">&#9670;&nbsp;</a></span>value() <span class="overload">[1/2]</span></h2>
+<a id="a84a31899b7ab0c15d636ae42ee14b41f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84a31899b7ab0c15d636ae42ee14b41f">&#9670;&nbsp;</a></span>value() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <div class="memtemplate">
-template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&lt; U &gt;::value &amp;&amp;is_const &gt;::type *  = nullptr&gt; </div>
+template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&lt; U &gt;::value &amp;&amp;IsConst &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const U::value_type&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::value </td>
+          <td class="memname">const U::value_type&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::value </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -462,23 +435,23 @@ template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&
 
 </div>
 </div>
-<a id="a9814359030e3373828b6d267ee229e38"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9814359030e3373828b6d267ee229e38">&#9670;&nbsp;</a></span>value() <span class="overload">[2/2]</span></h2>
+<a id="a49b29f615bd8a152005b8c404febb1d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49b29f615bd8a152005b8c404febb1d7">&#9670;&nbsp;</a></span>value() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <div class="memtemplate">
-template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&lt; U &gt;::value &amp;&amp;!is_const &gt;::type *  = nullptr&gt; </div>
+template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&lt; U &gt;::value &amp;&amp;!IsConst &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">U::value_type&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt;::value </td>
+          <td class="memname">U::value_type&amp; <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html">tsl::detail_robin_hash::robin_hash</a>&lt; ValueType, KeySelect, ValueSelect, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt;::value </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -502,7 +475,7 @@ template&lt;class U  = ValueSelect, typename std::enable_if&lt; has_mapped_type&
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -510,13 +483,13 @@ template&lt;bool is_const&gt; </div>
         <tr>
           <td class="memname">bool operator!= </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt; &amp;&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt; &amp;&#160;</td>
           <td class="paramname"><em>rhs</em>&#160;</td>
         </tr>
         <tr>
@@ -542,7 +515,7 @@ template&lt;bool is_const&gt; </div>
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -550,13 +523,13 @@ template&lt;bool is_const&gt; </div>
         <tr>
           <td class="memname">bool operator== </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt; &amp;&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; is_const &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash_1_1robin__iterator.html">robin_iterator</a>&lt; IsConst &gt; &amp;&#160;</td>
           <td class="paramname"><em>rhs</em>&#160;</td>
         </tr>
         <tr>
@@ -582,7 +555,7 @@ template&lt;bool is_const&gt; </div>
 <div class="memtemplate">
 template&lt;class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy&gt; </div>
 <div class="memtemplate">
-template&lt;bool is_const&gt; </div>
+template&lt;bool IsConst&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
