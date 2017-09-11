@@ -86,7 +86,8 @@ public:
      * Return the maximum number of buckets supported by the policy.
      */
     std::size_t max_bucket_count() const {
-        return (std::numeric_limits<std::size_t>::max() / GrowthFactor) + 1;
+        // Largest power of two.
+        return (std::numeric_limits<std::size_t>::max() / 2) + 1;
     }
     
 private:

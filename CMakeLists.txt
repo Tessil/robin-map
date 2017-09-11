@@ -8,7 +8,8 @@ find_package(Boost 1.54.0 REQUIRED COMPONENTS unit_test_framework)
 set(TEST_EXECUTABLE "test_robin_map")
 
 add_executable("${TEST_EXECUTABLE}" "tests/main.cpp" 
-                                    "tests/custom_allocator_tests.cpp" 
+                                    "tests/custom_allocator_tests.cpp"
+                                    "tests/policy_tests.cpp"
                                     "tests/robin_map_tests.cpp" 
                                     "tests/robin_set_tests.cpp")
                                     
