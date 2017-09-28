@@ -37,6 +37,7 @@
 
 
 namespace tsl {
+namespace rh {
     
 /**
  * Grow the hash table by a factor of GrowthFactor keeping the bucket count to a power of two. It allows
@@ -45,13 +46,13 @@ namespace tsl {
  * GrowthFactor must be a power of two >= 2.
  */
 template<std::size_t GrowthFactor>
-class power_of_two_growth_policy_rh {
+class power_of_two_growth_policy {
 public:
     /**
      * Called on the hash table creation and on rehash. The number of buckets for the table is passed in parameter.
      * This number is a minimum, the policy may update this value with a higher value if needed (but not lower).
      */
-    power_of_two_growth_policy_rh(std::size_t& min_bucket_count_in_out) {
+    power_of_two_growth_policy(std::size_t& min_bucket_count_in_out) {
         if(min_bucket_count_in_out > max_bucket_count()) {
             throw std::length_error("The hash table exceeds its maxmimum size.");
         }
@@ -125,9 +126,9 @@ protected:
  * to a bucket. Slower but it can be usefull if you want a slower growth.
  */
 template<class GrowthFactor = std::ratio<3, 2>>
-class mod_growth_policy_rh {
+class mod_growth_policy {
 public:
-    mod_growth_policy_rh(std::size_t& min_bucket_count_in_out) {
+    mod_growth_policy(std::size_t& min_bucket_count_in_out) {
         if(min_bucket_count_in_out > max_bucket_count()) {
             throw std::length_error("The hash table exceeds its maxmimum size.");
         }
@@ -180,7 +181,7 @@ private:
 
 
 
-namespace detail_robin_hash {
+namespace detail {
 
 static constexpr const std::array<std::size_t, 39> PRIMES = {{
     5ul, 17ul, 29ul, 37ul, 53ul, 67ul, 79ul, 97ul, 131ul, 193ul, 257ul, 389ul, 521ul, 769ul, 1031ul, 1543ul, 2053ul, 
@@ -204,7 +205,7 @@ static constexpr const std::array<std::size_t(*)(std::size_t), 39> MOD_PRIME = {
 }
 
 /**
- * Grow the hash table by using prime numbers as bucket count. Slower than tsl::power_of_two_growth_policy_rh in  
+ * Grow the hash table by using prime numbers as bucket count. Slower than tsl::rh::power_of_two_growth_policy in  
  * general but will probably distribute the values around better in the buckets with a poor hash function.
  * 
  * To allow the compiler to optimize the modulo operation, a lookup table is used with constant primes numbers.
@@ -227,42 +228,43 @@ static constexpr const std::array<std::size_t(*)(std::size_t), 39> MOD_PRIME = {
  * 
  * The 'hash % 5' could become something like 'hash - (hash * 0xCCCCCCCD) >> 34) * 5' in a 64 bits environement.
  */
-class prime_growth_policy_rh {
+class prime_growth_policy {
 public:
-    prime_growth_policy_rh(std::size_t& min_bucket_count_in_out) {
-        auto it_prime = std::lower_bound(tsl::detail_robin_hash::PRIMES.begin(), 
-                                         tsl::detail_robin_hash::PRIMES.end(), min_bucket_count_in_out);
-        if(it_prime == tsl::detail_robin_hash::PRIMES.end()) {
+    prime_growth_policy(std::size_t& min_bucket_count_in_out) {
+        auto it_prime = std::lower_bound(detail::PRIMES.begin(), 
+                                         detail::PRIMES.end(), min_bucket_count_in_out);
+        if(it_prime == detail::PRIMES.end()) {
             throw std::length_error("The hash table exceeds its maxmimum size.");
         }
         
-        m_iprime = static_cast<unsigned int>(std::distance(tsl::detail_robin_hash::PRIMES.begin(), it_prime));
+        m_iprime = static_cast<unsigned int>(std::distance(detail::PRIMES.begin(), it_prime));
         min_bucket_count_in_out = *it_prime;
     }
     
     std::size_t bucket_for_hash(std::size_t hash) const noexcept {
-        return tsl::detail_robin_hash::MOD_PRIME[m_iprime](hash);
+        return detail::MOD_PRIME[m_iprime](hash);
     }
     
     std::size_t next_bucket_count() const {
-        if(m_iprime + 1 >= tsl::detail_robin_hash::PRIMES.size()) {
+        if(m_iprime + 1 >= detail::PRIMES.size()) {
             throw std::length_error("The hash table exceeds its maxmimum size.");
         }
         
-        return tsl::detail_robin_hash::PRIMES[m_iprime + 1];
+        return detail::PRIMES[m_iprime + 1];
     }   
     
     std::size_t max_bucket_count() const {
-        return tsl::detail_robin_hash::PRIMES.back();
+        return detail::PRIMES.back();
     }
     
 private:
     unsigned int m_iprime;
     
-    static_assert(std::numeric_limits<decltype(m_iprime)>::max() >= tsl::detail_robin_hash::PRIMES.size(), 
+    static_assert(std::numeric_limits<decltype(m_iprime)>::max() >= detail::PRIMES.size(), 
                   "The type of m_iprime is not big enough.");
 }; 
 
+}
 }
 
 #endif

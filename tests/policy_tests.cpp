@@ -35,11 +35,11 @@
 
 BOOST_AUTO_TEST_SUITE(test_policy)
 
-using test_types = boost::mpl::list<tsl::power_of_two_growth_policy_rh<2>,
-                                    tsl::power_of_two_growth_policy_rh<4>,
-                                    tsl::prime_growth_policy_rh,
-                                    tsl::mod_growth_policy_rh<>,
-                                    tsl::mod_growth_policy_rh<std::ratio<7,2>>>;
+using test_types = boost::mpl::list<tsl::rh::power_of_two_growth_policy<2>,
+                                    tsl::rh::power_of_two_growth_policy<4>,
+                                    tsl::rh::prime_growth_policy,
+                                    tsl::rh::mod_growth_policy<>,
+                                    tsl::rh::mod_growth_policy<std::ratio<7,2>>>;
 
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_policy, Policy, test_types) {

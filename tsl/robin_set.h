@@ -50,19 +50,19 @@ namespace tsl {
  * 
  * When `StoreHash` is true, 32 bits of the hash are stored alongside the values. It can improve 
  * the performance during lookups if the `KeyEqual` function takes time (or engenders a cache-miss for example) 
- * as we then compare the stored hashes before comparing the keys. When tsl::power_of_two_growth_policy_rh is used
+ * as we then compare the stored hashes before comparing the keys. When `tsl::rh::power_of_two_growth_policy` is used
  * as `GrowthPolicy`, it may also speed-up the rehash process as we can avoid to recalculate the hash. 
  * When it is detected that storing the hash will not incur any memory penality due to alignement (i.e. 
  * `sizeof(tsl::detail_robin_hash::bucket_entry<ValueType, true>) == 
- * sizeof(tsl::detail_robin_hash::bucket_entry<ValueType, false>)`) and `tsl::power_of_two_growth_policy_rh` is
+ * sizeof(tsl::detail_robin_hash::bucket_entry<ValueType, false>)`) and `tsl::rh::power_of_two_growth_policy` is
  * used, the hash will be stored even if `StoreHash` is false so that we can speed-up the rehash (but it will
  * not be used on lookups unless `StoreHash` is true).
  * 
  * `GrowthPolicy` defines how the set grows and consequently how a hash value is mapped to a bucket. 
- * By default the set uses `tsl::power_of_two_growth_policy_rh`. This policy keeps the number of buckets 
+ * By default the set uses `tsl::rh::power_of_two_growth_policy`. This policy keeps the number of buckets 
  * to a power of two and uses a mask to set the hash to a bucket instead of the slow modulo.
  * Other growth policies are available and you may define your own growth policy, 
- * check `tsl::power_of_two_growth_policy_rh` for the interface.
+ * check `tsl::rh::power_of_two_growth_policy` for the interface.
  * 
  * If the destructor of `Key` throws an exception, the behaviour of the class is undefined.
  * 
@@ -76,7 +76,7 @@ template<class Key,
          class KeyEqual = std::equal_to<Key>,
          class Allocator = std::allocator<Key>,
          bool StoreHash = false,
-         class GrowthPolicy = tsl::power_of_two_growth_policy_rh<2>>
+         class GrowthPolicy = tsl::rh::power_of_two_growth_policy<2>>
 class robin_set {
 private:
     template<typename U>
@@ -520,14 +520,14 @@ private:
 
 
 /**
- * Same as `tsl::robin_set<Key, Hash, KeyEqual, Allocator, StoreHash, tsl::prime_growth_policy_rh>`.
+ * Same as `tsl::robin_set<Key, Hash, KeyEqual, Allocator, StoreHash, tsl::rh::prime_growth_policy>`.
  */
 template<class Key, 
          class Hash = std::hash<Key>,
          class KeyEqual = std::equal_to<Key>,
          class Allocator = std::allocator<Key>,
          bool StoreHash = false>
-using robin_pg_set = robin_set<Key, Hash, KeyEqual, Allocator, StoreHash, tsl::prime_growth_policy_rh>;
+using robin_pg_set = robin_set<Key, Hash, KeyEqual, Allocator, StoreHash, tsl::rh::prime_growth_policy>;
 
 } // end namespace tsl
 

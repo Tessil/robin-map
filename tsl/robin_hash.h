@@ -75,7 +75,7 @@ struct is_power_of_two_policy: std::false_type {
 };
 
 template<std::size_t GrowthFactor>
-struct is_power_of_two_policy<tsl::power_of_two_growth_policy_rh<GrowthFactor>>: std::true_type {
+struct is_power_of_two_policy<tsl::rh::power_of_two_growth_policy<GrowthFactor>>: std::true_type {
 };
 
 

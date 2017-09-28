@@ -50,19 +50,19 @@ using test_types = boost::mpl::list<tsl::robin_set<std::int64_t>,
                                                    std::equal_to<move_only_test>, 
                                                    std::allocator<move_only_test>,
                                                    true,
-                                                   tsl::prime_growth_policy_rh>,
+                                                   tsl::rh::prime_growth_policy>,
                                     tsl::robin_set<self_reference_member_test, 
                                                    std::hash<self_reference_member_test>,
                                                    std::equal_to<self_reference_member_test>, 
                                                    std::allocator<self_reference_member_test>,
                                                    true,
-                                                   tsl::mod_growth_policy_rh<>>,
+                                                   tsl::rh::mod_growth_policy<>>,
                                     tsl::robin_set<move_only_test, 
                                                    std::hash<move_only_test>,
                                                    std::equal_to<move_only_test>, 
                                                    std::allocator<move_only_test>,
                                                    false,
-                                                   tsl::mod_growth_policy_rh<>>
+                                                   tsl::rh::mod_growth_policy<>>
                                     >;
                                     
                                     
