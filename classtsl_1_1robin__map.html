@@ -308,13 +308,13 @@ Friends</h2></td></tr>
 <tr class="separator:a614982dcc0873a246c7cfca6395c6d8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class Key, class T, class Hash = std::hash&lt;Key&gt;, class KeyEqual = std::equal_to&lt;Key&gt;, class Allocator = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt;<br />
+<div class="textblock"><h3>template&lt;class Key, class T, class Hash = std::hash&lt;Key&gt;, class KeyEqual = std::equal_to&lt;Key&gt;, class Allocator = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt;<br />
 class tsl::robin_map&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;</h3>
 
 <p>Implementation of a hash map using open-adressing and the robin hood hashing algorithm with backward shift deletion.</p>
 <p>For operations modifying the hash map (insert, erase, rehash, ...), the strong exception guarantee is only guaranteed when the expression <code>std::is_nothrow_swappable&lt;std::pair&lt;Key, T&gt;&gt;::value &amp;&amp; std::is_nothrow_move_constructible&lt;std::pair&lt;Key, T&gt;&gt;::value</code> is true, otherwise if an exception is thrown during the swap or the move, the hash map may end up in a undefined state. Per the standard a <code>Key</code> or <code>T</code> with a noexcept copy constructor and no move constructor also satisfies the <code>std::is_nothrow_move_constructible&lt;std::pair&lt;Key, T&gt;&gt;::value</code> criterion (and will thus guarantee the strong exception for the map).</p>
-<p>When <code>StoreHash</code> is true, 32 bits of the hash are stored alongside the values. It can improve the performance during lookups if the <code>KeyEqual</code> function takes time (if it engenders a cache-miss for example) as we then compare the stored hashes before comparing the keys. When <code><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html">tsl::power_of_two_growth_policy_rh</a></code> is used as <code>GrowthPolicy</code>, it may also speed-up the rehash process as we can avoid to recalculate the hash. When it is detected that storing the hash will not incur any memory penality due to alignement (i.e. <code>sizeof(tsl::detail_robin_hash::bucket_entry&lt;ValueType, true&gt;) == sizeof(tsl::detail_robin_hash::bucket_entry&lt;ValueType, false&gt;)</code>) and <code><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html">tsl::power_of_two_growth_policy_rh</a></code> is used, the hash will be stored even if <code>StoreHash</code> is false so that we can speed-up the rehash (but it will not be used on lookups unless <code>StoreHash</code> is true).</p>
-<p><code>GrowthPolicy</code> defines how the map grows and consequently how a hash value is mapped to a bucket. By default the map uses <code><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html">tsl::power_of_two_growth_policy_rh</a></code>. This policy keeps the number of buckets to a power of two and uses a mask to map the hash to a bucket instead of the slow modulo. Other growth policies are available and you may define your own growth policy, check <code><a class="el" href="classtsl_1_1power__of__two__growth__policy__rh.html">tsl::power_of_two_growth_policy_rh</a></code> for the interface.</p>
+<p>When <code>StoreHash</code> is true, 32 bits of the hash are stored alongside the values. It can improve the performance during lookups if the <code>KeyEqual</code> function takes time (if it engenders a cache-miss for example) as we then compare the stored hashes before comparing the keys. When <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> is used as <code>GrowthPolicy</code>, it may also speed-up the rehash process as we can avoid to recalculate the hash. When it is detected that storing the hash will not incur any memory penality due to alignement (i.e. <code>sizeof(tsl::detail_robin_hash::bucket_entry&lt;ValueType, true&gt;) == sizeof(tsl::detail_robin_hash::bucket_entry&lt;ValueType, false&gt;)</code>) and <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> is used, the hash will be stored even if <code>StoreHash</code> is false so that we can speed-up the rehash (but it will not be used on lookups unless <code>StoreHash</code> is true).</p>
+<p><code>GrowthPolicy</code> defines how the map grows and consequently how a hash value is mapped to a bucket. By default the map uses <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code>. This policy keeps the number of buckets to a power of two and uses a mask to map the hash to a bucket instead of the slow modulo. Other growth policies are available and you may define your own growth policy, check <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> for the interface.</p>
 <p>If the destructor of <code>Key</code> or <code>T</code> throws an exception, the behaviour of the class is undefined.</p>
 <p>Iterators invalidation:</p><ul>
 <li>clear, operator=, reserve, rehash: always invalidate the iterators.</li>
@@ -328,7 +328,7 @@ class tsl::robin_map&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPol
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a37f47824e4d915497871a4c390545832">allocator_type</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#aeda2cef10fe15ff7953e6aa0433ada6a">ht::allocator_type</a></td>
@@ -344,7 +344,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#aaa64e5b935fdeea46e58cf369bd957b1">const_iterator</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#ad8c3296c96efcd99a9a57b647e32f573">ht::const_iterator</a></td>
@@ -360,7 +360,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a0d430390641c33d9d664a9436cb8e6e3">const_pointer</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#adf7f923f717c88e6e394dc7e32eb7d1d">ht::const_pointer</a></td>
@@ -376,7 +376,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a8ecb3cf83ea0185f9c0cc8ceb9beb2e5">const_reference</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a60a745268c4df3b28ef154fe0949d0f6">ht::const_reference</a></td>
@@ -392,7 +392,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a5aace92d99e7a1e30fa5ff1de6835408">difference_type</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a5cfbcd23725f53d67dc61f58e8a1379e">ht::difference_type</a></td>
@@ -408,7 +408,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a27eb24e5f5c5343b7c83cb6dfd8b2d4a">hasher</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a0b9227d7a66492cef157cd8c9dc8e319">ht::hasher</a></td>
@@ -424,7 +424,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#afcded2ad86ebfdb7e1e9b252866215d8">iterator</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a72c542e1ad48127eb9d7bf2cd52471e2">ht::iterator</a></td>
@@ -440,7 +440,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#aa9982c8b5dd744a8c48333929d1587d8">key_equal</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a2c4de138a046875ad6861b9ec3e1259e">ht::key_equal</a></td>
@@ -456,7 +456,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a76bc73ce3005e1f39c254e9d5092f0c2">key_type</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a283312016dcb08dd7e64bfebb94a284b">ht::key_type</a></td>
@@ -472,7 +472,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a1d794edbc5168dca57ba353e0bee1784">mapped_type</a> =  T</td>
@@ -488,7 +488,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a3cce1b7d31889ec3843291a4687314c8">pointer</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a1b80d1395ecf1d9c06b6585030eb962f">ht::pointer</a></td>
@@ -504,7 +504,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a04a16c9f6b0b693f80c3c3b4e88bf84d">reference</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a3ea7411cc9c577ff7e3173376507f8f6">ht::reference</a></td>
@@ -520,7 +520,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#ae42652a724ddc26237783a8a8e0a3545">size_type</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#adda293c49b4383de44cfe90428b53abe">ht::size_type</a></td>
@@ -536,7 +536,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::<a class="el" href="classtsl_1_1robin__map.html#a02fd8609545d611ba93a01aa8edb40d5">value_type</a> =  typename <a class="el" href="classtsl_1_1detail__robin__hash_1_1robin__hash.html#a7040c9dfa801bb5b4e8c0333a8df43f0">ht::value_type</a></td>
@@ -553,7 +553,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -580,7 +580,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -630,7 +630,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -668,7 +668,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -712,7 +712,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -740,7 +740,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class InputIt &gt; </div>
 <table class="mlabels">
@@ -804,7 +804,7 @@ template&lt;class InputIt &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class InputIt &gt; </div>
 <table class="mlabels">
@@ -856,7 +856,7 @@ template&lt;class InputIt &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class InputIt &gt; </div>
 <table class="mlabels">
@@ -914,7 +914,7 @@ template&lt;class InputIt &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -970,7 +970,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1014,7 +1014,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1065,7 +1065,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1093,7 +1093,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1132,7 +1132,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1160,7 +1160,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1201,7 +1201,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -1232,7 +1232,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -1276,7 +1276,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -1309,7 +1309,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -1353,7 +1353,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1380,7 +1380,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1407,7 +1407,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1434,7 +1434,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1461,7 +1461,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1488,7 +1488,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1515,7 +1515,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1543,7 +1543,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1582,7 +1582,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -1613,7 +1613,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -1657,7 +1657,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class... Args&gt; </div>
 <table class="mlabels">
@@ -1689,7 +1689,7 @@ template&lt;class... Args&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class... Args&gt; </div>
 <table class="mlabels">
@@ -1731,7 +1731,7 @@ template&lt;class... Args&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1758,7 +1758,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1785,7 +1785,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1812,7 +1812,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1840,7 +1840,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1879,7 +1879,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1907,7 +1907,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1948,7 +1948,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -1979,7 +1979,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2023,7 +2023,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2056,7 +2056,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2100,7 +2100,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2128,7 +2128,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2156,7 +2156,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2194,7 +2194,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2222,7 +2222,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2261,7 +2261,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2292,7 +2292,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2336,7 +2336,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2364,7 +2364,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2403,7 +2403,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2431,7 +2431,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2472,7 +2472,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2503,7 +2503,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2547,7 +2547,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2580,7 +2580,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_transparent&lt; KE &gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2624,7 +2624,7 @@ template&lt;class K , class KE  = KeyEqual, typename std::enable_if&lt; has_is_t
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2651,7 +2651,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2678,7 +2678,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2706,7 +2706,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class P , typename std::enable_if&lt; std::is_constructible&lt; value_type, P &amp;&amp;&gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2736,7 +2736,7 @@ template&lt;class P , typename std::enable_if&lt; std::is_constructible&lt; valu
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2764,7 +2764,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2802,7 +2802,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class P , typename std::enable_if&lt; std::is_constructible&lt; value_type, P &amp;&amp;&gt;::value &gt;::type *  = nullptr&gt; </div>
 <table class="mlabels">
@@ -2842,7 +2842,7 @@ template&lt;class P , typename std::enable_if&lt; std::is_constructible&lt; valu
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2880,7 +2880,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class InputIt &gt; </div>
 <table class="mlabels">
@@ -2920,7 +2920,7 @@ template&lt;class InputIt &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -2948,7 +2948,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class M &gt; </div>
 <table class="mlabels">
@@ -2988,7 +2988,7 @@ template&lt;class M &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class M &gt; </div>
 <table class="mlabels">
@@ -3028,7 +3028,7 @@ template&lt;class M &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class M &gt; </div>
 <table class="mlabels">
@@ -3074,7 +3074,7 @@ template&lt;class M &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class M &gt; </div>
 <table class="mlabels">
@@ -3120,7 +3120,7 @@ template&lt;class M &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3147,7 +3147,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3174,7 +3174,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3201,7 +3201,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3228,7 +3228,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3256,7 +3256,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3283,7 +3283,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3312,7 +3312,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3340,7 +3340,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3368,7 +3368,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3396,7 +3396,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3424,7 +3424,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3452,7 +3452,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3479,7 +3479,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3507,7 +3507,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class... Args&gt; </div>
 <table class="mlabels">
@@ -3547,7 +3547,7 @@ template&lt;class... Args&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class... Args&gt; </div>
 <table class="mlabels">
@@ -3587,7 +3587,7 @@ template&lt;class... Args&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class... Args&gt; </div>
 <table class="mlabels">
@@ -3633,7 +3633,7 @@ template&lt;class... Args&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class... Args&gt; </div>
 <table class="mlabels">
@@ -3680,7 +3680,7 @@ template&lt;class... Args&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3718,7 +3718,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -3756,7 +3756,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::power_of_two_growth_policy_rh&lt;2&gt;&gt; </div>
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
