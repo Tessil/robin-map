@@ -731,12 +731,53 @@ public:
             return mutable_iterator(first);
         }
         
-        auto to_delete = erase(first);
-        while(to_delete != last) {
-            to_delete = erase(to_delete);
+        auto first_mutable = mutable_iterator(first);
+        auto last_mutable = mutable_iterator(last);
+        for(auto it = first_mutable.m_iterator; it != last_mutable.m_iterator; ++it) {
+            if(!it->empty()) {
+                it->clear();
+                m_nb_elements--;
+            }
         }
         
-        return to_delete;
+        if(last_mutable == end()) {
+            return end();
+        }
+        
+        
+        /*
+         * Backward shift on the values which come after the deleted values.
+         * We try to move the values closer to their ideal bucket.
+         */
+        std::size_t icloser_bucket = std::size_t(std::distance(m_buckets.begin(), first_mutable.m_iterator));
+        std::size_t ito_move_closer_value = std::size_t(std::distance(m_buckets.begin(), last_mutable.m_iterator));
+        tsl_assert(ito_move_closer_value > icloser_bucket);
+        
+        const std::size_t ireturn_bucket = ito_move_closer_value - 
+                                           std::min(ito_move_closer_value - icloser_bucket, 
+                                                    std::size_t(m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
+        
+        while(ito_move_closer_value < m_buckets.size() && m_buckets[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
+            icloser_bucket = ito_move_closer_value - 
+                             std::min(ito_move_closer_value - icloser_bucket, 
+                                      std::size_t(m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
+            
+            
+            tsl_assert(m_buckets[icloser_bucket].empty());
+            const distance_type new_distance = distance_type(m_buckets[ito_move_closer_value].dist_from_ideal_bucket() -
+                                                             (ito_move_closer_value - icloser_bucket));
+            m_buckets[icloser_bucket].set_value_of_empty_bucket(new_distance, 
+                                                                m_buckets[ito_move_closer_value].truncated_hash(), 
+                                                                std::move(m_buckets[ito_move_closer_value].value()));
+            m_buckets[ito_move_closer_value].clear();
+            
+            
+            ++icloser_bucket;
+            ++ito_move_closer_value;
+        }
+
+        
+        return iterator(m_buckets.begin() + ireturn_bucket);
     }
     
     

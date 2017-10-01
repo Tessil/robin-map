@@ -315,18 +315,23 @@ BOOST_AUTO_TEST_CASE(test_range_erase_all) {
 }
 
 BOOST_AUTO_TEST_CASE(test_range_erase) {
-    // insert x values, delete all except first and last value
+    // insert x values, delete all except 10 first and 780 last values
     using HMap = tsl::robin_map<std::string, std::int64_t>;
     
     const std::size_t nb_values = 1000;
     HMap map = utils::get_filled_hash_map<HMap>(nb_values);
     
-    auto it_second_elem = std::next(map.begin(), 1);
-    auto it_last_elem = std::next(map.begin(), 999);
+    auto it_first = std::next(map.begin(), 10);
+    auto it_last = std::next(map.begin(), 220);
     
-    auto it = map.erase(it_second_elem, it_last_elem);
-    BOOST_CHECK(it == it_last_elem);
-    BOOST_CHECK_EQUAL(map.size(), 2);
+    auto it = map.erase(it_first, it_last);
+    BOOST_CHECK_EQUAL(std::distance(it, map.end()), 780);
+    BOOST_CHECK_EQUAL(map.size(), 790);
+    BOOST_CHECK_EQUAL(std::distance(map.begin(), map.end()), 790);
+    
+    for(auto& val: map) {
+        BOOST_CHECK_EQUAL(map.count(val.first), 1);
+    }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_erase_loop, HMap, test_types) {
@@ -351,6 +356,29 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_erase_loop, HMap, test_types) {
     BOOST_CHECK(map.empty());
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_erase_loop_range, HMap, test_types) {
+    // insert x values, delete all five by five
+    const std::size_t range = 5;
+    std::size_t nb_values = 1000;
+    
+    BOOST_REQUIRE_EQUAL(1000 % 5, 0);
+    
+    HMap map = utils::get_filled_hash_map<HMap>(nb_values);
+    HMap map2 = utils::get_filled_hash_map<HMap>(nb_values);
+    
+    auto it = map.begin();
+    // Use second map to check for key after delete as we may not copy the key with move-only types.
+    auto it2 = map2.begin();
+    while(it != map.end()) {
+        it = map.erase(it, std::next(it, range));
+        nb_values -= range;
+        
+        BOOST_CHECK_EQUAL(map.size(), nb_values);
+        it2 = std::next(it2, range);
+    }
+    
+    BOOST_CHECK(map.empty());
+}
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_insert_erase_insert, HMap, test_types) {
     // insert x/2 values, delete x/4 values, insert x/2 values, find each value
