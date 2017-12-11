@@ -122,7 +122,7 @@ public:
     
     friend bool operator==(const move_only_test& lhs, const move_only_test& rhs) { 
         if(lhs.m_value == nullptr || rhs.m_value == nullptr) {
-            return lhs.m_value == nullptr && lhs.m_value == nullptr;
+            return lhs.m_value == nullptr && rhs.m_value == nullptr;
         }
         else {
             return *lhs.m_value == *rhs.m_value; 
