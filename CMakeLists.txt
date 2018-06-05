@@ -19,7 +19,7 @@ target_link_libraries("${TEST_EXECUTABLE}" ${Boost_LIBRARIES})
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options("${TEST_EXECUTABLE}" PRIVATE -std=c++11 -Werror -Wall -Wextra -Wold-style-cast -O3 -DTSL_DEBUG)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_options("${TEST_EXECUTABLE}" PRIVATE /WX /W3 /DTSL_DEBUG)
+    target_compile_options("${TEST_EXECUTABLE}" PRIVATE /WX /W3 /DTSL_DEBUG /D__EXCEPTIONS)
 endif()
 
 

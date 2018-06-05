@@ -498,7 +498,7 @@ public:
                                        m_grow_on_next_insert(false)
     {
         if(bucket_count > max_bucket_count()) {
-            throw std::length_error("The map exceeds its maxmimum size.");
+            THROW(std::length_error, "The map exceeds its maxmimum size.");
         }
         
         /*
@@ -844,7 +844,7 @@ public:
             return it.value();
         }
         else {
-            throw std::out_of_range("Couldn't find key.");
+            THROW(std::out_of_range, "Couldn't find key.");
         }
     }
     
@@ -1013,8 +1013,8 @@ private:
         distance_type dist_from_ideal_bucket = 0;
         
         while(dist_from_ideal_bucket <= m_buckets[ibucket].dist_from_ideal_bucket()) {
-            if((!USE_STORED_HASH_ON_LOOKUP || m_buckets[ibucket].bucket_hash_equal(hash)) && 
-               compare_keys(KeySelect()(m_buckets[ibucket].value()), key)) 
+            if (TSL_LIKELY((!USE_STORED_HASH_ON_LOOKUP || m_buckets[ibucket].bucket_hash_equal(hash)) &&
+               compare_keys(KeySelect()(m_buckets[ibucket].value()), key)))
             {
                 return const_iterator(m_buckets.begin() + ibucket);
             }
