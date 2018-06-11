@@ -83,7 +83,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_insert, HMap, test_types) {
     using key_t = typename HMap::key_type; using value_t = typename HMap:: mapped_type;
     
     const std::size_t nb_values = 1000;
-    HMap map;
+    HMap map(0);
+    BOOST_CHECK_EQUAL(map.bucket_count(), 0);
+    
     typename HMap::iterator it;
     bool inserted;
     
@@ -541,6 +543,40 @@ BOOST_AUTO_TEST_CASE(test_modify_value) {
     }
 }
 
+/**
+ * constructor
+ */
+BOOST_AUTO_TEST_CASE(test_extreme_bucket_count_value_construction) {
+    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+                                      std::allocator<std::pair<int, int>>, false,
+                                      tsl::rh::power_of_two_growth_policy<2>>
+                            (std::numeric_limits<std::size_t>::max())), std::length_error);
+    
+    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+                                      std::allocator<std::pair<int, int>>, false, 
+                                      tsl::rh::power_of_two_growth_policy<2>>
+                            (std::numeric_limits<std::size_t>::max()/2 + 1)), std::length_error);
+    
+    
+    
+    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+                                      std::allocator<std::pair<int, int>>, false, 
+                                      tsl::rh::prime_growth_policy>
+                            (std::numeric_limits<std::size_t>::max())), std::length_error);
+    
+    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+                                      std::allocator<std::pair<int, int>>, false, 
+                                      tsl::rh::prime_growth_policy>
+                            (std::numeric_limits<std::size_t>::max()/2)), std::length_error);
+    
+    
+    
+    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+                                      std::allocator<std::pair<int, int>>, false, 
+                                      tsl::rh::mod_growth_policy<>>
+                            (std::numeric_limits<std::size_t>::max())), std::length_error);
+}
+
 
 /**
  * operator=(std::initializer_list)
@@ -641,7 +677,7 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor_operator) {
     
     HMap map_copy = map;
     HMap map_copy2(map);
-    HMap map_copy3;
+    HMap map_copy3 = utils::get_filled_hash_map<HMap>(1);
     map_copy3 = map;
     
     BOOST_CHECK(map == map_copy);
@@ -651,6 +687,49 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor_operator) {
     BOOST_CHECK(map_copy == map_copy3);
 }
 
+BOOST_AUTO_TEST_CASE(test_use_after_move_constructor) {
+    using HMap = tsl::robin_map<std::string, move_only_test>;
+    
+    const std::size_t nb_values = 100;
+    HMap map = utils::get_filled_hash_map<HMap>(nb_values);
+    HMap map_move(std::move(map));
+    
+    
+    BOOST_CHECK(map == (HMap()));
+    BOOST_CHECK_EQUAL(map.size(), 0);
+    BOOST_CHECK_EQUAL(map.bucket_count(), 0);
+    BOOST_CHECK_EQUAL(map.erase("a"), 0);
+    BOOST_CHECK(map.find("a") == map.end());
+    
+    for(std::size_t i = 0; i < nb_values; i++) {
+        map.insert({utils::get_key<std::string>(i), utils::get_value<move_only_test>(i)});
+    }
+    
+    BOOST_CHECK_EQUAL(map.size(), nb_values);
+    BOOST_CHECK(map == map_move);
+}
+
+BOOST_AUTO_TEST_CASE(test_use_after_move_operator) {
+    using HMap = tsl::robin_map<std::string, move_only_test>;
+    
+    const std::size_t nb_values = 100;
+    HMap map = utils::get_filled_hash_map<HMap>(nb_values);
+    HMap map_move = std::move(map);
+    
+    
+    BOOST_CHECK(map == (HMap()));
+    BOOST_CHECK_EQUAL(map.size(), 0);
+    BOOST_CHECK_EQUAL(map.bucket_count(), 0);
+    BOOST_CHECK_EQUAL(map.erase("a"), 0);
+    BOOST_CHECK(map.find("a") == map.end());
+    
+    for(std::size_t i = 0; i < nb_values; i++) {
+        map.insert({utils::get_key<std::string>(i), utils::get_value<move_only_test>(i)});
+    }
+    
+    BOOST_CHECK_EQUAL(map.size(), nb_values);
+    BOOST_CHECK(map == map_move);
+}
 
 
 /**
@@ -709,6 +788,12 @@ BOOST_AUTO_TEST_CASE(test_swap) {
     
     BOOST_CHECK(map == (tsl::robin_map<std::int64_t, std::int64_t>{{4, 40}, {5, 50}}));
     BOOST_CHECK(map2 == (tsl::robin_map<std::int64_t, std::int64_t>{{1, 10}, {8, 80}, {3, 30}}));
+    
+    map.insert({6, 60});
+    map2.insert({4, 40});
+    
+    BOOST_CHECK(map == (tsl::robin_map<std::int64_t, std::int64_t>{{4, 40}, {5, 50}, {6, 60}}));
+    BOOST_CHECK(map2 == (tsl::robin_map<std::int64_t, std::int64_t>{{1, 10}, {8, 80}, {3, 30}, {4, 40}}));
 }
 
 
@@ -807,6 +892,7 @@ BOOST_AUTO_TEST_CASE(test_heterogeneous_lookups) {
 BOOST_AUTO_TEST_CASE(test_empty_map) {
     tsl::robin_map<std::string, int> map(0);
     
+    BOOST_CHECK_EQUAL(map.bucket_count(), 0);
     BOOST_CHECK_EQUAL(map.size(), 0);
     BOOST_CHECK(map.empty());
     
