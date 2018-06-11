@@ -78,7 +78,7 @@ public:
     }
     
     /**
-     * Return the bucket count to use when the bucket array grows on rehash.
+     * Return the number of buckets that should be used on next growth.
      */
     std::size_t next_bucket_count() const {
         if((m_mask + 1) > max_bucket_count() / GrowthFactor) {
