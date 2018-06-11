@@ -42,17 +42,6 @@
 #include "robin_growth_policy.h"
 
 
-
-#ifndef tsl_assert
-    #ifdef TSL_DEBUG
-    #define tsl_assert(expr) assert(expr)
-    #else
-    #define tsl_assert(expr) (static_cast<void>(0))
-    #endif
-#endif
-
-
-
 namespace tsl {
     
 namespace detail_robin_hash {
@@ -507,7 +496,7 @@ public:
                                        m_grow_on_next_insert(false)
     {
         if(bucket_count > max_bucket_count()) {
-            THROW(std::length_error, "The map exceeds its maxmimum size.");
+            TSL_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum size.");
         }
         
         if(m_bucket_count > 0) {
@@ -892,7 +881,7 @@ public:
             return it.value();
         }
         else {
-            THROW(std::out_of_range, "Couldn't find key.");
+            TSL_THROW_OR_TERMINATE(std::out_of_range, "Couldn't find key.");
         }
     }
     
