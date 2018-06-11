@@ -4,7 +4,7 @@
 
 The robin-map library is a C++ implementation of a fast hash map and hash set using open-addressing and linear robin hood hashing with backward shift deletion to resolve collisions.
 
-Four classes are provided: `tsl::robin_map`, `tsl::robin_set`, `tsl::robin_pg_map` and `tsl::robin_pg_set`. The first two are faster and use a power of two growth policy, the last two use a prime growth policy instead and are able to cope better with a poor hash function. Use the prime version if there is a chance of repeating patterns in the lower bits of your hash (e.g. you are storing pointers with an identity hash function). See [GrowthPolicy](https://github.com/Tessil/robin-map#growth-policy) for details.
+Four classes are provided: `tsl::robin_map`, `tsl::robin_set`, `tsl::robin_pg_map` and `tsl::robin_pg_set`. The first two are faster and use a power of two growth policy, the last two use a prime growth policy instead and are able to cope better with a poor hash function. Use the prime version if there is a chance of repeating patterns in the lower bits of your hash (e.g. you are storing pointers with an identity hash function). See [GrowthPolicy](#growth-policy) for details.
 
 A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html). This page also gives some advices on which hash table structure you should try for your use case (useful if you are a bit lost with the multiple hash tables implementations in the `tsl` namespace).
 
@@ -13,7 +13,7 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 - Header-only library, just include the project to your include path and you are ready to go.
 - Fast hash table, see the [benchmark](https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html) for some numbers.
 - Support for move-only and non-default constructible key/value.
-- Support for heterogeneous lookups (e.g. if you have a map that uses `std::unique_ptr<int>` as key, you could use an `int*` or a `std::uintptr_t` as key parameter to `find`, see [example](https://github.com/Tessil/robin-map#heterogeneous-lookups)).
+- Support for heterogeneous lookups (e.g. if you have a map that uses `std::unique_ptr<int>` as key, you could use an `int*` or a `std::uintptr_t` as key parameter to `find`, see [example](#heterogeneous-lookups)).
 - No need to reserve any sentinel value from the keys.
 - Possibility to store the hash value alongside the stored key-value for faster rehash and lookup if the hash or the key equal functions are expensive to compute. Note that hash may be stored even if not asked explicitly when the library can detect that it will have no impact on the size of the structure in memory due to alignment. See the [StoreHash](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) template parameter for details.
 - If the hash is known before a lookup, it is possible to pass it as parameter to speed-up the lookup.
@@ -41,7 +41,7 @@ Thread-safety guarantees are the same as `std::unordered_map/set` (i.e. possible
 
 ### Growth policy
 
-The library supports multiple growth policies through the `GrowthPolicy` template parameter. Three policies are provided by the library but you can easly implement your own if needed.
+The library supports multiple growth policies through the `GrowthPolicy` template parameter. Three policies are provided by the library but you can easily implement your own if needed.
 
 * **[tsl::rh::power_of_two_growth_policy.](https://tessil.github.io/robin-map/classtsl_1_1rh_1_1power__of__two__growth__policy.html)** Default policy used by `tsl::robin_map/set`. This policy keeps the size of the bucket array of the hash table to a power of two. This constraint allows the policy to avoid the usage of the slow modulo operation to map a hash to a bucket, instead of <code>hash % 2<sup>n</sup></code>, it uses <code>hash & (2<sup>n</sup> - 1)</code> (see [fast modulo](https://en.wikipedia.org/wiki/Modulo_operation#Performance_issues)). Fast but this may cause a lot of collisions with a poor hash function as the modulo with a power of two only masks the most significant bits in the end.
 * **[tsl::rh::prime_growth_policy.](https://tessil.github.io/robin-map/classtsl_1_1rh_1_1prime__growth__policy.html)** Default policy used by `tsl::robin_pg_map/set`. The policy keeps the size of the bucket array of the hash table to a prime number. When mapping a hash to a bucket, using a prime number as modulo will result in a better distribution of the hash across the buckets even with a poor hash function. To allow the compiler to optimize the modulo operation, the policy use a lookup table with constant primes modulos (see [API](https://tessil.github.io/robin-map/classtsl_1_1rh_1_1prime__growth__policy.html#details) for details). Slower than `tsl::rh::power_of_two_growth_policy` but more secure.
@@ -52,18 +52,26 @@ To implement your own policy, you have to implement the following interface.
 
 ```c++
 struct custom_policy {
-    // Called on hash table construction, min_bucket_count_in_out is the minimum size
-    // that the hash table needs. The policy can change it to a higher bucket count if needed
-    custom_policy(std::size_t& min_bucket_count_in_out);
+    // Called on the hash table creation and on rehash. The number of buckets for the table is passed in parameter.
+    // This number is a minimum, the policy may update this value with a higher value if needed (but not lower).
+    //
+    // If 0 is given, min_bucket_count_in_out must still be 0 after the policy creation and
+    // bucket_for_hash must always return 0 in this case.    
+    explicit custom_policy(std::size_t& min_bucket_count_in_out);
     
-    // Return the bucket for the corresponding hash
+    // Return the bucket [0, bucket_count()) to which the hash belongs. 
+    // If bucket_count() is 0, it must always return 0.
     std::size_t bucket_for_hash(std::size_t hash) const noexcept;
     
     // Return the number of buckets that should be used on next growth
     std::size_t next_bucket_count() const;
     
-    // Maximum number of buckets supported by the policy
+    // Return the maximum number of buckets supported by the policy.
     std::size_t max_bucket_count() const;
+    
+    // Reset the growth policy as if it was created with a bucket count of 0.
+    // After a clear, the policy must always return 0 when bucket_for_hash is called.
+    void clear() noexcept;
 }
 ```
 
