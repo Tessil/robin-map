@@ -17,6 +17,7 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 - No need to reserve any sentinel value from the keys.
 - Possibility to store the hash value alongside the stored key-value for faster rehash and lookup if the hash or the key equal functions are expensive to compute. Note that hash may be stored even if not asked explicitly when the library can detect that it will have no impact on the size of the structure in memory due to alignment. See the [StoreHash](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) template parameter for details.
 - If the hash is known before a lookup, it is possible to pass it as parameter to speed-up the lookup.
+- The library can be used with exceptions disabled (through `-fno-exceptions` option on Clang and GCC, without an `/EH` option on MSVC or simply by defining `TSL_NO_EXCEPTIONS`). `std::terminate` is used in replacement of the `throw` instruction when exceptions are disabled.
 - API closely similar to `std::unordered_map` and `std::unordered_set`.
 
 ### Differences compare to `std::unordered_map`
