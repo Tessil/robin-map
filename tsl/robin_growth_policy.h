@@ -55,7 +55,7 @@
 #        ifdef NDEBUG
 #            define TSL_THROW_OR_TERMINATE(ex, msg) std::terminate()
 #        else
-#            include<cstdio>
+#            include <cstdio>
 #            define TSL_THROW_OR_TERMINATE(ex, msg) do { std::fprintf(stderr, msg); std::terminate(); } while(0)
 #        endif
 #    endif
