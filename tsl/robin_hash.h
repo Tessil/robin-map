@@ -1148,11 +1148,19 @@ private:
     void insert_value(std::size_t ibucket, distance_type dist_from_ideal_bucket, 
                       truncated_hash_type hash, Args&&... value_type_args) 
     {
-        insert_value(ibucket, dist_from_ideal_bucket, hash, value_type(std::forward<Args>(value_type_args)...));
+        insert_value_impl(ibucket, dist_from_ideal_bucket, hash, value_type(std::forward<Args>(value_type_args)...));
     }
 
-    void insert_value(std::size_t ibucket, distance_type dist_from_ideal_bucket, 
-                      truncated_hash_type hash, value_type&& value) 
+    void insert_value(std::size_t ibucket, distance_type dist_from_ideal_bucket,
+                      truncated_hash_type hash, value_type&& value)
+    {
+        insert_value_impl(ibucket, dist_from_ideal_bucket, hash, value);
+    }
+
+    // We don't use value_type&& value as last argument due to a bug in MSVC,
+    // but the value will be in a moved state at the end of the function.
+    void insert_value_impl(std::size_t ibucket, distance_type dist_from_ideal_bucket,
+                           truncated_hash_type hash, value_type& value)
     {
         m_buckets[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket, hash, value);
         ibucket = next_bucket(ibucket);
