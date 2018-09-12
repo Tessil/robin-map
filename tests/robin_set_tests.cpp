@@ -118,7 +118,8 @@ BOOST_AUTO_TEST_CASE(test_compare) {
 }
 
 BOOST_AUTO_TEST_CASE(test_insert_pointer) {
-    // Test added mainly to be sure that the code compiles with MSVC due to a bug in the compiler
+    // Test added mainly to be sure that the code compiles with MSVC due to a bug in the compiler.
+    // See robin_hash::insert_value_impl for details.
     std::string value;
     std::string* value_ptr = &value;
 
