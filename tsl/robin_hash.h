@@ -1148,7 +1148,8 @@ private:
     void insert_value(std::size_t ibucket, distance_type dist_from_ideal_bucket, 
                       truncated_hash_type hash, Args&&... value_type_args) 
     {
-        insert_value_impl(ibucket, dist_from_ideal_bucket, hash, value_type(std::forward<Args>(value_type_args)...));
+        value_type value(std::forward<Args>(value_type_args)...);
+        insert_value_impl(ibucket, dist_from_ideal_bucket, hash, value);
     }
 
     void insert_value(std::size_t ibucket, distance_type dist_from_ideal_bucket,
