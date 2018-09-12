@@ -117,5 +117,16 @@ BOOST_AUTO_TEST_CASE(test_compare) {
     BOOST_CHECK(set3_1 != set2_1);
 }
 
+BOOST_AUTO_TEST_CASE(test_insert_pointer) {
+    // Test added mainly to be sure that the code compiles with MSVC due to a bug in the compiler
+    std::string value;
+    std::string* value_ptr = &value;
+
+    tsl::robin_set<std::string*> set;
+    set.insert(value_ptr);
+
+    BOOST_CHECK_EQUAL(set.size(), 1);
+    BOOST_CHECK_EQUAL(**set.begin(), value);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
