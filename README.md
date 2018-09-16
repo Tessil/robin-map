@@ -10,7 +10,7 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 
 ### Key features
 
-- Header-only library, just include the project to your include path and you are ready to go.
+- Header-only library, just add the [include](include/) directory to your include path and you are ready to go. If you use CMake, you can also use the `tsl::robin_map` exported target from the [CMakeLists.txt](CMakeLists.txt).
 - Fast hash table, see the [benchmark](https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html) for some numbers.
 - Support for move-only and non-default constructible key/value.
 - Support for heterogeneous lookups (e.g. if you have a map that uses `std::unique_ptr<int>` as key, you could use an `int*` or a `std::uintptr_t` as key parameter to `find`, see [example](#heterogeneous-lookups)).
@@ -78,7 +78,14 @@ struct custom_policy {
 
 ### Installation
 
-To use robin-map, just add the project to your include path. It is a **header-only** library.
+To use robin-map, just add the [include](include/) directory to your include path. It is a **header-only** library.
+
+If you use CMake, you can also use the `tsl::robin_map` exported target from the [CMakeLists.txt](CMakeLists.txt) with `target_link_libraries`. 
+```cmake
+# Example where the robin-map project is stored in a third-party directory
+add_subdirectory(third-party/robin-map)
+target_link_libraries(your_target PRIVATE tsl::robin_map)  
+```
 
 The code should work with any C++11 standard-compliant compiler and has been tested with GCC 4.8.4, Clang 3.5.0 and Visual Studio 2015.
 
@@ -86,12 +93,12 @@ To run the tests you will need the Boost Test library and CMake.
 
 ```bash
 git clone https://github.com/Tessil/robin-map.git
-cd robin-map
+cd robin-map/tests
 mkdir build
 cd build
 cmake ..
-make
-./test_robin_map
+cmake --build .
+./tsl_robin_map_tests
 ```
 
 ### Usage
