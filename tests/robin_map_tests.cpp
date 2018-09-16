@@ -363,20 +363,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_erase_loop_range, HMap, test_types) {
     const std::size_t range = 5;
     std::size_t nb_values = 1000;
     
-    BOOST_REQUIRE_EQUAL(1000 % 5, 0);
+    BOOST_REQUIRE_EQUAL(nb_values % range, 0);
     
     HMap map = utils::get_filled_hash_map<HMap>(nb_values);
-    HMap map2 = utils::get_filled_hash_map<HMap>(nb_values);
     
     auto it = map.begin();
-    // Use second map to check for key after delete as we may not copy the key with move-only types.
-    auto it2 = map2.begin();
     while(it != map.end()) {
         it = map.erase(it, std::next(it, range));
         nb_values -= range;
         
         BOOST_CHECK_EQUAL(map.size(), nb_values);
-        it2 = std::next(it2, range);
     }
     
     BOOST_CHECK(map.empty());
@@ -453,6 +449,23 @@ BOOST_AUTO_TEST_CASE(test_range_erase_same_iterators) {
     
     it_mutable.value() = -100;
     BOOST_CHECK_EQUAL(it_const.value(), -100);
+}
+
+/**
+ * rehash
+ */
+BOOST_AUTO_TEST_CASE(test_rehash_empty) {
+    const std::size_t nb_values = 100;
+    auto map = utils::get_filled_hash_map<tsl::robin_map<std::int64_t, std::int64_t>>(nb_values);
+    
+    const std::size_t bucket_count = map.bucket_count();
+    BOOST_CHECK(bucket_count >= nb_values);
+    
+    map.clear();
+    BOOST_CHECK_EQUAL(map.bucket_count(), bucket_count);
+    
+    map.rehash(0);
+    BOOST_CHECK_EQUAL(map.bucket_count(), 0);
 }
 
 
@@ -714,7 +727,8 @@ BOOST_AUTO_TEST_CASE(test_use_after_move_operator) {
     
     const std::size_t nb_values = 100;
     HMap map = utils::get_filled_hash_map<HMap>(nb_values);
-    HMap map_move = std::move(map);
+    HMap map_move(0);
+    map_move = std::move(map);
     
     
     BOOST_CHECK(map == (HMap()));
@@ -922,8 +936,8 @@ BOOST_AUTO_TEST_CASE(test_empty_map) {
  * Test precalculated hash
  */
 BOOST_AUTO_TEST_CASE(test_precalculated_hash) {
-    tsl::robin_map<int, int, std::hash<int>> map = {{1, -1}, {2, -2}, {3, -3}, {4, -4}, {5, -5}, {6, -6}};
-    const tsl::robin_map<int, int> map_const = map;
+    tsl::robin_map<int, int, identity_hash<int>> map = {{1, -1}, {2, -2}, {3, -3}, {4, -4}, {5, -5}, {6, -6}};
+    const tsl::robin_map<int, int, identity_hash<int>> map_const = map;
     
     /**
      * find
