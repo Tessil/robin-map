@@ -14,8 +14,9 @@ os:
   - osx  
 
 script:
+  - cd tests
   - mkdir build
   - cd build
   - cmake ..
   - make
-  - ./test_robin_map
+  - ./tsl_robin_map_tests
