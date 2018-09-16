@@ -34,7 +34,7 @@ for(auto it = map.begin(); it != map.end(); ++it) {
     it.value() = 2; // Ok
 }
 ```
-- No support for some buckets related methods (like bucket_size, bucket, ...).
+- No support for some buckets related methods (like `bucket_size`, `bucket`, ...).
 
 These differences also apply between `std::unordered_set` and `tsl::robin_set`.
 
