@@ -12,6 +12,9 @@ target_sources(tsl_robin_map INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/
                                        "${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_map.h"
                                        "${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_set.h")
 
+if(MSVC)
+    target_sources(tsl_robin_map INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/tsl_robin_map.natvis")
+endif()
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.7") 
     # Only available since version 3.8
