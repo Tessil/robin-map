@@ -139,13 +139,13 @@ public:
     bucket_entry() noexcept: bucket_hash(), m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
                              m_last_bucket(false)
     {
-        tsl_assert(empty());
+        tsl_rh_assert(empty());
     }
     
     bucket_entry(bool last_bucket) noexcept: bucket_hash(), m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
                                              m_last_bucket(last_bucket)
     {
-        tsl_assert(empty());
+        tsl_rh_assert(empty());
     }
     
     bucket_entry(const bucket_entry& other) noexcept(std::is_nothrow_copy_constructible<value_type>::value): 
@@ -210,12 +210,12 @@ public:
     }
     
     value_type& value() noexcept {
-        tsl_assert(!empty());
+        tsl_rh_assert(!empty());
         return *reinterpret_cast<value_type*>(std::addressof(m_value));
     }
     
     const value_type& value() const noexcept {
-        tsl_assert(!empty());
+        tsl_rh_assert(!empty());
         return *reinterpret_cast<const value_type*>(std::addressof(m_value));
     }
     
@@ -235,20 +235,20 @@ public:
     void set_value_of_empty_bucket(distance_type dist_from_ideal_bucket, 
                                    truncated_hash_type hash, Args&&... value_type_args) 
     {
-        tsl_assert(dist_from_ideal_bucket >= 0);
-        tsl_assert(empty());
+        tsl_rh_assert(dist_from_ideal_bucket >= 0);
+        tsl_rh_assert(empty());
         
         ::new (static_cast<void*>(std::addressof(m_value))) value_type(std::forward<Args>(value_type_args)...);
         this->set_hash(hash);
         m_dist_from_ideal_bucket = dist_from_ideal_bucket;
         
-        tsl_assert(!empty());
+        tsl_rh_assert(!empty());
     }
     
     void swap_with_value_in_bucket(distance_type& dist_from_ideal_bucket, 
                                    truncated_hash_type& hash, value_type& value) 
     {
-        tsl_assert(!empty());
+        tsl_rh_assert(!empty());
         
         using std::swap;
         swap(value, this->value());
@@ -269,7 +269,7 @@ public:
     
 private:
     void destroy_value() noexcept {
-        tsl_assert(!empty());
+        tsl_rh_assert(!empty());
         value().~value_type();
     }
     
@@ -372,7 +372,7 @@ private:
             return true;
         }
         else if(STORE_HASH && is_power_of_two_policy<GrowthPolicy>::value) {
-            tsl_assert(bucket_count > 0);
+            tsl_rh_assert(bucket_count > 0);
             return (bucket_count - 1) <= std::numeric_limits<truncated_hash_type>::max();
         }
         else {
@@ -496,7 +496,7 @@ public:
                                        m_grow_on_next_insert(false)
     {
         if(bucket_count > max_bucket_count()) {
-            TSL_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum size.");
         }
         
         if(m_bucket_count > 0) {
@@ -511,7 +511,7 @@ public:
             m_buckets.resize(m_bucket_count);
             m_first_or_empty_bucket = m_buckets.data();
             
-            tsl_assert(!m_buckets.empty());
+            tsl_rh_assert(!m_buckets.empty());
             m_buckets.back().set_as_last_bucket();
         }
         
@@ -675,7 +675,7 @@ public:
         {
             const auto nb_elements_insert = std::distance(first, last);
             const size_type nb_free_buckets = m_load_threshold - size();
-            tsl_assert(m_load_threshold >= size());
+            tsl_rh_assert(m_load_threshold >= size());
             
             if(nb_elements_insert > 0 && nb_free_buckets < size_type(nb_elements_insert)) {
                 reserve(size() + size_type(nb_elements_insert));
@@ -787,7 +787,7 @@ public:
          */
         std::size_t icloser_bucket = std::size_t(std::distance(m_buckets.begin(), first_mutable.m_iterator));
         std::size_t ito_move_closer_value = std::size_t(std::distance(m_buckets.begin(), last_mutable.m_iterator));
-        tsl_assert(ito_move_closer_value > icloser_bucket);
+        tsl_rh_assert(ito_move_closer_value > icloser_bucket);
         
         const std::size_t ireturn_bucket = ito_move_closer_value - 
                                            std::min(ito_move_closer_value - icloser_bucket, 
@@ -799,7 +799,7 @@ public:
                                       std::size_t(m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
             
             
-            tsl_assert(m_buckets[icloser_bucket].empty());
+            tsl_rh_assert(m_buckets[icloser_bucket].empty());
             const distance_type new_distance = distance_type(m_buckets[ito_move_closer_value].dist_from_ideal_bucket() -
                                                              (ito_move_closer_value - icloser_bucket));
             m_buckets[icloser_bucket].set_value_of_empty_bucket(new_distance, 
@@ -881,7 +881,7 @@ public:
             return it.value();
         }
         else {
-            TSL_THROW_OR_TERMINATE(std::out_of_range, "Couldn't find key.");
+            TSL_RH_THROW_OR_TERMINATE(std::out_of_range, "Couldn't find key.");
         }
     }
     
@@ -1024,21 +1024,21 @@ private:
     
     std::size_t bucket_for_hash(std::size_t hash) const {
         const std::size_t bucket = GrowthPolicy::bucket_for_hash(hash);
-        tsl_assert(bucket < m_buckets.size() || (bucket == 0 && m_buckets.empty()));
+        tsl_rh_assert(bucket < m_buckets.size() || (bucket == 0 && m_buckets.empty()));
         
         return bucket;
     }
     
     template<class U = GrowthPolicy, typename std::enable_if<is_power_of_two_policy<U>::value>::type* = nullptr>
     std::size_t next_bucket(std::size_t index) const noexcept {
-        tsl_assert(index < bucket_count());
+        tsl_rh_assert(index < bucket_count());
         
         return (index + 1) & this->m_mask;
     }
     
     template<class U = GrowthPolicy, typename std::enable_if<!is_power_of_two_policy<U>::value>::type* = nullptr>
     std::size_t next_bucket(std::size_t index) const noexcept {
-        tsl_assert(index < bucket_count());
+        tsl_rh_assert(index < bucket_count());
         
         index++;
         return (index != bucket_count())?index:0;
@@ -1057,7 +1057,7 @@ private:
         distance_type dist_from_ideal_bucket = 0;
         
         while(dist_from_ideal_bucket <= (m_first_or_empty_bucket + ibucket)->dist_from_ideal_bucket()) {
-            if(TSL_LIKELY((!USE_STORED_HASH_ON_LOOKUP || (m_first_or_empty_bucket + ibucket)->bucket_hash_equal(hash)) && 
+            if(TSL_RH_LIKELY((!USE_STORED_HASH_ON_LOOKUP || (m_first_or_empty_bucket + ibucket)->bucket_hash_equal(hash)) && 
                compare_keys(KeySelect()((m_first_or_empty_bucket + ibucket)->value()), key))) 
             {
                 return const_iterator(m_buckets.begin() + ibucket);
@@ -1084,7 +1084,7 @@ private:
         std::size_t ibucket = next_bucket(previous_ibucket);
         
         while(m_buckets[ibucket].dist_from_ideal_bucket() > 0) {
-            tsl_assert(m_buckets[previous_ibucket].empty());
+            tsl_rh_assert(m_buckets[previous_ibucket].empty());
             
             const distance_type new_distance = distance_type(m_buckets[ibucket].dist_from_ideal_bucket() - 1);
             m_buckets[previous_ibucket].set_value_of_empty_bucket(new_distance, m_buckets[ibucket].truncated_hash(), 
