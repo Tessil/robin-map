@@ -15,8 +15,12 @@
         <DisplayString>{{ size={m_ht.m_nb_elements} }}</DisplayString>
         <Expand>
             <Item Name="[bucket_count]" IncludeView="detailed">m_ht.m_buckets._Mypair._Myval2._Mylast - m_ht.m_buckets._Mypair._Myval2._Myfirst</Item>
-            <Item Condition="m_ht.m_buckets._Mypair._Myval2._Myfirst != m_ht.m_buckets._Mypair._Myval2._Mylast" Name="[load_factor]" IncludeView="detailed">((float)m_ht.m_nb_elements) / ((float)(m_ht.m_buckets._Mypair._Myval2._Mylast - m_ht.m_buckets._Mypair._Myval2._Myfirst))</Item>
-            <Item Condition="m_ht.m_buckets._Mypair._Myval2._Myfirst == m_ht.m_buckets._Mypair._Myval2._Mylast" Name="[load_factor]" IncludeView="detailed">0</Item>
+            <Item Name="[load_factor]" Condition="m_ht.m_buckets._Mypair._Myval2._Myfirst != m_ht.m_buckets._Mypair._Myval2._Mylast" IncludeView="detailed">
+                ((float)m_ht.m_nb_elements) / ((float)(m_ht.m_buckets._Mypair._Myval2._Mylast - m_ht.m_buckets._Mypair._Myval2._Myfirst))
+            </Item>
+            <Item Name="[load_factor]" Condition="m_ht.m_buckets._Mypair._Myval2._Myfirst == m_ht.m_buckets._Mypair._Myval2._Mylast" IncludeView="detailed">
+                0
+            </Item>
             <Item Name="[max_load_factor]" IncludeView="detailed">m_ht.m_max_load_factor</Item>
             <CustomListItems>
                 <Variable Name="bucket" InitialValue="m_ht.m_first_or_empty_bucket"/>
