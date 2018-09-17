@@ -11,12 +11,12 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 ### Key features
 
 - Header-only library, just add the [include](include/) directory to your include path and you are ready to go. If you use CMake, you can also use the `tsl::robin_map` exported target from the [CMakeLists.txt](CMakeLists.txt).
-- Fast hash table, see the [benchmark](https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html) for some numbers.
+- Fast hash table, check the [benchmark](https://tessil.github.io/2016/08/29/benchmark-hopscotch-map.html) for some numbers.
 - Support for move-only and non-default constructible key/value.
-- Support for heterogeneous lookups (e.g. if you have a map that uses `std::unique_ptr<int>` as key, you could use an `int*` or a `std::uintptr_t` as key parameter to `find`, see [example](#heterogeneous-lookups)).
+- Support for heterogeneous lookups allowing the usage of `find` with a type different than `Key` (e.g. if you have a map that uses `std::unique_ptr<foo>` as key, you can use a `foo*` or a `std::uintptr_t` as key parameter to `find` without constructing a `std::unique_ptr<foo>`, see [example](#heterogeneous-lookups)).
 - No need to reserve any sentinel value from the keys.
 - Possibility to store the hash value alongside the stored key-value for faster rehash and lookup if the hash or the key equal functions are expensive to compute. Note that hash may be stored even if not asked explicitly when the library can detect that it will have no impact on the size of the structure in memory due to alignment. See the [StoreHash](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) template parameter for details.
-- If the hash is known before a lookup, it is possible to pass it as parameter to speed-up the lookup.
+- If the hash is known before a lookup, it is possible to pass it as parameter to speed-up the lookup (see `precalculated_hash` parameter in [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#a35021b11aabb61820236692a54b3a0f8)).
 - The library can be used with exceptions disabled (through `-fno-exceptions` option on Clang and GCC, without an `/EH` option on MSVC or simply by defining `TSL_NO_EXCEPTIONS`). `std::terminate` is used in replacement of the `throw` instruction when exceptions are disabled.
 - API closely similar to `std::unordered_map` and `std::unordered_set`.
 
@@ -53,11 +53,10 @@ To implement your own policy, you have to implement the following interface.
 
 ```c++
 struct custom_policy {
-    // Called on the hash table creation and on rehash. The number of buckets for the table is passed in parameter.
-    // This number is a minimum, the policy may update this value with a higher value if needed (but not lower).
-    //
-    // If 0 is given, min_bucket_count_in_out must still be 0 after the policy creation and
-    // bucket_for_hash must always return 0 in this case.    
+    // Called on hash table construction and rehash, min_bucket_count_in_out is the minimum buckets
+    // that the hash table needs. The policy can change it to a higher number of buckets if needed 
+    // and the hash table will use this value as bucket count. If 0 bucket is asked, then the value
+    // must stay at 0.
     explicit custom_policy(std::size_t& min_bucket_count_in_out);
     
     // Return the bucket [0, bucket_count()) to which the hash belongs. 
@@ -67,11 +66,11 @@ struct custom_policy {
     // Return the number of buckets that should be used on next growth
     std::size_t next_bucket_count() const;
     
-    // Return the maximum number of buckets supported by the policy.
+    // Maximum number of buckets supported by the policy
     std::size_t max_bucket_count() const;
     
-    // Reset the growth policy as if it was created with a bucket count of 0.
-    // After a clear, the policy must always return 0 when bucket_for_hash is called.
+    // Reset the growth policy as if the policy was created with a bucket count of 0.
+    // After a clear, the policy must always return 0 when bucket_for_hash() is called.
     void clear() noexcept;
 }
 ```
@@ -135,7 +134,16 @@ int main() {
         std::cout << "{" << key_value.first << ", " << key_value.second << "}" << std::endl;
     }
     
+        
+    if(map.find("a") != map.end()) {
+        std::cout << "Found \"a\"." << std::endl;
+    }
     
+    const std::size_t precalculated_hash = std::hash<std::string>()("a");
+    // If we already know the hash beforehand, we can pass it in parameter to speed-up lookups.
+    if(map.find("a", precalculated_hash) != map.end()) {
+        std::cout << "Found \"a\" with hash " << precalculated_hash << "." << std::endl;
+    }
     
     
     /*
@@ -189,6 +197,7 @@ struct employee {
     employee(int id, std::string name) : m_id(id), m_name(std::move(name)) {
     }
     
+    // Either we include the comparators in the class and we use `std::equal_to<>`...
     friend bool operator==(const employee& empl, int empl_id) {
         return empl.m_id == empl_id;
     }
@@ -206,16 +215,7 @@ struct employee {
     std::string m_name;
 };
 
-struct hash_employee {
-    std::size_t operator()(const employee& empl) const {
-        return std::hash<int>()(empl.m_id);
-    }
-    
-    std::size_t operator()(int id) const {
-        return std::hash<int>()(id);
-    }
-};
-
+// ... or we implement a separate class to compare employees.
 struct equal_employee {
     using is_transparent = void;
     
@@ -229,6 +229,16 @@ struct equal_employee {
     
     bool operator()(const employee& empl1, const employee& empl2) const {
         return empl1.m_id == empl2.m_id;
+    }
+};
+
+struct hash_employee {
+    std::size_t operator()(const employee& empl) const {
+        return std::hash<int>()(empl.m_id);
+    }
+    
+    std::size_t operator()(int id) const {
+        return std::hash<int>()(id);
     }
 };
 
