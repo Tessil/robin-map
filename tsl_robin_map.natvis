@@ -2,14 +2,6 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
     <!-- Written in VC 2017 15.7 but is expected to be compatible with VC 2015 -->
 
-    <Type Name="tsl::detail_robin_hash::bucket_entry&lt;*&gt;">
-        <DisplayString Condition="m_dist_from_ideal_bucket == -1">empty</DisplayString>
-        <DisplayString Condition="m_dist_from_ideal_bucket != -1">{*reinterpret_cast&lt;$T1*&gt;(&amp;m_value)}</DisplayString>
-        <Expand>
-            <ExpandedItem Condition="m_dist_from_ideal_bucket != -1">*reinterpret_cast&lt;$T1*&gt;(&amp;m_value)</ExpandedItem>
-        </Expand>
-    </Type>
-
     <Type Name="tsl::robin_map&lt;*&gt;">
         <AlternativeType Name="tsl::robin_set&lt;*&gt;"/>
         <DisplayString>{{ size={m_ht.m_nb_elements} }}</DisplayString>
@@ -39,6 +31,14 @@
         <DisplayString>{m_iterator}</DisplayString>
         <Expand>
             <ExpandedItem>m_iterator</ExpandedItem>
+        </Expand>
+    </Type>
+
+    <Type Name="tsl::detail_robin_hash::bucket_entry&lt;*&gt;">
+        <DisplayString Condition="m_dist_from_ideal_bucket == -1">empty</DisplayString>
+        <DisplayString Condition="m_dist_from_ideal_bucket != -1">{*reinterpret_cast&lt;$T1*&gt;(&amp;m_value)}</DisplayString>
+        <Expand>
+            <ExpandedItem Condition="m_dist_from_ideal_bucket != -1">*reinterpret_cast&lt;$T1*&gt;(&amp;m_value)</ExpandedItem>
         </Expand>
     </Type>
 </AutoVisualizer>
