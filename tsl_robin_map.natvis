@@ -20,7 +20,7 @@
 
                 <Size>m_ht.m_nb_elements</Size>
                 <Loop>
-                    <Item Condition="bucket-&gt;m_dist_from_ideal_bucket != -1">bucket,na</Item>
+                    <Item Condition="bucket-&gt;m_dist_from_ideal_bucket != -1">*bucket</Item>
                     <Break Condition="bucket-&gt;m_last_bucket"/>
                     <Exec>++bucket</Exec>
                 </Loop>
@@ -28,7 +28,7 @@
         </Expand>
     </Type>
 
-    <!-- Visualization that shows the key in the name column and the value in the value column -->
+    <!-- Visualization that shows the key in the name column and the key-value pair in the value column -->
     <Type Name="tsl::robin_map&lt;*&gt;" ExcludeView="ShowElementsByIndex" Priority="MediumHigh">
         <DisplayString>{{ size={m_ht.m_nb_elements} }}</DisplayString>
         <Expand>
@@ -45,7 +45,7 @@
 
                 <Size>m_ht.m_nb_elements</Size>
                 <Loop>
-                    <Item Condition="bucket-&gt;m_dist_from_ideal_bucket != -1" Name="[{reinterpret_cast&lt;std::pair&lt;$T1,$T2&gt;*&gt;(&amp;bucket->m_value)->first}]">*bucket,view(MapHelper)</Item>
+                    <Item Condition="bucket-&gt;m_dist_from_ideal_bucket != -1" Name="[{reinterpret_cast&lt;std::pair&lt;$T1,$T2&gt;*&gt;(&amp;bucket->m_value)->first}]">*bucket</Item>
                     <Break Condition="bucket-&gt;m_last_bucket"/>
                     <Exec>++bucket</Exec>
                 </Loop>
