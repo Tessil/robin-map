@@ -35,9 +35,14 @@ if(${CMAKE_VERSION} VERSION_GREATER "3.2")
     include(CMakePackageConfigHelpers)
     include(GNUInstallDirs)
 
-    ## Install include directory
+    ## Install include directory and potential natvis file
     install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/tsl"
             DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+
+    if(MSVC)
+        install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/tsl_robin_map.natvis"
+                DESTINATION ".")
+    endif()
 
 
 
