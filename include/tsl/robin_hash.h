@@ -403,12 +403,12 @@ public:
         friend class robin_hash;
         
     private:
-        using iterator_bucket = typename std::conditional<IsConst, 
-                                                          typename buckets_container_type::const_iterator, 
-                                                          typename buckets_container_type::iterator>::type;
+        using bucket_entry_ptr = typename std::conditional<IsConst, 
+                                                           const bucket_entry*, 
+                                                           bucket_entry*>::type;
     
         
-        robin_iterator(iterator_bucket it) noexcept: m_iterator(it) {
+        robin_iterator(bucket_entry_ptr bucket) noexcept: m_bucket(bucket) {
         }
         
     public:
@@ -422,40 +422,40 @@ public:
         robin_iterator() noexcept {
         }
         
-        robin_iterator(const robin_iterator<false>& other) noexcept: m_iterator(other.m_iterator) {
+        robin_iterator(const robin_iterator<false>& other) noexcept: m_bucket(other.m_bucket) {
         }
         
         const typename robin_hash::key_type& key() const {
-            return KeySelect()(m_iterator->value());
+            return KeySelect()(m_bucket->value());
         }
 
         template<class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value && IsConst>::type* = nullptr>
         const typename U::value_type& value() const {
-            return U()(m_iterator->value());
+            return U()(m_bucket->value());
         }
 
         template<class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value && !IsConst>::type* = nullptr>
         typename U::value_type& value() {
-            return U()(m_iterator->value());
+            return U()(m_bucket->value());
         }
         
         reference operator*() const {
-            return m_iterator->value();
+            return m_bucket->value();
         }
         
         pointer operator->() const {
-            return std::addressof(m_iterator->value());
+            return std::addressof(m_bucket->value());
         }
         
         robin_iterator& operator++() {
             while(true) {
-                if(m_iterator->last_bucket()) {
-                    ++m_iterator;
+                if(m_bucket->last_bucket()) {
+                    ++m_bucket;
                     return *this;
                 }
                 
-                ++m_iterator;
-                if(!m_iterator->empty()) {
+                ++m_bucket;
+                if(!m_bucket->empty()) {
                     return *this;
                 }
             }
@@ -469,7 +469,7 @@ public:
         }
         
         friend bool operator==(const robin_iterator& lhs, const robin_iterator& rhs) { 
-            return lhs.m_iterator == rhs.m_iterator; 
+            return lhs.m_bucket == rhs.m_bucket; 
         }
         
         friend bool operator!=(const robin_iterator& lhs, const robin_iterator& rhs) { 
@@ -477,7 +477,7 @@ public:
         }
         
     private:
-        iterator_bucket m_iterator;
+        bucket_entry_ptr m_bucket;
     };
 
     
@@ -489,8 +489,8 @@ public:
                float max_load_factor): Hash(hash), 
                                        KeyEqual(equal),
                                        GrowthPolicy(bucket_count),
-                                       m_buckets(alloc), 
-                                       m_first_or_empty_bucket(static_empty_bucket_ptr()), 
+                                       m_buckets_data(alloc), 
+                                       m_buckets(static_empty_bucket_ptr()), 
                                        m_bucket_count(bucket_count),
                                        m_nb_elements(0), 
                                        m_grow_on_next_insert(false)
@@ -508,11 +508,11 @@ public:
             * We can't use `vector(size_type count, const T& value, const Allocator& alloc)` as it requires the
             * value T to be copyable.
             */
-            m_buckets.resize(m_bucket_count);
-            m_first_or_empty_bucket = m_buckets.data();
+            m_buckets_data.resize(m_bucket_count);
+            m_buckets = m_buckets_data.data();
             
-            tsl_rh_assert(!m_buckets.empty());
-            m_buckets.back().set_as_last_bucket();
+            tsl_rh_assert(!m_buckets_data.empty());
+            m_buckets_data.back().set_as_last_bucket();
         }
         
         
@@ -522,8 +522,8 @@ public:
     robin_hash(const robin_hash& other): Hash(other),
                                          KeyEqual(other),
                                          GrowthPolicy(other),
-                                         m_buckets(other.m_buckets),
-                                         m_first_or_empty_bucket(m_buckets.empty()?static_empty_bucket_ptr():m_buckets.data()),
+                                         m_buckets_data(other.m_buckets_data),
+                                         m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
                                          m_bucket_count(other.m_bucket_count),
                                          m_nb_elements(other.m_nb_elements),
                                          m_load_threshold(other.m_load_threshold),
@@ -539,8 +539,8 @@ public:
                                           : Hash(std::move(static_cast<Hash&>(other))),
                                             KeyEqual(std::move(static_cast<KeyEqual&>(other))),
                                             GrowthPolicy(std::move(static_cast<GrowthPolicy&>(other))),
-                                            m_buckets(std::move(other.m_buckets)),
-                                            m_first_or_empty_bucket(m_buckets.empty()?static_empty_bucket_ptr():m_buckets.data()),
+                                            m_buckets_data(std::move(other.m_buckets_data)),
+                                            m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
                                             m_bucket_count(other.m_bucket_count),
                                             m_nb_elements(other.m_nb_elements),
                                             m_load_threshold(other.m_load_threshold),
@@ -548,8 +548,8 @@ public:
                                             m_grow_on_next_insert(other.m_grow_on_next_insert)
     {
         other.GrowthPolicy::clear();
-        other.m_buckets.clear();
-        other.m_first_or_empty_bucket = static_empty_bucket_ptr();
+        other.m_buckets_data.clear();
+        other.m_buckets = static_empty_bucket_ptr();
         other.m_bucket_count = 0;
         other.m_nb_elements = 0;
         other.m_load_threshold = 0;
@@ -562,9 +562,9 @@ public:
             KeyEqual::operator=(other);
             GrowthPolicy::operator=(other);
             
-            m_buckets = other.m_buckets;
-            m_first_or_empty_bucket = m_buckets.empty()?static_empty_bucket_ptr():
-                                                        m_buckets.data();
+            m_buckets_data = other.m_buckets_data;
+            m_buckets = m_buckets_data.empty()?static_empty_bucket_ptr():
+                                               m_buckets_data.data();
             m_bucket_count = other.m_bucket_count;
             m_nb_elements = other.m_nb_elements;
             m_load_threshold = other.m_load_threshold;
@@ -583,7 +583,7 @@ public:
     }
     
     allocator_type get_allocator() const {
-        return m_buckets.get_allocator();
+        return m_buckets_data.get_allocator();
     }
     
     
@@ -591,12 +591,12 @@ public:
      * Iterators
      */
     iterator begin() noexcept {
-        auto begin = m_buckets.begin();
-        while(begin != m_buckets.end() && begin->empty()) {
-            ++begin;
+        std::size_t i = 0;
+        while(i < m_bucket_count && m_buckets[i].empty()) {
+            i++;
         }
         
-        return iterator(begin);
+        return iterator(m_buckets + i);
     }
     
     const_iterator begin() const noexcept {
@@ -604,16 +604,16 @@ public:
     }
     
     const_iterator cbegin() const noexcept {
-        auto begin = m_buckets.cbegin();
-        while(begin != m_buckets.cend() && begin->empty()) {
-            ++begin;
+        std::size_t i = 0;
+        while(i < m_bucket_count && m_buckets[i].empty()) {
+            i++;
         }
         
-        return const_iterator(begin);
+        return const_iterator(m_buckets + i);
     }
     
     iterator end() noexcept {
-        return iterator(m_buckets.end());
+        return iterator(m_buckets + m_bucket_count);
     }
     
     const_iterator end() const noexcept {
@@ -621,7 +621,7 @@ public:
     }
     
     const_iterator cend() const noexcept {
-        return const_iterator(m_buckets.cend());
+        return const_iterator(m_buckets + m_bucket_count);
     }
     
     
@@ -637,14 +637,14 @@ public:
     }
     
     size_type max_size() const noexcept {
-        return m_buckets.max_size();
+        return m_buckets_data.max_size();
     }
     
     /*
      * Modifiers
      */
     void clear() noexcept {
-        for(auto& bucket: m_buckets) {
+        for(auto& bucket: m_buckets_data) {
             bucket.clear();
         }
         
@@ -751,7 +751,7 @@ public:
          * Erase bucket used a backward shift after clearing the bucket.
          * Check if there is a new value in the bucket, if not get the next non-empty.
          */
-        if(pos.m_iterator->empty()) {
+        if(pos.m_bucket->empty()) {
             ++pos;
         }
         
@@ -769,7 +769,7 @@ public:
         
         auto first_mutable = mutable_iterator(first);
         auto last_mutable = mutable_iterator(last);
-        for(auto it = first_mutable.m_iterator; it != last_mutable.m_iterator; ++it) {
+        for(auto it = first_mutable.m_bucket; it != last_mutable.m_bucket; ++it) {
             if(!it->empty()) {
                 it->clear();
                 m_nb_elements--;
@@ -785,15 +785,15 @@ public:
          * Backward shift on the values which come after the deleted values.
          * We try to move the values closer to their ideal bucket.
          */
-        std::size_t icloser_bucket = std::size_t(std::distance(m_buckets.begin(), first_mutable.m_iterator));
-        std::size_t ito_move_closer_value = std::size_t(std::distance(m_buckets.begin(), last_mutable.m_iterator));
+        std::size_t icloser_bucket = static_cast<std::size_t>(first_mutable.m_bucket - m_buckets);
+        std::size_t ito_move_closer_value = static_cast<std::size_t>(last_mutable.m_bucket - m_buckets);
         tsl_rh_assert(ito_move_closer_value > icloser_bucket);
         
         const std::size_t ireturn_bucket = ito_move_closer_value - 
                                            std::min(ito_move_closer_value - icloser_bucket, 
                                                     std::size_t(m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
         
-        while(ito_move_closer_value < m_buckets.size() && m_buckets[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
+        while(ito_move_closer_value < m_bucket_count && m_buckets[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
             icloser_bucket = ito_move_closer_value - 
                              std::min(ito_move_closer_value - icloser_bucket, 
                                       std::size_t(m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
@@ -813,7 +813,7 @@ public:
         }
 
         
-        return iterator(m_buckets.begin() + ireturn_bucket);
+        return iterator(m_buckets + ireturn_bucket);
     }
     
     
@@ -845,8 +845,8 @@ public:
         swap(static_cast<Hash&>(*this), static_cast<Hash&>(other));
         swap(static_cast<KeyEqual&>(*this), static_cast<KeyEqual&>(other));
         swap(static_cast<GrowthPolicy&>(*this), static_cast<GrowthPolicy&>(other));
+        swap(m_buckets_data, other.m_buckets_data);
         swap(m_buckets, other.m_buckets);
-        swap(m_first_or_empty_bucket, other.m_first_or_empty_bucket);
         swap(m_bucket_count, other.m_bucket_count);
         swap(m_nb_elements, other.m_nb_elements);
         swap(m_load_threshold, other.m_load_threshold);
@@ -960,7 +960,7 @@ public:
     }
     
     size_type max_bucket_count() const {
-        return std::min(GrowthPolicy::max_bucket_count(), m_buckets.max_size());
+        return std::min(GrowthPolicy::max_bucket_count(), m_buckets_data.max_size());
     }
     
     /*
@@ -1008,7 +1008,7 @@ public:
      * Other
      */    
     iterator mutable_iterator(const_iterator pos) {
-        return iterator(m_buckets.begin() + std::distance(m_buckets.cbegin(), pos.m_iterator));
+        return iterator(const_cast<bucket_entry*>(pos.m_bucket));
     }
     
 private:
@@ -1024,7 +1024,7 @@ private:
     
     std::size_t bucket_for_hash(std::size_t hash) const {
         const std::size_t bucket = GrowthPolicy::bucket_for_hash(hash);
-        tsl_rh_assert(bucket < m_buckets.size() || (bucket == 0 && m_buckets.empty()));
+        tsl_rh_assert(bucket < m_bucket_count || (bucket == 0 && m_bucket_count == 0));
         
         return bucket;
     }
@@ -1056,11 +1056,11 @@ private:
         std::size_t ibucket = bucket_for_hash(hash); 
         distance_type dist_from_ideal_bucket = 0;
         
-        while(dist_from_ideal_bucket <= (m_first_or_empty_bucket + ibucket)->dist_from_ideal_bucket()) {
-            if(TSL_RH_LIKELY((!USE_STORED_HASH_ON_LOOKUP || (m_first_or_empty_bucket + ibucket)->bucket_hash_equal(hash)) && 
-               compare_keys(KeySelect()((m_first_or_empty_bucket + ibucket)->value()), key))) 
+        while(dist_from_ideal_bucket <= m_buckets[ibucket].dist_from_ideal_bucket()) {
+            if(TSL_RH_LIKELY((!USE_STORED_HASH_ON_LOOKUP || m_buckets[ibucket].bucket_hash_equal(hash)) && 
+               compare_keys(KeySelect()(m_buckets[ibucket].value()), key))) 
             {
-                return const_iterator(m_buckets.begin() + ibucket);
+                return const_iterator(m_buckets + ibucket);
             }
             
             ibucket = next_bucket(ibucket);
@@ -1071,7 +1071,7 @@ private:
     }
     
     void erase_from_bucket(iterator pos) {
-        pos.m_iterator->clear();
+        pos.m_bucket->clear();
         m_nb_elements--;
         
         /**
@@ -1080,7 +1080,7 @@ private:
          * 
          * We try to move the values closer to their ideal bucket.
          */
-        std::size_t previous_ibucket = std::size_t(std::distance(m_buckets.begin(), pos.m_iterator));
+        std::size_t previous_ibucket = static_cast<std::size_t>(pos.m_bucket - m_buckets);
         std::size_t ibucket = next_bucket(previous_ibucket);
         
         while(m_buckets[ibucket].dist_from_ideal_bucket() > 0) {
@@ -1103,11 +1103,11 @@ private:
         std::size_t ibucket = bucket_for_hash(hash); 
         distance_type dist_from_ideal_bucket = 0;
         
-        while(dist_from_ideal_bucket <= (m_first_or_empty_bucket + ibucket)->dist_from_ideal_bucket()) {
-            if((!USE_STORED_HASH_ON_LOOKUP || (m_first_or_empty_bucket + ibucket)->bucket_hash_equal(hash)) &&
-               compare_keys(KeySelect()((m_first_or_empty_bucket + ibucket)->value()), key)) 
+        while(dist_from_ideal_bucket <= m_buckets[ibucket].dist_from_ideal_bucket()) {
+            if((!USE_STORED_HASH_ON_LOOKUP || m_buckets[ibucket].bucket_hash_equal(hash)) &&
+               compare_keys(KeySelect()(m_buckets[ibucket].value()), key)) 
             {
-                return std::make_pair(iterator(m_buckets.begin() + ibucket), false);
+                return std::make_pair(iterator(m_buckets + ibucket), false);
             }
             
             ibucket = next_bucket(ibucket);
@@ -1118,16 +1118,16 @@ private:
             ibucket = bucket_for_hash(hash);
             dist_from_ideal_bucket = 0;
             
-            while(dist_from_ideal_bucket <= (m_first_or_empty_bucket + ibucket)->dist_from_ideal_bucket()) {
+            while(dist_from_ideal_bucket <= m_buckets[ibucket].dist_from_ideal_bucket()) {
                 ibucket = next_bucket(ibucket);
                 dist_from_ideal_bucket++;
             }
         }
  
         
-        if((m_first_or_empty_bucket + ibucket)->empty()) {
-            (m_first_or_empty_bucket + ibucket)->set_value_of_empty_bucket(dist_from_ideal_bucket, bucket_entry::truncate_hash(hash),
-                                                                           std::forward<Args>(value_type_args)...);
+        if(m_buckets[ibucket].empty()) {
+            m_buckets[ibucket].set_value_of_empty_bucket(dist_from_ideal_bucket, bucket_entry::truncate_hash(hash),
+                                                         std::forward<Args>(value_type_args)...);
         }
         else {
             insert_value(ibucket, dist_from_ideal_bucket, bucket_entry::truncate_hash(hash), 
@@ -1140,7 +1140,7 @@ private:
          * The value will be inserted in ibucket in any case, either because it was
          * empty or by stealing the bucket (robin hood). 
          */
-        return std::make_pair(iterator(m_buckets.begin() + ibucket), true);
+        return std::make_pair(iterator(m_buckets + ibucket), true);
     }
     
     
@@ -1200,7 +1200,7 @@ private:
                              get_allocator(), m_max_load_factor);
         
         const bool use_stored_hash = USE_STORED_HASH_ON_REHASH(new_table.bucket_count());
-        for(auto& bucket: m_buckets) {
+        for(auto& bucket: m_buckets_data) {
             if(bucket.empty()) { 
                 continue; 
             }
@@ -1270,17 +1270,20 @@ private:
     }
     
 private:
-    buckets_container_type m_buckets;
+    buckets_container_type m_buckets_data;
     
     /**
-     * Points to m_buckets.data() if !m_buckets.empty() otherwise points to static_empty_bucket_ptr.
-     * This variable is useful to avoid the cost of checking if m_buckets is empty when trying 
+     * Points to m_buckets_data.data() if !m_buckets_data.empty() otherwise points to static_empty_bucket_ptr.
+     * This variable is useful to avoid the cost of checking if m_buckets_data is empty when trying 
      * to find an element.
+     * 
+     * TODO Remove m_buckets_data and only use a pointer instead of a pointer+vector to save some space in the robin_hash object.
+     * Manage the Allocator manually.
      */
-    bucket_entry* m_first_or_empty_bucket;
+    bucket_entry* m_buckets;
     
     /**
-     * Used a lot in find, avoid the call to m_buckets.size() which is a bit slower.
+     * Used a lot in find, avoid the call to m_buckets_data.size() which is a bit slower.
      */
     size_type m_bucket_count;
     
