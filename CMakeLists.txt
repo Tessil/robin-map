@@ -10,11 +10,11 @@ target_include_directories(robin_map INTERFACE
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>)
 
-target_sources(robin_map INTERFACE 
-               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_growth_policy.h
-                                 ${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_hash.h
-                                 ${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_map.h
-                                 ${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_set.h>)
+list(APPEND headers ${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_growth_policy.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_hash.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_map.h
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include/tsl/robin_set.h)
+target_sources(robin_map INTERFACE "$<BUILD_INTERFACE:${headers}>")
 
 if(MSVC)
     target_sources(robin_map INTERFACE
