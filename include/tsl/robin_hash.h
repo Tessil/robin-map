@@ -72,7 +72,7 @@ struct is_power_of_two_policy<tsl::rh::power_of_two_growth_policy<GrowthFactor>>
 using truncated_hash_type = std::uint_least32_t;
 
 /**
- * Helper class that store a truncated hash if StoreHash is true and nothing otherwise.
+ * Helper class that stores a truncated hash if StoreHash is true and nothing otherwise.
  */
 template<bool StoreHash>
 class bucket_entry_hash {
@@ -496,7 +496,7 @@ public:
                                        m_grow_on_next_insert(false)
     {
         if(bucket_count > max_bucket_count()) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum bucket count.");
         }
         
         if(m_bucket_count > 0) {
