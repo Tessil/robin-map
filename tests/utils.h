@@ -156,7 +156,7 @@ public:
         }
     }
     
-    std::string value() const {
+    const std::string& value() const {
         return *m_value;
     }
     
