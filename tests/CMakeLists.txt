@@ -9,9 +9,9 @@ add_executable(tsl_robin_map_tests "main.cpp"
                                    "robin_set_tests.cpp")                                     
                                     
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(tsl_robin_map_tests PRIVATE -std=c++11 -Werror -Wall -Wextra -Wold-style-cast -O3 -DTSL_DEBUG)
+    target_compile_options(tsl_robin_map_tests PRIVATE -Werror -Wall -Wextra -Wold-style-cast -DTSL_DEBUG -UNDEBUG)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_options(tsl_robin_map_tests PRIVATE /bigobj /WX /W3 /DTSL_DEBUG)
+    target_compile_options(tsl_robin_map_tests PRIVATE /bigobj /WX /W3 /DTSL_DEBUG /UNDEBUG)
 endif()
 
 # Boost::unit_test_framework
