@@ -1253,7 +1253,7 @@ private:
 
     
 public:
-    static const size_type DEFAULT_INIT_BUCKETS_SIZE = 16;
+    static const size_type DEFAULT_INIT_BUCKETS_SIZE = 0;
     static constexpr float DEFAULT_MAX_LOAD_FACTOR = 0.5f;
     
 private:
