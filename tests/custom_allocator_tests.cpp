@@ -84,7 +84,7 @@ public:
     }
 
     void deallocate(T* p, size_type /*n*/) {
-        free(p);
+        std::free(p);
     }
     
     size_type max_size() const noexcept {
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(test_custom_allocator_1) {
     tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
                     custom_allocator<std::pair<int, int>>> map;
     
-    const int nb_elements = 10000;
+    const int nb_elements = 1000;
     for(int i = 0; i < nb_elements; i++) {
         map.insert({i, i*2});
     }

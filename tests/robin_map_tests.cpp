@@ -131,6 +131,7 @@ BOOST_AUTO_TEST_CASE(test_range_insert) {
     
     BOOST_CHECK_EQUAL(map.at(-1), 1);
     BOOST_CHECK_EQUAL(map.at(-2), 2);
+    
     for(int i = 10; i < nb_values - 5; i++) {
         BOOST_CHECK_EQUAL(map.at(i), i+1);
     }
@@ -161,7 +162,9 @@ BOOST_AUTO_TEST_CASE(test_insert_with_hint) {
     BOOST_CHECK_EQUAL(map.size(), 5);
 }
 
-
+/**
+ * emplace_hint
+ */
 BOOST_AUTO_TEST_CASE(test_emplace_hint) {
     tsl::robin_map<int, int> map{{1, 0}, {2, 1}, {3, 2}};
     
@@ -201,16 +204,16 @@ BOOST_AUTO_TEST_CASE(test_emplace) {
     
     
     std::tie(it, inserted) = map.emplace(std::piecewise_construct,
-                                            std::forward_as_tuple(10),
-                                            std::forward_as_tuple(1));
+                                         std::forward_as_tuple(10),
+                                         std::forward_as_tuple(1));
     BOOST_CHECK_EQUAL(it->first, 10);
     BOOST_CHECK_EQUAL(it->second, move_only_test(1));
     BOOST_CHECK(inserted);
     
     
     std::tie(it, inserted) = map.emplace(std::piecewise_construct,
-                                            std::forward_as_tuple(10),
-                                            std::forward_as_tuple(3));
+                                         std::forward_as_tuple(10),
+                                         std::forward_as_tuple(3));
     BOOST_CHECK_EQUAL(it->first, 10);
     BOOST_CHECK_EQUAL(it->second, move_only_test(1));
     BOOST_CHECK(!inserted);
@@ -239,6 +242,7 @@ BOOST_AUTO_TEST_CASE(test_try_emplace) {
 }
 
 BOOST_AUTO_TEST_CASE(test_try_emplace_2) {
+    // Insert x values with try_emplace, insert them again, check with find.
     tsl::robin_map<std::string, move_only_test> map;
     tsl::robin_map<std::string, move_only_test>::iterator it;
     bool inserted;
@@ -414,7 +418,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_insert_erase_insert, HMap, test_types) {
     using key_t = typename HMap::key_type; using value_t = typename HMap:: mapped_type;
     
     const std::size_t nb_values = 2000;
-    HMap map;
+    HMap map(10);
     typename HMap::iterator it;
     bool inserted;
     
@@ -681,6 +685,16 @@ BOOST_AUTO_TEST_CASE(test_move_constructor) {
     BOOST_CHECK(map_move == utils::get_filled_hash_map<HMap>(nb_values*2));
 }
 
+BOOST_AUTO_TEST_CASE(test_move_constructor_empty) {
+    tsl::robin_map<std::string, move_only_test> map(0);
+    tsl::robin_map<std::string, move_only_test> map_move(std::move(map));
+    
+    BOOST_CHECK(map.empty());
+    BOOST_CHECK(map_move.empty());
+    
+    BOOST_CHECK(map.find("") == map.end());
+    BOOST_CHECK(map_move.find("") == map_move.end());
+}
 
 BOOST_AUTO_TEST_CASE(test_move_operator) {
     // insert x values in map, move map into map_move with move operator, check map and map_move, 
@@ -703,6 +717,18 @@ BOOST_AUTO_TEST_CASE(test_move_operator) {
     
     BOOST_CHECK_EQUAL(map_move.size(), nb_values*2);
     BOOST_CHECK(map_move == utils::get_filled_hash_map<HMap>(nb_values*2));
+}
+
+BOOST_AUTO_TEST_CASE(test_move_operator_empty) {
+    tsl::robin_map<std::string, move_only_test> map(0);
+    tsl::robin_map<std::string, move_only_test> map_move;
+    map_move = (std::move(map));
+    
+    BOOST_CHECK(map.empty());
+    BOOST_CHECK(map_move.empty());
+    
+    BOOST_CHECK(map.find("") == map.end());
+    BOOST_CHECK(map_move.find("") == map_move.end());
 }
 
 BOOST_AUTO_TEST_CASE(test_reassign_moved_object_move_constructor) {
@@ -800,6 +826,7 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor_and_operator) {
  * at
  */
 BOOST_AUTO_TEST_CASE(test_at) {
+    // insert x values, use at for known and unknown values.
     const tsl::robin_map<std::int64_t, std::int64_t> map = {{0, 10}, {-2, 20}};
     
     BOOST_CHECK_EQUAL(map.at(0), 10);
@@ -856,6 +883,23 @@ BOOST_AUTO_TEST_CASE(test_swap) {
     map2.insert({4, 40});
     
     BOOST_CHECK(map == (tsl::robin_map<std::int64_t, std::int64_t>{{4, 40}, {5, 50}, {6, 60}}));
+    BOOST_CHECK(map2 == (tsl::robin_map<std::int64_t, std::int64_t>{{1, 10}, {8, 80}, {3, 30}, {4, 40}}));
+}
+
+BOOST_AUTO_TEST_CASE(test_swap_empty) {
+    tsl::robin_map<std::int64_t, std::int64_t> map = {{1, 10}, {8, 80}, {3, 30}};
+    tsl::robin_map<std::int64_t, std::int64_t> map2;
+    
+    using std::swap;
+    swap(map, map2);
+    
+    BOOST_CHECK(map == (tsl::robin_map<std::int64_t, std::int64_t>{}));
+    BOOST_CHECK(map2 == (tsl::robin_map<std::int64_t, std::int64_t>{{1, 10}, {8, 80}, {3, 30}}));
+    
+    map.insert({6, 60});
+    map2.insert({4, 40});
+    
+    BOOST_CHECK(map == (tsl::robin_map<std::int64_t, std::int64_t>{{6, 60}}));
     BOOST_CHECK(map2 == (tsl::robin_map<std::int64_t, std::int64_t>{{1, 10}, {8, 80}, {3, 30}, {4, 40}}));
 }
 
