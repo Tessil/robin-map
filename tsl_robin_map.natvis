@@ -7,16 +7,16 @@
         <AlternativeType Name="tsl::robin_set&lt;*&gt;"/>
         <DisplayString>{{ size={m_ht.m_nb_elements} }}</DisplayString>
         <Expand>
-            <Item Name="[bucket_count]" IncludeView="detailed">m_ht.m_buckets._Mypair._Myval2._Mylast - m_ht.m_buckets._Mypair._Myval2._Myfirst</Item>
-            <Item Name="[load_factor]" Condition="m_ht.m_buckets._Mypair._Myval2._Myfirst != m_ht.m_buckets._Mypair._Myval2._Mylast" IncludeView="detailed">
-                ((float)m_ht.m_nb_elements) / ((float)(m_ht.m_buckets._Mypair._Myval2._Mylast - m_ht.m_buckets._Mypair._Myval2._Myfirst))
+            <Item Name="[bucket_count]" IncludeView="detailed">m_ht.m_buckets_data._Mypair._Myval2._Mylast - m_ht.m_buckets_data._Mypair._Myval2._Myfirst</Item>
+            <Item Name="[load_factor]" Condition="m_ht.m_buckets_data._Mypair._Myval2._Myfirst != m_ht.m_buckets_data._Mypair._Myval2._Mylast" IncludeView="detailed">
+                ((float)m_ht.m_nb_elements) / ((float)(m_ht.m_buckets_data._Mypair._Myval2._Mylast - m_ht.m_buckets_data._Mypair._Myval2._Myfirst))
             </Item>
-            <Item Name="[load_factor]" Condition="m_ht.m_buckets._Mypair._Myval2._Myfirst == m_ht.m_buckets._Mypair._Myval2._Mylast" IncludeView="detailed">
+            <Item Name="[load_factor]" Condition="m_ht.m_buckets_data._Mypair._Myval2._Myfirst == m_ht.m_buckets_data._Mypair._Myval2._Mylast" IncludeView="detailed">
                 0
             </Item>
             <Item Name="[max_load_factor]" IncludeView="detailed">m_ht.m_max_load_factor</Item>
             <CustomListItems>
-                <Variable Name="bucket" InitialValue="m_ht.m_first_or_empty_bucket"/>
+                <Variable Name="bucket" InitialValue="m_ht.m_buckets"/>
 
                 <Size>m_ht.m_nb_elements</Size>
                 <Loop>
@@ -32,16 +32,16 @@
     <Type Name="tsl::robin_map&lt;*&gt;" ExcludeView="ShowElementsByIndex" Priority="MediumHigh">
         <DisplayString>{{ size={m_ht.m_nb_elements} }}</DisplayString>
         <Expand>
-            <Item Name="[bucket_count]" IncludeView="detailed">m_ht.m_buckets._Mypair._Myval2._Mylast - m_ht.m_buckets._Mypair._Myval2._Myfirst</Item>
-            <Item Name="[load_factor]" Condition="m_ht.m_buckets._Mypair._Myval2._Myfirst != m_ht.m_buckets._Mypair._Myval2._Mylast" IncludeView="detailed">
-                ((float)m_ht.m_nb_elements) / ((float)(m_ht.m_buckets._Mypair._Myval2._Mylast - m_ht.m_buckets._Mypair._Myval2._Myfirst))
+            <Item Name="[bucket_count]" IncludeView="detailed">m_ht.m_buckets_data._Mypair._Myval2._Mylast - m_ht.m_buckets_data._Mypair._Myval2._Myfirst</Item>
+            <Item Name="[load_factor]" Condition="m_ht.m_buckets_data._Mypair._Myval2._Myfirst != m_ht.m_buckets_data._Mypair._Myval2._Mylast" IncludeView="detailed">
+                ((float)m_ht.m_nb_elements) / ((float)(m_ht.m_buckets_data._Mypair._Myval2._Mylast - m_ht.m_buckets_data._Mypair._Myval2._Myfirst))
             </Item>
-            <Item Name="[load_factor]" Condition="m_ht.m_buckets._Mypair._Myval2._Myfirst == m_ht.m_buckets._Mypair._Myval2._Mylast" IncludeView="detailed">
+            <Item Name="[load_factor]" Condition="m_ht.m_buckets_data._Mypair._Myval2._Myfirst == m_ht.m_buckets_data._Mypair._Myval2._Mylast" IncludeView="detailed">
                 0
             </Item>
             <Item Name="[max_load_factor]" IncludeView="detailed">m_ht.m_max_load_factor</Item>
             <CustomListItems>
-                <Variable Name="bucket" InitialValue="m_ht.m_first_or_empty_bucket"/>
+                <Variable Name="bucket" InitialValue="m_ht.m_buckets"/>
 
                 <Size>m_ht.m_nb_elements</Size>
                 <Loop>
@@ -54,9 +54,9 @@
     </Type>
 
     <Type Name="tsl::detail_robin_hash::robin_hash&lt;*&gt;::robin_iterator&lt;*&gt;">
-        <DisplayString>{m_iterator}</DisplayString>
+        <DisplayString>{*m_bucket}</DisplayString>
         <Expand>
-            <ExpandedItem>m_iterator</ExpandedItem>
+            <ExpandedItem>*m_bucket</ExpandedItem>
         </Expand>
     </Type>
 
