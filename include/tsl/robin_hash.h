@@ -489,8 +489,8 @@ public:
                float max_load_factor): Hash(hash), 
                                        KeyEqual(equal),
                                        GrowthPolicy(bucket_count),
-                                       m_buckets_data(alloc), 
-                                       m_buckets(static_empty_bucket_ptr()), 
+                                       m_buckets_data(bucket_count, alloc),
+                                       m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
                                        m_bucket_count(bucket_count),
                                        m_nb_elements(0), 
                                        m_grow_on_next_insert(false)
@@ -500,17 +500,6 @@ public:
         }
         
         if(m_bucket_count > 0) {
-            /*
-            * We can't use the `vector(size_type count, const Allocator& alloc)` constructor
-            * as it's only available in C++14 and we need to support C++11. We thus must resize after using
-            * the `vector(const Allocator& alloc)` constructor.
-            * 
-            * We can't use `vector(size_type count, const T& value, const Allocator& alloc)` as it requires the
-            * value T to be copyable.
-            */
-            m_buckets_data.resize(m_bucket_count);
-            m_buckets = m_buckets_data.data();
-            
             tsl_rh_assert(!m_buckets_data.empty());
             m_buckets_data.back().set_as_last_bucket();
         }
