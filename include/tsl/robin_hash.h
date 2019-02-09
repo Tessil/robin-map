@@ -284,6 +284,139 @@ private:
 };
 
 
+template<class ValueType,
+         class Allocator,
+         bool StoreHash>
+class buckets {
+public:
+    using allocator_type = Allocator;
+    using value_type = ValueType;
+    using size_type = std::size_t;
+
+private:
+    using bucket_entry = tsl::detail_robin_hash::bucket_entry<value_type, StoreHash>;    
+    using buckets_allocator = typename std::allocator_traits<allocator_type>::template rebind_alloc<bucket_entry>;
+    using buckets_container_type = std::vector<bucket_entry, buckets_allocator>;
+    
+public:
+    buckets(size_type bucket_count, const Allocator& alloc): m_buckets_data(alloc), 
+                                                             m_buckets(static_empty_bucket_ptr()), 
+                                                             m_bucket_count(bucket_count)
+    {
+        if(m_bucket_count > max_size()) {
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum bucket count.");
+        }
+        
+        if(m_bucket_count > 0) {
+            /*
+            * We can't use the `vector(size_type count, const Allocator& alloc)` constructor
+            * as it's only available in C++14 and we need to support C++11. We thus must resize after using
+            * the `vector(const Allocator& alloc)` constructor.
+            * 
+            * We can't use `vector(size_type count, const T& value, const Allocator& alloc)` as it requires the
+            * value T to be copyable.
+            */
+            m_buckets_data.resize(m_bucket_count);
+            m_buckets = m_buckets_data.data();
+            
+            tsl_rh_assert(!m_buckets_data.empty());
+            m_buckets_data.back().set_as_last_bucket();
+        }
+    }
+    
+    buckets(const buckets& other): m_buckets_data(other.m_buckets_data),
+                                   m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
+                                   m_bucket_count(other.m_bucket_count)
+    {
+    }
+    
+    buckets(buckets&& other) noexcept(std::is_nothrow_move_constructible<buckets_container_type>::value)
+                                  : m_buckets_data(std::move(other.m_buckets_data)),
+                                    m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
+                                    m_bucket_count(other.m_bucket_count)
+    {
+        other.m_buckets_data.clear();
+        other.m_buckets = static_empty_bucket_ptr();
+        other.m_bucket_count = 0;
+    }
+    
+    buckets& operator=(const buckets& other) {
+        if(&other != this) {
+            m_buckets_data = other.m_buckets_data;
+            m_buckets = m_buckets_data.empty()?static_empty_bucket_ptr():
+                                               m_buckets_data.data();
+            m_bucket_count = other.m_bucket_count;
+        }
+        
+        return *this;
+    }
+    
+    buckets& operator=(buckets&& other) {
+        other.swap(*this);
+        other.clear();
+        
+        return *this;
+    }
+    
+    void swap(buckets& other) {
+        using std::swap;
+        
+        swap(m_buckets_data, other.m_buckets_data);
+        swap(m_buckets, other.m_buckets);
+        swap(m_bucket_count, other.m_bucket_count);
+    }
+    
+    void clear() noexcept {
+        for(std::size_t i = 0; i < m_buckets_data.size(); i++) {
+            m_buckets_data[i].clear();
+        }
+    }
+
+    allocator_type get_allocator() const {
+        return m_buckets_data.get_allocator();
+    }
+    
+    size_type size() const {
+        return m_buckets_data.size();
+    }
+    
+    size_type max_size() const noexcept {
+        return m_buckets_data.max_size();
+    }
+    
+    operator bucket_entry*() noexcept {
+        return m_buckets;
+    }
+    
+    operator const bucket_entry*() const noexcept {
+        return m_buckets;
+    }
+
+private:
+    /**
+     * Return an always valid pointer to an static empty bucket_entry with last_bucket() == true.
+     */            
+    bucket_entry* static_empty_bucket_ptr() {
+        static bucket_entry empty_bucket(true);
+        return &empty_bucket;
+    }    
+    
+private:
+    buckets_container_type m_buckets_data;
+    
+    /**
+     * Points to m_buckets_data.data() if !m_buckets_data.empty() otherwise points to static_empty_bucket_ptr.
+     * This variable is useful to avoid the cost of checking if m_buckets_data is empty when trying 
+     * to find an element.
+     */
+    bucket_entry* m_buckets;
+    
+    /**
+     * Used a lot in find, avoid the call to m_buckets_data.size() which is a bit slower.
+     */
+    size_type m_bucket_count;
+};
+
 
 /**
  * Internal common class used by `robin_map` and `robin_set`. 
@@ -381,11 +514,8 @@ private:
     }
     
     using bucket_entry = tsl::detail_robin_hash::bucket_entry<value_type, STORE_HASH>;
+    using buckets = tsl::detail_robin_hash::buckets<ValueType, Allocator, STORE_HASH>;
     using distance_type = typename bucket_entry::distance_type;
-    
-    using buckets_allocator = typename std::allocator_traits<allocator_type>::template rebind_alloc<bucket_entry>;
-    using buckets_container_type = std::vector<bucket_entry, buckets_allocator>;
-    
     
 public: 
     /**
@@ -489,91 +619,35 @@ public:
                float max_load_factor): Hash(hash), 
                                        KeyEqual(equal),
                                        GrowthPolicy(bucket_count),
-                                       m_buckets_data(alloc), 
-                                       m_buckets(static_empty_bucket_ptr()), 
-                                       m_bucket_count(bucket_count),
+                                       m_buckets(bucket_count, alloc),
                                        m_nb_elements(0), 
                                        m_grow_on_next_insert(false)
     {
-        if(bucket_count > max_bucket_count()) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum bucket count.");
-        }
-        
-        if(m_bucket_count > 0) {
-            /*
-            * We can't use the `vector(size_type count, const Allocator& alloc)` constructor
-            * as it's only available in C++14 and we need to support C++11. We thus must resize after using
-            * the `vector(const Allocator& alloc)` constructor.
-            * 
-            * We can't use `vector(size_type count, const T& value, const Allocator& alloc)` as it requires the
-            * value T to be copyable.
-            */
-            m_buckets_data.resize(m_bucket_count);
-            m_buckets = m_buckets_data.data();
-            
-            tsl_rh_assert(!m_buckets_data.empty());
-            m_buckets_data.back().set_as_last_bucket();
-        }
-        
-        
         this->max_load_factor(max_load_factor);
     }
     
-    robin_hash(const robin_hash& other): Hash(other),
-                                         KeyEqual(other),
-                                         GrowthPolicy(other),
-                                         m_buckets_data(other.m_buckets_data),
-                                         m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
-                                         m_bucket_count(other.m_bucket_count),
-                                         m_nb_elements(other.m_nb_elements),
-                                         m_load_threshold(other.m_load_threshold),
-                                         m_max_load_factor(other.m_max_load_factor),
-                                         m_grow_on_next_insert(other.m_grow_on_next_insert)
-    {
-    }
+    robin_hash(const robin_hash& other) = default;
     
     robin_hash(robin_hash&& other) noexcept(std::is_nothrow_move_constructible<Hash>::value &&
                                             std::is_nothrow_move_constructible<KeyEqual>::value &&
                                             std::is_nothrow_move_constructible<GrowthPolicy>::value &&
-                                            std::is_nothrow_move_constructible<buckets_container_type>::value)
+                                            std::is_nothrow_move_constructible<buckets>::value)
                                           : Hash(std::move(static_cast<Hash&>(other))),
                                             KeyEqual(std::move(static_cast<KeyEqual&>(other))),
                                             GrowthPolicy(std::move(static_cast<GrowthPolicy&>(other))),
-                                            m_buckets_data(std::move(other.m_buckets_data)),
-                                            m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
-                                            m_bucket_count(other.m_bucket_count),
+                                            m_buckets(std::move(other.m_buckets)),
                                             m_nb_elements(other.m_nb_elements),
                                             m_load_threshold(other.m_load_threshold),
                                             m_max_load_factor(other.m_max_load_factor),
                                             m_grow_on_next_insert(other.m_grow_on_next_insert)
     {
         other.GrowthPolicy::clear();
-        other.m_buckets_data.clear();
-        other.m_buckets = static_empty_bucket_ptr();
-        other.m_bucket_count = 0;
         other.m_nb_elements = 0;
         other.m_load_threshold = 0;
         other.m_grow_on_next_insert = false;
     }
     
-    robin_hash& operator=(const robin_hash& other) {
-        if(&other != this) {
-            Hash::operator=(other);
-            KeyEqual::operator=(other);
-            GrowthPolicy::operator=(other);
-            
-            m_buckets_data = other.m_buckets_data;
-            m_buckets = m_buckets_data.empty()?static_empty_bucket_ptr():
-                                               m_buckets_data.data();
-            m_bucket_count = other.m_bucket_count;
-            m_nb_elements = other.m_nb_elements;
-            m_load_threshold = other.m_load_threshold;
-            m_max_load_factor = other.m_max_load_factor;
-            m_grow_on_next_insert = other.m_grow_on_next_insert;
-        }
-        
-        return *this;
-    }
+    robin_hash& operator=(const robin_hash& other) = default;
     
     robin_hash& operator=(robin_hash&& other) {
         other.swap(*this);
@@ -582,8 +656,22 @@ public:
         return *this;
     }
     
+    void swap(robin_hash& other) {
+        using std::swap;
+        
+        swap(static_cast<Hash&>(*this), static_cast<Hash&>(other));
+        swap(static_cast<KeyEqual&>(*this), static_cast<KeyEqual&>(other));
+        swap(static_cast<GrowthPolicy&>(*this), static_cast<GrowthPolicy&>(other));
+        swap(m_buckets, other.m_buckets);
+        swap(m_nb_elements, other.m_nb_elements);
+        swap(m_load_threshold, other.m_load_threshold);
+        swap(m_max_load_factor, other.m_max_load_factor);
+        swap(m_grow_on_next_insert, other.m_grow_on_next_insert);
+    }
+    
+    
     allocator_type get_allocator() const {
-        return m_buckets_data.get_allocator();
+        return m_buckets.get_allocator();
     }
     
     
@@ -592,7 +680,7 @@ public:
      */
     iterator begin() noexcept {
         std::size_t i = 0;
-        while(i < m_bucket_count && m_buckets[i].empty()) {
+        while(i < m_buckets.size() && m_buckets[i].empty()) {
             i++;
         }
         
@@ -605,7 +693,7 @@ public:
     
     const_iterator cbegin() const noexcept {
         std::size_t i = 0;
-        while(i < m_bucket_count && m_buckets[i].empty()) {
+        while(i < m_buckets.size() && m_buckets[i].empty()) {
             i++;
         }
         
@@ -613,7 +701,7 @@ public:
     }
     
     iterator end() noexcept {
-        return iterator(m_buckets + m_bucket_count);
+        return iterator(m_buckets + m_buckets.size());
     }
     
     const_iterator end() const noexcept {
@@ -621,7 +709,7 @@ public:
     }
     
     const_iterator cend() const noexcept {
-        return const_iterator(m_buckets + m_bucket_count);
+        return const_iterator(m_buckets + m_buckets.size());
     }
     
     
@@ -637,17 +725,14 @@ public:
     }
     
     size_type max_size() const noexcept {
-        return m_buckets_data.max_size();
+        return m_buckets.max_size();
     }
     
     /*
      * Modifiers
      */
     void clear() noexcept {
-        for(auto& bucket: m_buckets_data) {
-            bucket.clear();
-        }
-        
+        m_buckets.clear();
         m_nb_elements = 0;
         m_grow_on_next_insert = false;
     }
@@ -793,7 +878,7 @@ public:
                                            std::min(ito_move_closer_value - icloser_bucket, 
                                                     std::size_t(m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
         
-        while(ito_move_closer_value < m_bucket_count && m_buckets[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
+        while(ito_move_closer_value < m_buckets.size() && m_buckets[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
             icloser_bucket = ito_move_closer_value - 
                              std::min(ito_move_closer_value - icloser_bucket, 
                                       std::size_t(m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
@@ -833,25 +918,6 @@ public:
         else {
             return 0;
         }
-    }
-    
-    
-    
-    
-    
-    void swap(robin_hash& other) {
-        using std::swap;
-        
-        swap(static_cast<Hash&>(*this), static_cast<Hash&>(other));
-        swap(static_cast<KeyEqual&>(*this), static_cast<KeyEqual&>(other));
-        swap(static_cast<GrowthPolicy&>(*this), static_cast<GrowthPolicy&>(other));
-        swap(m_buckets_data, other.m_buckets_data);
-        swap(m_buckets, other.m_buckets);
-        swap(m_bucket_count, other.m_bucket_count);
-        swap(m_nb_elements, other.m_nb_elements);
-        swap(m_load_threshold, other.m_load_threshold);
-        swap(m_max_load_factor, other.m_max_load_factor);
-        swap(m_grow_on_next_insert, other.m_grow_on_next_insert);
     }
     
     
@@ -956,11 +1022,11 @@ public:
      * Bucket interface 
      */
     size_type bucket_count() const {
-        return m_bucket_count; 
+        return m_buckets.size(); 
     }
     
     size_type max_bucket_count() const {
-        return std::min(GrowthPolicy::max_bucket_count(), m_buckets_data.max_size());
+        return std::min(GrowthPolicy::max_bucket_count(), m_buckets.max_size());
     }
     
     /*
@@ -1024,7 +1090,7 @@ private:
     
     std::size_t bucket_for_hash(std::size_t hash) const {
         const std::size_t bucket = GrowthPolicy::bucket_for_hash(hash);
-        tsl_rh_assert(bucket < m_bucket_count || (bucket == 0 && m_bucket_count == 0));
+        tsl_rh_assert(bucket < bucket_count() || (bucket == 0 && bucket_count() == 0));
         
         return bucket;
     }
@@ -1200,16 +1266,16 @@ private:
                              get_allocator(), m_max_load_factor);
         
         const bool use_stored_hash = USE_STORED_HASH_ON_REHASH(new_table.bucket_count());
-        for(auto& bucket: m_buckets_data) {
-            if(bucket.empty()) { 
+        for(std::size_t ibucket = 0; ibucket < m_buckets.size(); ibucket++) {
+            if(m_buckets[ibucket].empty()) { 
                 continue; 
             }
             
-            const std::size_t hash = use_stored_hash?bucket.truncated_hash():
-                                                     new_table.hash_key(KeySelect()(bucket.value()));
+            const std::size_t hash = use_stored_hash?m_buckets[ibucket].truncated_hash():
+                                                     new_table.hash_key(KeySelect()(m_buckets[ibucket].value()));
                                                      
             new_table.insert_value_on_rehash(new_table.bucket_for_hash(hash), 0, 
-                                             bucket_entry::truncate_hash(hash), std::move(bucket.value()));
+                                             bucket_entry::truncate_hash(hash), std::move(m_buckets[ibucket].value()));
         }
         
         new_table.m_nb_elements = m_nb_elements;
@@ -1260,33 +1326,8 @@ private:
     static const distance_type REHASH_ON_HIGH_NB_PROBES__NPROBES = 128;
     static constexpr float REHASH_ON_HIGH_NB_PROBES__MIN_LOAD_FACTOR = 0.15f;
     
-    
-    /**
-     * Return an always valid pointer to an static empty bucket_entry with last_bucket() == true.
-     */            
-    bucket_entry* static_empty_bucket_ptr() {
-        static bucket_entry empty_bucket(true);
-        return &empty_bucket;
-    }
-    
 private:
-    buckets_container_type m_buckets_data;
-    
-    /**
-     * Points to m_buckets_data.data() if !m_buckets_data.empty() otherwise points to static_empty_bucket_ptr.
-     * This variable is useful to avoid the cost of checking if m_buckets_data is empty when trying 
-     * to find an element.
-     * 
-     * TODO Remove m_buckets_data and only use a pointer instead of a pointer+vector to save some space in the robin_hash object.
-     * Manage the Allocator manually.
-     */
-    bucket_entry* m_buckets;
-    
-    /**
-     * Used a lot in find, avoid the call to m_buckets_data.size() which is a bit slower.
-     */
-    size_type m_bucket_count;
-    
+    buckets m_buckets;
     size_type m_nb_elements;
     
     size_type m_load_threshold;
