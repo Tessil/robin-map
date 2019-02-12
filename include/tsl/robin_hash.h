@@ -422,6 +422,7 @@ public:
         robin_iterator() noexcept {
         }
         
+        template<bool TIsConst = IsConst, typename std::enable_if<TIsConst>::type* = nullptr>
         robin_iterator(const robin_iterator<false>& other) noexcept: m_bucket(other.m_bucket) {
         }
         
