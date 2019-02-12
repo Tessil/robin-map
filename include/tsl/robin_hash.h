@@ -426,6 +426,11 @@ public:
         robin_iterator(const robin_iterator<false>& other) noexcept: m_bucket(other.m_bucket) {
         }
         
+        robin_iterator(const robin_iterator& other) = default;
+        robin_iterator(robin_iterator&& other) = default;
+        robin_iterator& operator=(const robin_iterator& other) = default;
+        robin_iterator& operator=(robin_iterator&& other) = default;
+        
         const typename robin_hash::key_type& key() const {
             return KeySelect()(m_bucket->value());
         }
