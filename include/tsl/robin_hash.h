@@ -667,7 +667,7 @@ public:
     }
     
     template<typename P>
-    iterator insert(const_iterator hint, P&& value) { 
+    iterator insert_hint(const_iterator hint, P&& value) { 
         if(hint != cend() && compare_keys(KeySelect()(*hint), KeySelect()(value))) { 
             return mutable_iterator(hint); 
         }
@@ -726,7 +726,7 @@ public:
     
     template<class... Args>
     iterator emplace_hint(const_iterator hint, Args&&... args) {
-        return insert(hint, value_type(std::forward<Args>(args)...));        
+        return insert_hint(hint, value_type(std::forward<Args>(args)...));        
     }
     
     
@@ -739,7 +739,7 @@ public:
     }
     
     template<class K, class... Args>
-    iterator try_emplace(const_iterator hint, K&& key, Args&&... args) { 
+    iterator try_emplace_hint(const_iterator hint, K&& key, Args&&... args) { 
         if(hint != cend() && compare_keys(KeySelect()(*hint), key)) { 
             return mutable_iterator(hint); 
         }
