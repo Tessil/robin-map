@@ -158,7 +158,18 @@ public:
         }
     }
     
-    bucket_entry(bucket_entry&& ) = delete;
+    bucket_entry(bucket_entry&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+            : bucket_hash(other),
+              m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
+              m_last_bucket(other.m_last_bucket)
+    {
+        if(!other.empty()) {
+            ::new (static_cast<void*>(std::addressof(m_value))) value_type(std::move(other.value()));
+            m_dist_from_ideal_bucket = other.m_dist_from_ideal_bucket;
+            other.clear();
+        }
+    }
+    
     bucket_entry& operator=(const bucket_entry& ) = delete;
     bucket_entry& operator=(bucket_entry&& ) = delete;
     
@@ -290,10 +301,7 @@ public:
     }
     
     ~buckets() {
-        tsl_rh_assert(m_buckets != nullptr);
-        if(m_buckets != static_empty_bucket_ptr()) {
-            deallocate();
-        }
+        deallocate();
     }
     
     buckets(const buckets& other): allocator_type(std::allocator_traits<allocator_type>::select_on_container_copy_construction(other)),
@@ -368,7 +376,7 @@ public:
                 m_bucket_count = other.m_bucket_count;
             }
             else {
-                destroy(m_buckets, m_buckets + m_bucket_count);
+                destroy(*this, m_buckets, m_buckets + m_bucket_count);
             }
             
             if(m_bucket_count == 0) {
@@ -376,6 +384,7 @@ public:
             }
             else {
                 uninitialized_move(*this, other.m_buckets, other.m_buckets + m_bucket_count, m_buckets);
+                other.deallocate();
             }
         }
         
@@ -440,6 +449,12 @@ private:
     }
     
     void deallocate() {
+        tsl_rh_assert(m_buckets != nullptr);
+        if(m_bucket_count == 0) {
+            tsl_rh_assert(m_buckets == static_empty_bucket_ptr());
+            return;
+        }
+        
         destroy(*this, m_buckets, m_buckets + m_bucket_count);
         std::allocator_traits<allocator_type>::deallocate(*this, m_buckets, m_bucket_count);
         
@@ -753,7 +768,16 @@ public:
     robin_hash& operator=(const robin_hash& other) = default;
     
     robin_hash& operator=(robin_hash&& other) {
-        other.swap(*this);
+        static_cast<Hash&>(*this) = std::move(static_cast<Hash&>(other));
+        static_cast<KeyEqual&>(*this) = std::move(static_cast<KeyEqual&>(other));
+        static_cast<GrowthPolicy&>(*this) = std::move(static_cast<GrowthPolicy&>(other));
+        m_buckets = std::move(other.m_buckets);
+        m_nb_elements = other.m_nb_elements;
+        m_load_threshold = other.m_load_threshold;
+        m_max_load_factor = other.m_max_load_factor;
+        m_grow_on_next_insert = other.m_grow_on_next_insert;
+        
+        other.GrowthPolicy::clear();
         other.clear();
         
         return *this;
@@ -837,6 +861,7 @@ public:
     void clear() noexcept {
         m_buckets.clear();
         m_nb_elements = 0;
+        m_load_threshold = 0;
         m_grow_on_next_insert = false;
     }
     
