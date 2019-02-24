@@ -68,7 +68,6 @@ struct is_power_of_two_policy<tsl::rh::power_of_two_growth_policy<GrowthFactor>>
 };
 
 
-
 using truncated_hash_type = std::uint_least32_t;
 
 /**
@@ -148,10 +147,10 @@ public:
         tsl_rh_assert(empty());
     }
     
-    bucket_entry(const bucket_entry& other) noexcept(std::is_nothrow_copy_constructible<value_type>::value): 
-            bucket_hash(other),
-            m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET), 
-            m_last_bucket(other.m_last_bucket)
+    bucket_entry(const bucket_entry& other) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
+            : bucket_hash(other),
+              m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET), 
+              m_last_bucket(other.m_last_bucket)
     {
         if(!other.empty()) {
             ::new (static_cast<void*>(std::addressof(m_value))) value_type(other.value());
@@ -159,39 +158,8 @@ public:
         }
     }
     
-    /**
-     * Never really used, but still necessary as we must call resize on an empty `std::vector<bucket_entry>`.
-     * and we need to support move-only types. See robin_hash constructor for details.
-     */
-    bucket_entry(bucket_entry&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value): 
-            bucket_hash(std::move(other)),
-            m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET), 
-            m_last_bucket(other.m_last_bucket) 
-    {
-        if(!other.empty()) {
-            ::new (static_cast<void*>(std::addressof(m_value))) value_type(std::move(other.value()));
-            m_dist_from_ideal_bucket = other.m_dist_from_ideal_bucket;
-        }
-    }
-    
-    bucket_entry& operator=(const bucket_entry& other) 
-            noexcept(std::is_nothrow_copy_constructible<value_type>::value) 
-    {
-        if(this != &other) {
-            clear();
-            
-            bucket_hash::operator=(other);
-            if(!other.empty()) {
-                ::new (static_cast<void*>(std::addressof(m_value))) value_type(other.value());
-            }
-            
-            m_dist_from_ideal_bucket = other.m_dist_from_ideal_bucket;
-            m_last_bucket = other.m_last_bucket;
-        }
-        
-        return *this;
-    }
-    
+    bucket_entry(bucket_entry&& ) = delete;
+    bucket_entry& operator=(const bucket_entry& ) = delete;
     bucket_entry& operator=(bucket_entry&& ) = delete;
     
     ~bucket_entry() noexcept {
@@ -284,22 +252,28 @@ private:
 };
 
 
+/**
+ * Sequential allocator-aware container of 'bucket_entry<ValueType, StoreHash>'.
+ * The 'operator bucket_entry*()' method always returns a valid pointer to a 'bucket_entry'.
+ * When 'buckets' is empty, the returned value is an empty 'bucket_entry'.
+ * 
+ * We use this class instead of a `std::vector<bucket_entry<ValueType, StoreHash>>` to 
+ * reduce the sizeof(robin_hash). With a vector we would need 3*sizeof(void*) for the vector + sizeof(void*) for
+ * a pointer that either points to the start of the vector or an empty bucket.
+ * The 'bucket' class only requires sizeof(void*) + sizeof(std::size_t).
+ */
 template<class ValueType,
          class Allocator,
          bool StoreHash>
-class buckets {
+class buckets: private std::allocator_traits<Allocator>::template rebind_alloc<bucket_entry<ValueType, StoreHash>> {
 public:
-    using allocator_type = Allocator;
+    using bucket_entry = tsl::detail_robin_hash::bucket_entry<ValueType, StoreHash>;
+    using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<bucket_entry>;
     using value_type = ValueType;
     using size_type = std::size_t;
-
-private:
-    using bucket_entry = tsl::detail_robin_hash::bucket_entry<value_type, StoreHash>;    
-    using buckets_allocator = typename std::allocator_traits<allocator_type>::template rebind_alloc<bucket_entry>;
-    using buckets_container_type = std::vector<bucket_entry, buckets_allocator>;
     
 public:
-    buckets(size_type bucket_count, const Allocator& alloc): m_buckets_data(alloc), 
+    buckets(size_type bucket_count, const Allocator& alloc): allocator_type(alloc),
                                                              m_buckets(static_empty_bucket_ptr()), 
                                                              m_bucket_count(bucket_count)
     {
@@ -308,52 +282,102 @@ public:
         }
         
         if(m_bucket_count > 0) {
-            /*
-            * We can't use the `vector(size_type count, const Allocator& alloc)` constructor
-            * as it's only available in C++14 and we need to support C++11. We thus must resize after using
-            * the `vector(const Allocator& alloc)` constructor.
-            * 
-            * We can't use `vector(size_type count, const T& value, const Allocator& alloc)` as it requires the
-            * value T to be copyable.
-            */
-            m_buckets_data.resize(m_bucket_count);
-            m_buckets = m_buckets_data.data();
+            m_buckets = std::allocator_traits<allocator_type>::allocate(*this, m_bucket_count);
+            uninitialized_default_construct(*this, m_buckets, m_buckets + m_bucket_count);
             
-            tsl_rh_assert(!m_buckets_data.empty());
-            m_buckets_data.back().set_as_last_bucket();
+            m_buckets[m_bucket_count - 1].set_as_last_bucket();
         }
     }
     
-    buckets(const buckets& other): m_buckets_data(other.m_buckets_data),
-                                   m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
-                                   m_bucket_count(other.m_bucket_count)
-    {
+    ~buckets() {
+        tsl_rh_assert(m_buckets != nullptr);
+        if(m_buckets != static_empty_bucket_ptr()) {
+            deallocate();
+        }
     }
     
-    buckets(buckets&& other) noexcept(std::is_nothrow_move_constructible<buckets_container_type>::value)
-                                  : m_buckets_data(std::move(other.m_buckets_data)),
-                                    m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
-                                    m_bucket_count(other.m_bucket_count)
+    buckets(const buckets& other): allocator_type(std::allocator_traits<allocator_type>::select_on_container_copy_construction(other)),
+                                   m_buckets(static_empty_bucket_ptr()),
+                                   m_bucket_count(other.m_bucket_count)
     {
-        other.m_buckets_data.clear();
+        if(m_bucket_count > 0) {
+            m_buckets = std::allocator_traits<allocator_type>::allocate(*this, m_bucket_count);
+            uninitialized_copy(*this, other.m_buckets, other.m_buckets + other.m_bucket_count, m_buckets);
+        }
+    }
+    
+    buckets(buckets&& other) noexcept: allocator_type(std::move(static_cast<allocator_type&>(other))),
+                                       m_buckets(other.m_buckets),
+                                       m_bucket_count(other.m_bucket_count)
+    {
         other.m_buckets = static_empty_bucket_ptr();
         other.m_bucket_count = 0;
     }
     
     buckets& operator=(const buckets& other) {
         if(&other != this) {
-            m_buckets_data = other.m_buckets_data;
-            m_buckets = m_buckets_data.empty()?static_empty_bucket_ptr():
-                                               m_buckets_data.data();
-            m_bucket_count = other.m_bucket_count;
+            if(std::allocator_traits<allocator_type>::propagate_on_container_copy_assignment::value) {
+                if(get_allocator_ref() != other.get_allocator_ref()) {
+                    deallocate();
+                }
+                
+                get_allocator_ref() = other.get_allocator_ref();
+            }
+            
+            if(m_bucket_count != other.m_bucket_count) {
+                deallocate();
+                
+                m_buckets = std::allocator_traits<allocator_type>::allocate(*this, other.m_bucket_count);
+                m_bucket_count = other.m_bucket_count;
+            }
+            else {
+                destroy(*this, m_buckets, m_buckets + m_bucket_count);
+            }
+            
+            if(m_bucket_count == 0) {
+                m_buckets = static_empty_bucket_ptr();
+            }
+            else {
+                uninitialized_copy(*this, other.m_buckets, other.m_buckets + m_bucket_count, m_buckets);
+            }
+                    
         }
         
         return *this;
     }
     
     buckets& operator=(buckets&& other) {
-        other.swap(*this);
-        other.clear();
+        if(std::allocator_traits<allocator_type>::propagate_on_container_move_assignment::value ||
+           get_allocator_ref() == other.get_allocator_ref()) 
+        {
+            deallocate();
+            
+            if(std::allocator_traits<allocator_type>::propagate_on_container_move_assignment::value) {
+                get_allocator_ref() = other.get_allocator_ref();
+            }
+            
+            using std::swap;
+            swap(m_buckets, other.m_buckets);
+            swap(m_bucket_count, other.m_bucket_count);
+        }
+        else {
+            if(m_bucket_count != other.m_bucket_count) {
+                deallocate();
+                
+                m_buckets = std::allocator_traits<allocator_type>::allocate(*this, other.m_bucket_count);
+                m_bucket_count = other.m_bucket_count;
+            }
+            else {
+                destroy(m_buckets, m_buckets + m_bucket_count);
+            }
+            
+            if(m_bucket_count == 0) {
+                m_buckets = static_empty_bucket_ptr();
+            }
+            else {
+                uninitialized_move(*this, other.m_buckets, other.m_buckets + m_bucket_count, m_buckets);
+            }
+        }
         
         return *this;
     }
@@ -361,27 +385,37 @@ public:
     void swap(buckets& other) {
         using std::swap;
         
-        swap(m_buckets_data, other.m_buckets_data);
+        if(std::allocator_traits<allocator_type>::propagate_on_container_swap::value) {
+            swap(get_allocator_ref(), other.get_allocator_ref());
+        }
+        else {
+            tsl_rh_assert(get_allocator_ref() == other.get_allocator_ref());
+        }
+        
         swap(m_buckets, other.m_buckets);
         swap(m_bucket_count, other.m_bucket_count);
     }
     
     void clear() noexcept {
-        for(std::size_t i = 0; i < m_buckets_data.size(); i++) {
-            m_buckets_data[i].clear();
+        for(std::size_t i = 0; i < size(); i++) {
+            m_buckets[i].clear();
         }
     }
 
-    allocator_type get_allocator() const {
-        return m_buckets_data.get_allocator();
+    allocator_type& get_allocator_ref() {
+        return static_cast<allocator_type&>(*this);
+    }
+
+    const allocator_type& get_allocator_ref() const {
+        return static_cast<const allocator_type&>(*this);
     }
     
     size_type size() const {
-        return m_buckets_data.size();
+        return m_bucket_count;
     }
     
     size_type max_size() const noexcept {
-        return m_buckets_data.max_size();
+        return std::allocator_traits<allocator_type>::max_size(*this);
     }
     
     operator bucket_entry*() noexcept {
@@ -391,29 +425,90 @@ public:
     operator const bucket_entry*() const noexcept {
         return m_buckets;
     }
+    
+    friend void swap(buckets& lhs, buckets& rhs) {
+        lhs.swap(rhs);
+    }
 
 private:
     /**
-     * Return an always valid pointer to an static empty bucket_entry with last_bucket() == true.
+     * Return an always valid pointer to a static empty bucket_entry with last_bucket() == true.
      */            
     bucket_entry* static_empty_bucket_ptr() {
         static bucket_entry empty_bucket(true);
         return &empty_bucket;
-    }    
+    }
+    
+    void deallocate() {
+        destroy(*this, m_buckets, m_buckets + m_bucket_count);
+        std::allocator_traits<allocator_type>::deallocate(*this, m_buckets, m_bucket_count);
+        
+        m_buckets = static_empty_bucket_ptr();
+        m_bucket_count = 0;
+    }
+    
+    // Equivalent to std::uninitialized_copy with Alloc
+    template<class Alloc, class InputIt, class ForwardIt>
+    static ForwardIt uninitialized_copy(Alloc& alloc, InputIt first, InputIt last, ForwardIt d_first) {
+        ForwardIt current = d_first;
+        
+        try {
+            for (; first != last; ++first, (void) ++current) {
+                std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current),  *first);
+            }
+            
+            return current;
+        } 
+        catch (...) {
+            destroy(alloc, d_first, current);
+            throw;
+        }
+    }
+    
+    // Equivalent to std::uninitialized_move with Alloc
+    template<class Alloc, class InputIt, class ForwardIt>
+    static ForwardIt uninitialized_move(Alloc& alloc, InputIt first, InputIt last, ForwardIt d_first) {
+        ForwardIt current = d_first;
+        
+        try {
+            for (; first != last; ++first, (void) ++current) {
+                std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current),  std::move(*first));
+            }
+            
+            return current;
+        } 
+        catch (...) {
+            destroy(alloc, d_first, current);
+            throw;
+        }
+    }
+
+    // Equivalent to std::uninitialized_default_construct with Alloc
+    template<class Alloc, class ForwardIt>
+    static void uninitialized_default_construct(Alloc& alloc, ForwardIt first, ForwardIt last) {
+        ForwardIt current = first;
+        
+        try {
+            for (; current != last; ++current) {
+                std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current));
+            }
+        } 
+        catch (...) {
+            destroy(alloc, first, current);
+            throw;
+        }
+    }
+    
+    // Equivalent to std::destroy with Alloc
+    template<class Alloc, class ForwardIt>
+    static void destroy(Alloc& alloc, ForwardIt first, ForwardIt last) {
+        for (; first != last; ++first) {
+            std::allocator_traits<Alloc>::destroy(alloc, std::addressof(*first));
+        }
+    }
     
 private:
-    buckets_container_type m_buckets_data;
-    
-    /**
-     * Points to m_buckets_data.data() if !m_buckets_data.empty() otherwise points to static_empty_bucket_ptr.
-     * This variable is useful to avoid the cost of checking if m_buckets_data is empty when trying 
-     * to find an element.
-     */
     bucket_entry* m_buckets;
-    
-    /**
-     * Used a lot in find, avoid the call to m_buckets_data.size() which is a bit slower.
-     */
     size_type m_bucket_count;
 };
 
@@ -513,8 +608,9 @@ private:
         }
     }
     
-    using bucket_entry = tsl::detail_robin_hash::bucket_entry<value_type, STORE_HASH>;
+private:
     using buckets = tsl::detail_robin_hash::buckets<ValueType, Allocator, STORE_HASH>;
+    using bucket_entry = typename buckets::bucket_entry;
     using distance_type = typename bucket_entry::distance_type;
     
 public: 
@@ -1263,7 +1359,7 @@ private:
     
     void rehash_impl(size_type count) {
         robin_hash new_table(count, static_cast<Hash&>(*this), static_cast<KeyEqual&>(*this), 
-                             get_allocator(), m_max_load_factor);
+                             m_buckets.get_allocator_ref(), m_max_load_factor);
         
         const bool use_stored_hash = USE_STORED_HASH_ON_REHASH(new_table.bucket_count());
         for(std::size_t ibucket = 0; ibucket < m_buckets.size(); ibucket++) {
