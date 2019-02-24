@@ -354,7 +354,7 @@ public:
         
         if(m_bucket_count > 0) {
             m_buckets = std::allocator_traits<allocator_type>::allocate(*this, m_bucket_count);
-            uninitialized_default_construct(*this, m_buckets, m_buckets + m_bucket_count);
+            tsl::detail_robin_hash::uninitialized_default_construct(*this, m_buckets, m_buckets + m_bucket_count);
             
             m_buckets[m_bucket_count - 1].set_as_last_bucket();
         }
@@ -370,7 +370,7 @@ public:
     {
         if(m_bucket_count > 0) {
             m_buckets = std::allocator_traits<allocator_type>::allocate(*this, m_bucket_count);
-            uninitialized_copy(*this, other.m_buckets, other.m_buckets + other.m_bucket_count, m_buckets);
+            tsl::detail_robin_hash::uninitialized_copy(*this, other.m_buckets, other.m_buckets + other.m_bucket_count, m_buckets);
         }
     }
     
@@ -400,14 +400,14 @@ public:
                 m_bucket_count = other.m_bucket_count;
             }
             else {
-                destroy(*this, m_buckets, m_buckets + m_bucket_count);
+                tsl::detail_robin_hash::destroy(*this, m_buckets, m_buckets + m_bucket_count);
             }
             
             if(m_bucket_count == 0) {
                 m_buckets = static_empty_bucket_ptr();
             }
             else {
-                uninitialized_copy(*this, other.m_buckets, other.m_buckets + m_bucket_count, m_buckets);
+                tsl::detail_robin_hash::uninitialized_copy(*this, other.m_buckets, other.m_buckets + m_bucket_count, m_buckets);
             }
                     
         }
@@ -437,14 +437,14 @@ public:
                 m_bucket_count = other.m_bucket_count;
             }
             else {
-                destroy(*this, m_buckets, m_buckets + m_bucket_count);
+                tsl::detail_robin_hash::destroy(*this, m_buckets, m_buckets + m_bucket_count);
             }
             
             if(m_bucket_count == 0) {
                 m_buckets = static_empty_bucket_ptr();
             }
             else {
-                uninitialized_move(*this, other.m_buckets, other.m_buckets + m_bucket_count, m_buckets);
+                tsl::detail_robin_hash::uninitialized_move(*this, other.m_buckets, other.m_buckets + m_bucket_count, m_buckets);
                 other.deallocate();
             }
         }
@@ -510,7 +510,7 @@ private:
             return;
         }
         
-        destroy(*this, m_buckets, m_buckets + m_bucket_count);
+        tsl::detail_robin_hash::destroy(*this, m_buckets, m_buckets + m_bucket_count);
         std::allocator_traits<allocator_type>::deallocate(*this, m_buckets, m_bucket_count);
         
         m_buckets = static_empty_bucket_ptr();

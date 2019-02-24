@@ -164,6 +164,26 @@ private:
     std::unique_ptr<std::string> m_value;
 };
 
+/**
+ * Move-only type with a move constructor/operator that can throw an exception.
+ */
+class move_only_throw_test: public move_only_test {
+public:
+    explicit move_only_throw_test(std::int64_t value): move_only_test(value) {
+    }
+        
+    move_only_throw_test(move_only_throw_test&& other) noexcept(false): move_only_test(std::move(other)) {
+    }
+    
+    move_only_throw_test& operator=(move_only_throw_test&& other) noexcept(false) {
+        move_only_test::operator=(std::move(other));
+        return *this;
+    }
+    
+    move_only_throw_test(const move_only_throw_test&) = delete;
+    move_only_throw_test& operator=(const move_only_throw_test&) = delete;
+};
+
 
 class copy_only_test {
 public:
@@ -227,6 +247,13 @@ namespace std {
     };
     
     template<>
+    struct hash<move_only_throw_test> {
+        std::size_t operator()(const move_only_throw_test& val) const {
+            return std::hash<std::string>()(val.value());
+        }
+    };
+    
+    template<>
     struct hash<copy_only_test> {
         std::size_t operator()(const copy_only_test& val) const {
             return std::hash<std::string>()(val.value());
@@ -270,6 +297,11 @@ inline move_only_test utils::get_key<move_only_test>(std::size_t counter) {
 }
 
 template<>
+inline move_only_throw_test utils::get_key<move_only_throw_test>(std::size_t counter) {
+    return move_only_throw_test(boost::numeric_cast<std::int64_t>(counter));
+}
+
+template<>
 inline copy_only_test utils::get_key<copy_only_test>(std::size_t counter) {
     return copy_only_test(boost::numeric_cast<std::int64_t>(counter));
 }
@@ -295,6 +327,11 @@ inline std::string utils::get_value<std::string>(std::size_t counter) {
 template<>
 inline move_only_test utils::get_value<move_only_test>(std::size_t counter) {
     return move_only_test(boost::numeric_cast<std::int64_t>(counter*2));
+}
+
+template<>
+inline move_only_throw_test utils::get_value<move_only_throw_test>(std::size_t counter) {
+    return move_only_throw_test(boost::numeric_cast<std::int64_t>(counter*2));
 }
 
 template<>

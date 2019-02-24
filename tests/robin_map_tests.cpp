@@ -53,6 +53,7 @@ using test_types = boost::mpl::list<
                         tsl::robin_map<std::int64_t, std::int64_t, mod_hash<9>>,
                         tsl::robin_map<std::string, std::string, mod_hash<9>>,
                         tsl::robin_map<move_only_test, move_only_test, mod_hash<9>>,
+                        tsl::robin_map<move_only_throw_test, move_only_throw_test, mod_hash<9>>,
                         tsl::robin_map<copy_only_test, copy_only_test, mod_hash<9>>,
                         tsl::robin_map<self_reference_member_test, self_reference_member_test, mod_hash<9>>,
                         
