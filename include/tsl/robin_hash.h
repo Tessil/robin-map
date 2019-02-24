@@ -364,9 +364,13 @@ public:
         deallocate();
     }
     
-    buckets(const buckets& other): allocator_type(std::allocator_traits<allocator_type>::select_on_container_copy_construction(other)),
-                                   m_buckets(static_empty_bucket_ptr()),
-                                   m_bucket_count(other.m_bucket_count)
+    buckets(const buckets& other): buckets(other, std::allocator_traits<allocator_type>::select_on_container_copy_construction(other)) {
+    }
+    
+    buckets(const buckets& other, const allocator_type& alloc)
+            : allocator_type(alloc),
+              m_buckets(static_empty_bucket_ptr()),
+              m_bucket_count(other.m_bucket_count)
     {
         if(m_bucket_count > 0) {
             m_buckets = std::allocator_traits<allocator_type>::allocate(*this, m_bucket_count);
@@ -385,31 +389,11 @@ public:
     
     buckets& operator=(const buckets& other) {
         if(&other != this) {
-            if(std::allocator_traits<allocator_type>::propagate_on_container_copy_assignment::value) {
-                if(get_allocator_ref() != other.get_allocator_ref()) {
-                    deallocate();
-                }
-                
-                get_allocator_ref() = other.get_allocator_ref();
-            }
+            buckets tmp(other, std::allocator_traits<allocator_type>::propagate_on_container_copy_assignment::value?
+                                   other.get_allocator_ref():
+                                   get_allocator_ref());
             
-            if(m_bucket_count != other.m_bucket_count) {
-                deallocate();
-                
-                m_buckets = std::allocator_traits<allocator_type>::allocate(*this, other.m_bucket_count);
-                m_bucket_count = other.m_bucket_count;
-            }
-            else {
-                tsl::detail_robin_hash::destroy(*this, m_buckets, m_buckets + m_bucket_count);
-            }
-            
-            if(m_bucket_count == 0) {
-                m_buckets = static_empty_bucket_ptr();
-            }
-            else {
-                tsl::detail_robin_hash::uninitialized_copy(*this, other.m_buckets, other.m_buckets + m_bucket_count, m_buckets);
-            }
-                    
+            swap(tmp, true);
         }
         
         return *this;
@@ -425,9 +409,7 @@ public:
                 get_allocator_ref() = other.get_allocator_ref();
             }
             
-            using std::swap;
-            swap(m_buckets, other.m_buckets);
-            swap(m_bucket_count, other.m_bucket_count);
+            swap(other, false);
         }
         else {
             if(m_bucket_count != other.m_bucket_count) {
@@ -453,17 +435,7 @@ public:
     }
     
     void swap(buckets& other) {
-        using std::swap;
-        
-        if(std::allocator_traits<allocator_type>::propagate_on_container_swap::value) {
-            swap(get_allocator_ref(), other.get_allocator_ref());
-        }
-        else {
-            tsl_rh_assert(get_allocator_ref() == other.get_allocator_ref());
-        }
-        
-        swap(m_buckets, other.m_buckets);
-        swap(m_bucket_count, other.m_bucket_count);
+        swap(other, std::allocator_traits<allocator_type>::propagate_on_container_swap::value);
     }
 
     allocator_type& get_allocator_ref() {
@@ -495,6 +467,20 @@ public:
     }
 
 private:
+    void swap(buckets& other, bool swap_allocator) {
+        using std::swap;
+        
+        if(swap_allocator) {
+            swap(get_allocator_ref(), other.get_allocator_ref());
+        }
+        else {
+            tsl_rh_assert(get_allocator_ref() == other.get_allocator_ref());
+        }
+        
+        swap(m_buckets, other.m_buckets);
+        swap(m_bucket_count, other.m_bucket_count);
+    }
+    
     /**
      * Return an always valid pointer to a static empty bucket_entry with last_bucket() == true.
      */            
