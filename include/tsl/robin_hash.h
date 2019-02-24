@@ -66,6 +66,66 @@ struct is_power_of_two_policy: std::false_type {
 template<std::size_t GrowthFactor>
 struct is_power_of_two_policy<tsl::rh::power_of_two_growth_policy<GrowthFactor>>: std::true_type {
 };
+    
+// Equivalent to std::uninitialized_copy with Alloc
+template<class Alloc, class InputIt, class ForwardIt>
+static ForwardIt uninitialized_copy(Alloc& alloc, InputIt first, InputIt last, ForwardIt d_first) {
+    ForwardIt current = d_first;
+    
+    try {
+        for (; first != last; ++first, (void) ++current) {
+            std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current),  *first);
+        }
+        
+        return current;
+    } 
+    catch (...) {
+        destroy(alloc, d_first, current);
+        throw;
+    }
+}
+
+// Equivalent to std::uninitialized_move with Alloc
+template<class Alloc, class InputIt, class ForwardIt>
+static ForwardIt uninitialized_move(Alloc& alloc, InputIt first, InputIt last, ForwardIt d_first) {
+    ForwardIt current = d_first;
+    
+    try {
+        for (; first != last; ++first, (void) ++current) {
+            std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current),  std::move(*first));
+        }
+        
+        return current;
+    } 
+    catch (...) {
+        destroy(alloc, d_first, current);
+        throw;
+    }
+}
+
+// Equivalent to std::uninitialized_default_construct with Alloc
+template<class Alloc, class ForwardIt>
+static void uninitialized_default_construct(Alloc& alloc, ForwardIt first, ForwardIt last) {
+    ForwardIt current = first;
+    
+    try {
+        for (; current != last; ++current) {
+            std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current));
+        }
+    } 
+    catch (...) {
+        destroy(alloc, first, current);
+        throw;
+    }
+}
+
+// Equivalent to std::destroy with Alloc
+template<class Alloc, class ForwardIt>
+static void destroy(Alloc& alloc, ForwardIt first, ForwardIt last) {
+    for (; first != last; ++first) {
+        std::allocator_traits<Alloc>::destroy(alloc, std::addressof(*first));
+    }
+}
 
 
 using truncated_hash_type = std::uint_least32_t;
@@ -159,7 +219,7 @@ public:
     }
     
     bucket_entry(bucket_entry&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value)
-            : bucket_hash(other),
+            : bucket_hash(std::move(other)),
               m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
               m_last_bucket(other.m_last_bucket)
     {
@@ -314,9 +374,10 @@ public:
         }
     }
     
-    buckets(buckets&& other) noexcept: allocator_type(std::move(static_cast<allocator_type&>(other))),
-                                       m_buckets(other.m_buckets),
-                                       m_bucket_count(other.m_bucket_count)
+    buckets(buckets&& other) noexcept(std::is_nothrow_move_constructible<allocator_type>::value)
+            : allocator_type(std::move(other.get_allocator_ref())),
+              m_buckets(other.m_buckets),
+              m_bucket_count(other.m_bucket_count)
     {
         other.m_buckets = static_empty_bucket_ptr();
         other.m_bucket_count = 0;
@@ -454,66 +515,6 @@ private:
         
         m_buckets = static_empty_bucket_ptr();
         m_bucket_count = 0;
-    }
-    
-    // Equivalent to std::uninitialized_copy with Alloc
-    template<class Alloc, class InputIt, class ForwardIt>
-    static ForwardIt uninitialized_copy(Alloc& alloc, InputIt first, InputIt last, ForwardIt d_first) {
-        ForwardIt current = d_first;
-        
-        try {
-            for (; first != last; ++first, (void) ++current) {
-                std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current),  *first);
-            }
-            
-            return current;
-        } 
-        catch (...) {
-            destroy(alloc, d_first, current);
-            throw;
-        }
-    }
-    
-    // Equivalent to std::uninitialized_move with Alloc
-    template<class Alloc, class InputIt, class ForwardIt>
-    static ForwardIt uninitialized_move(Alloc& alloc, InputIt first, InputIt last, ForwardIt d_first) {
-        ForwardIt current = d_first;
-        
-        try {
-            for (; first != last; ++first, (void) ++current) {
-                std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current),  std::move(*first));
-            }
-            
-            return current;
-        } 
-        catch (...) {
-            destroy(alloc, d_first, current);
-            throw;
-        }
-    }
-
-    // Equivalent to std::uninitialized_default_construct with Alloc
-    template<class Alloc, class ForwardIt>
-    static void uninitialized_default_construct(Alloc& alloc, ForwardIt first, ForwardIt last) {
-        ForwardIt current = first;
-        
-        try {
-            for (; current != last; ++current) {
-                std::allocator_traits<Alloc>::construct(alloc, std::addressof(*current));
-            }
-        } 
-        catch (...) {
-            destroy(alloc, first, current);
-            throw;
-        }
-    }
-    
-    // Equivalent to std::destroy with Alloc
-    template<class Alloc, class ForwardIt>
-    static void destroy(Alloc& alloc, ForwardIt first, ForwardIt last) {
-        for (; first != last; ++first) {
-            std::allocator_traits<Alloc>::destroy(alloc, std::addressof(*first));
-        }
     }
     
 private:
