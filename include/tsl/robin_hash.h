@@ -767,7 +767,7 @@ public:
     
     
     allocator_type get_allocator() const {
-        return m_buckets.get_allocator();
+        return m_buckets.get_allocator_ref();
     }
     
     

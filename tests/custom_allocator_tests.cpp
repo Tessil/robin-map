@@ -133,6 +133,7 @@ BOOST_AUTO_TEST_CASE(test_custom_allocator_1) {
     
     tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
                     custom_allocator<std::pair<int, int>>> map;
+    BOOST_CHECK(map.get_allocator() == (custom_allocator<std::pair<int, int>>()));
     
     const int nb_elements = 1000;
     for(int i = 0; i < nb_elements; i++) {
