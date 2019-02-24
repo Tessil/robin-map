@@ -400,22 +400,20 @@ public:
     }
     
     buckets& operator=(buckets&& other) {
-        if(std::allocator_traits<allocator_type>::propagate_on_container_move_assignment::value ||
-           get_allocator_ref() == other.get_allocator_ref()) 
-        {
+        if(std::allocator_traits<allocator_type>::propagate_on_container_move_assignment::value) {
+            buckets tmp(std::move(other));
+            swap(tmp, true);
+        }
+        else if(get_allocator_ref() == other.get_allocator_ref()) {
             deallocate();
-            
-            if(std::allocator_traits<allocator_type>::propagate_on_container_move_assignment::value) {
-                get_allocator_ref() = other.get_allocator_ref();
-            }
-            
             swap(other, false);
         }
         else {
             if(m_bucket_count != other.m_bucket_count) {
-                deallocate();
+                bucket_entry* new_buckets = std::allocator_traits<allocator_type>::allocate(*this, other.m_bucket_count);
                 
-                m_buckets = std::allocator_traits<allocator_type>::allocate(*this, other.m_bucket_count);
+                deallocate();
+                m_buckets = new_buckets;
                 m_bucket_count = other.m_bucket_count;
             }
             else {
