@@ -240,11 +240,11 @@ public:
     }
     
     iterator insert(const_iterator hint, const value_type& value) { 
-        return m_ht.insert(hint, value); 
+        return m_ht.insert_hint(hint, value); 
     }
     
     iterator insert(const_iterator hint, value_type&& value) { 
-        return m_ht.insert(hint, std::move(value)); 
+        return m_ht.insert_hint(hint, std::move(value)); 
     }
     
     template<class InputIt>

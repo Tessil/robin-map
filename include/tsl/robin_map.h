@@ -260,7 +260,7 @@ public:
     
     
     iterator insert(const_iterator hint, const value_type& value) { 
-        return m_ht.insert(hint, value); 
+        return m_ht.insert_hint(hint, value); 
     }
         
     template<class P, typename std::enable_if<std::is_constructible<value_type, P&&>::value>::type* = nullptr>
@@ -269,7 +269,7 @@ public:
     }
     
     iterator insert(const_iterator hint, value_type&& value) { 
-        return m_ht.insert(hint, std::move(value)); 
+        return m_ht.insert_hint(hint, std::move(value)); 
     }
     
     
@@ -346,12 +346,12 @@ public:
     
     template<class... Args>
     iterator try_emplace(const_iterator hint, const key_type& k, Args&&... args) {
-        return m_ht.try_emplace(hint, k, std::forward<Args>(args)...);
+        return m_ht.try_emplace_hint(hint, k, std::forward<Args>(args)...);
     }
     
     template<class... Args>
     iterator try_emplace(const_iterator hint, key_type&& k, Args&&... args) {
-        return m_ht.try_emplace(hint, std::move(k), std::forward<Args>(args)...);
+        return m_ht.try_emplace_hint(hint, std::move(k), std::forward<Args>(args)...);
     }
     
     
