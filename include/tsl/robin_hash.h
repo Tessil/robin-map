@@ -404,12 +404,6 @@ public:
         swap(m_buckets, other.m_buckets);
         swap(m_bucket_count, other.m_bucket_count);
     }
-    
-    void clear() noexcept {
-        for(std::size_t i = 0; i < size(); i++) {
-            m_buckets[i].clear();
-        }
-    }
 
     allocator_type& get_allocator_ref() {
         return static_cast<allocator_type&>(*this);
@@ -859,7 +853,10 @@ public:
      * Modifiers
      */
     void clear() noexcept {
-        m_buckets.clear();
+        for(std::size_t ibucket = 0; ibucket < m_buckets.size(); ibucket++) {
+            m_buckets[ibucket].clear();
+        }
+        
         m_nb_elements = 0;
         m_load_threshold = 0;
         m_grow_on_next_insert = false;
