@@ -265,7 +265,7 @@ private:
 template<class ValueType,
          class Allocator,
          bool StoreHash>
-class buckets: private std::allocator_traits<Allocator>::template rebind_alloc<bucket_entry<ValueType, StoreHash>> {
+class buckets: public std::allocator_traits<Allocator>::template rebind_alloc<bucket_entry<ValueType, StoreHash>> {
 public:
     using bucket_entry = tsl::detail_robin_hash::bucket_entry<ValueType, StoreHash>;
     using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<bucket_entry>;
