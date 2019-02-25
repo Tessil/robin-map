@@ -422,8 +422,15 @@ public:
         robin_iterator() noexcept {
         }
         
-        robin_iterator(const robin_iterator<false>& other) noexcept: m_bucket(other.m_bucket) {
+        // Copy constructor from iterator to const_iterator.
+        template<bool TIsConst = IsConst, typename std::enable_if<TIsConst>::type* = nullptr>
+        robin_iterator(const robin_iterator<!TIsConst>& other) noexcept: m_bucket(other.m_bucket) {
         }
+        
+        robin_iterator(const robin_iterator& other) = default;
+        robin_iterator(robin_iterator&& other) = default;
+        robin_iterator& operator=(const robin_iterator& other) = default;
+        robin_iterator& operator=(robin_iterator&& other) = default;
         
         const typename robin_hash::key_type& key() const {
             return KeySelect()(m_bucket->value());
@@ -649,7 +656,7 @@ public:
     }
     
     template<typename P>
-    iterator insert(const_iterator hint, P&& value) { 
+    iterator insert_hint(const_iterator hint, P&& value) { 
         if(hint != cend() && compare_keys(KeySelect()(*hint), KeySelect()(value))) { 
             return mutable_iterator(hint); 
         }
@@ -708,7 +715,7 @@ public:
     
     template<class... Args>
     iterator emplace_hint(const_iterator hint, Args&&... args) {
-        return insert(hint, value_type(std::forward<Args>(args)...));        
+        return insert_hint(hint, value_type(std::forward<Args>(args)...));        
     }
     
     
@@ -721,7 +728,7 @@ public:
     }
     
     template<class K, class... Args>
-    iterator try_emplace(const_iterator hint, K&& key, Args&&... args) { 
+    iterator try_emplace_hint(const_iterator hint, K&& key, Args&&... args) { 
         if(hint != cend() && compare_keys(KeySelect()(*hint), key)) { 
             return mutable_iterator(hint); 
         }
