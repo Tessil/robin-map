@@ -489,6 +489,42 @@ public:
 
     
 public:
+#if defined(__cplusplus) && __cplusplus >= 201402L
+    robin_hash(size_type bucket_count, 
+               const Hash& hash,
+               const KeyEqual& equal,
+               const Allocator& alloc,
+               float max_load_factor): Hash(hash), 
+                                       KeyEqual(equal),
+                                       GrowthPolicy(bucket_count),
+                                       m_buckets_data(
+                                           ((bucket_count > max_bucket_count())?
+                                               TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum bucket count."):
+                                               bucket_count), 
+                                           alloc
+                                       ),
+                                       m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
+                                       m_bucket_count(bucket_count),
+                                       m_nb_elements(0), 
+                                       m_grow_on_next_insert(false)
+    {
+        if(m_bucket_count > 0) {
+            tsl_rh_assert(!m_buckets_data.empty());
+            m_buckets_data.back().set_as_last_bucket();
+        }
+        
+        
+        this->max_load_factor(max_load_factor);
+    }
+#else
+    /**
+     * C++11 doesn't support the creation of a std::vector with a custom allocator and 'count' default-inserted elements. 
+     * The needed contructor `explicit vector(size_type count, const Allocator& alloc = Allocator());` is only
+     * available in C++14 and later. We thus must resize after using the `vector(const Allocator& alloc)` constructor.
+     * 
+     * We can't use `vector(size_type count, const T& value, const Allocator& alloc)` as it requires the
+     * value T to be copyable.
+     */
     robin_hash(size_type bucket_count, 
                const Hash& hash,
                const KeyEqual& equal,
@@ -507,14 +543,6 @@ public:
         }
         
         if(m_bucket_count > 0) {
-            /*
-            * We can't use the `vector(size_type count, const Allocator& alloc)` constructor
-            * as it's only available in C++14 and we need to support C++11. We thus must resize after using
-            * the `vector(const Allocator& alloc)` constructor.
-            * 
-            * We can't use `vector(size_type count, const T& value, const Allocator& alloc)` as it requires the
-            * value T to be copyable.
-            */
             m_buckets_data.resize(m_bucket_count);
             m_buckets = m_buckets_data.data();
             
@@ -525,6 +553,7 @@ public:
         
         this->max_load_factor(max_load_factor);
     }
+#endif
     
     robin_hash(const robin_hash& other): Hash(other),
                                          KeyEqual(other),
