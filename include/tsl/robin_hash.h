@@ -1325,8 +1325,9 @@ private:
         
         if(m_try_skrink_on_next_insert) {
             m_try_skrink_on_next_insert = false;
-            if(m_min_load_factor != 0.0f && load_factor() > m_min_load_factor) {
-                rehash(0);
+            if(m_min_load_factor != 0.0f && load_factor() < m_min_load_factor) {
+                reserve(size() + 1);
+                
                 return true;
             }
         }
