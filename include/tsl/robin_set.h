@@ -124,7 +124,7 @@ public:
                        const Hash& hash = Hash(),
                        const KeyEqual& equal = KeyEqual(),
                        const Allocator& alloc = Allocator()): 
-                    m_ht(bucket_count, hash, equal, alloc, ht::DEFAULT_MAX_LOAD_FACTOR)
+                    m_ht(bucket_count, hash, equal, alloc)
     {
     }
     
@@ -466,7 +466,11 @@ public:
      *  Hash policy 
      */
     float load_factor() const { return m_ht.load_factor(); }
+    
+    float min_load_factor() const { return m_ht.min_load_factor(); }
     float max_load_factor() const { return m_ht.max_load_factor(); }
+    
+    void min_load_factor(float ml) { m_ht.min_load_factor(ml); }
     void max_load_factor(float ml) { m_ht.max_load_factor(ml); }
     
     void rehash(size_type count) { m_ht.rehash(count); }

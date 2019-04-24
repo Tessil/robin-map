@@ -67,6 +67,11 @@ template<std::size_t GrowthFactor>
 struct is_power_of_two_policy<tsl::rh::power_of_two_growth_policy<GrowthFactor>>: std::true_type {
 };
 
+// Only available in C++17, we need to be compatible with C++11
+template<class T>
+const T& clamp( const T& v, const T& lo, const T& hi) {
+    return std::min(hi, std::max(lo, v));
+}
 
 
 using truncated_hash_type = std::uint_least32_t;
@@ -494,7 +499,9 @@ public:
                const Hash& hash,
                const KeyEqual& equal,
                const Allocator& alloc,
-               float max_load_factor): Hash(hash), 
+               float min_load_factor = DEFAULT_MIN_LOAD_FACTOR,
+               float max_load_factor = DEFAULT_MAX_LOAD_FACTOR): 
+                                       Hash(hash), 
                                        KeyEqual(equal),
                                        GrowthPolicy(bucket_count),
                                        m_buckets_data(
@@ -506,14 +513,15 @@ public:
                                        m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
                                        m_bucket_count(bucket_count),
                                        m_nb_elements(0), 
-                                       m_grow_on_next_insert(false)
+                                       m_grow_on_next_insert(false),
+                                       m_try_skrink_on_next_insert(false)
     {
         if(m_bucket_count > 0) {
             tsl_rh_assert(!m_buckets_data.empty());
             m_buckets_data.back().set_as_last_bucket();
         }
         
-        
+        this->min_load_factor(min_load_factor);
         this->max_load_factor(max_load_factor);
     }
 #else
@@ -529,7 +537,9 @@ public:
                const Hash& hash,
                const KeyEqual& equal,
                const Allocator& alloc,
-               float max_load_factor): Hash(hash), 
+               float min_load_factor = DEFAULT_MIN_LOAD_FACTOR,
+               float max_load_factor = DEFAULT_MAX_LOAD_FACTOR): 
+                                       Hash(hash), 
                                        KeyEqual(equal),
                                        GrowthPolicy(bucket_count),
                                        m_buckets_data(alloc), 
@@ -550,7 +560,7 @@ public:
             m_buckets_data.back().set_as_last_bucket();
         }
         
-        
+        this->min_load_factor(min_load_factor);
         this->max_load_factor(max_load_factor);
     }
 #endif
@@ -564,7 +574,9 @@ public:
                                          m_nb_elements(other.m_nb_elements),
                                          m_load_threshold(other.m_load_threshold),
                                          m_max_load_factor(other.m_max_load_factor),
-                                         m_grow_on_next_insert(other.m_grow_on_next_insert)
+                                         m_grow_on_next_insert(other.m_grow_on_next_insert),
+                                         m_min_load_factor(other.m_min_load_factor),
+                                         m_try_skrink_on_next_insert(other.m_try_skrink_on_next_insert)
     {
     }
     
@@ -581,7 +593,9 @@ public:
                                             m_nb_elements(other.m_nb_elements),
                                             m_load_threshold(other.m_load_threshold),
                                             m_max_load_factor(other.m_max_load_factor),
-                                            m_grow_on_next_insert(other.m_grow_on_next_insert)
+                                            m_grow_on_next_insert(other.m_grow_on_next_insert),
+                                            m_min_load_factor(other.m_min_load_factor),
+                                            m_try_skrink_on_next_insert(other.m_try_skrink_on_next_insert)
     {
         other.GrowthPolicy::clear();
         other.m_buckets_data.clear();
@@ -590,6 +604,7 @@ public:
         other.m_nb_elements = 0;
         other.m_load_threshold = 0;
         other.m_grow_on_next_insert = false;
+        other.m_try_skrink_on_next_insert = false;
     }
     
     robin_hash& operator=(const robin_hash& other) {
@@ -603,9 +618,13 @@ public:
                                                m_buckets_data.data();
             m_bucket_count = other.m_bucket_count;
             m_nb_elements = other.m_nb_elements;
+            
             m_load_threshold = other.m_load_threshold;
             m_max_load_factor = other.m_max_load_factor;
             m_grow_on_next_insert = other.m_grow_on_next_insert;
+            
+            m_min_load_factor = other.m_min_load_factor;
+            m_try_skrink_on_next_insert = other.m_try_skrink_on_next_insert;
         }
         
         return *this;
@@ -791,6 +810,8 @@ public:
             ++pos;
         }
         
+        m_try_skrink_on_next_insert = true;
+        
         return pos;
     }
     
@@ -847,7 +868,8 @@ public:
             ++icloser_bucket;
             ++ito_move_closer_value;
         }
-
+        
+        m_try_skrink_on_next_insert = true;
         
         return iterator(m_buckets + ireturn_bucket);
     }
@@ -863,6 +885,7 @@ public:
         auto it = find(key, hash);
         if(it != end()) {
             erase_from_bucket(it);
+            m_try_skrink_on_next_insert = true;
             
             return 1;
         }
@@ -888,6 +911,8 @@ public:
         swap(m_load_threshold, other.m_load_threshold);
         swap(m_max_load_factor, other.m_max_load_factor);
         swap(m_grow_on_next_insert, other.m_grow_on_next_insert);
+        swap(m_min_load_factor, other.m_min_load_factor);
+        swap(m_try_skrink_on_next_insert, other.m_try_skrink_on_next_insert);
     }
     
     
@@ -1010,12 +1035,22 @@ public:
         return float(m_nb_elements)/float(bucket_count());
     }
     
+    float min_load_factor() const {
+        return m_min_load_factor;
+    }
+    
     float max_load_factor() const {
         return m_max_load_factor;
     }
     
+    void min_load_factor(float ml) {
+        m_min_load_factor = clamp(ml, float(MINIMUM_MIN_LOAD_FACTOR), 
+                                      float(MAXIMUM_MIN_LOAD_FACTOR));
+    }
+    
     void max_load_factor(float ml) {
-        m_max_load_factor = std::max(0.1f, std::min(ml, 0.95f));
+        m_max_load_factor = clamp(ml, float(MINIMUM_MAX_LOAD_FACTOR), 
+                                      float(MAXIMUM_MAX_LOAD_FACTOR));
         m_load_threshold = size_type(float(bucket_count())*m_max_load_factor);
     }
     
@@ -1150,7 +1185,7 @@ private:
             dist_from_ideal_bucket++;
         }
         
-        if(grow_on_high_load()) {
+        if(rehash_on_extreme_load()) {
             ibucket = bucket_for_hash(hash);
             dist_from_ideal_bucket = 0;
             
@@ -1233,7 +1268,7 @@ private:
     
     void rehash_impl(size_type count) {
         robin_hash new_table(count, static_cast<Hash&>(*this), static_cast<KeyEqual&>(*this), 
-                             get_allocator(), m_max_load_factor);
+                             get_allocator(), m_min_load_factor, m_max_load_factor);
         
         const bool use_stored_hash = USE_STORED_HASH_ON_REHASH(new_table.bucket_count());
         for(auto& bucket: m_buckets_data) {
@@ -1274,14 +1309,26 @@ private:
     
     
     /**
-     * Return true if the map has been rehashed.
+     * Grow the table if m_grow_on_next_insert is true or we reached the max_load_factor.
+     * Shrink the table if m_try_skrink_on_next_insert is true (an erase occured) and
+     * we're below the min_load_factor.
+     * 
+     * Return true if the table has been rehashed.
      */
-    bool grow_on_high_load() {
+    bool rehash_on_extreme_load() {
         if(m_grow_on_next_insert || size() >= m_load_threshold) {
             rehash_impl(GrowthPolicy::next_bucket_count());
             m_grow_on_next_insert = false;
             
             return true;
+        }
+        
+        if(m_try_skrink_on_next_insert) {
+            m_try_skrink_on_next_insert = false;
+            if(m_min_load_factor != 0.0f && load_factor() > m_min_load_factor) {
+                rehash(0);
+                return true;
+            }
         }
         
         return false;
@@ -1290,7 +1337,21 @@ private:
     
 public:
     static const size_type DEFAULT_INIT_BUCKETS_SIZE = 0;
+    
     static constexpr float DEFAULT_MAX_LOAD_FACTOR = 0.5f;
+    static constexpr float MINIMUM_MAX_LOAD_FACTOR = 0.2f;
+    static constexpr float MAXIMUM_MAX_LOAD_FACTOR = 0.95f;
+    
+    static constexpr float DEFAULT_MIN_LOAD_FACTOR = 0.0f;
+    static constexpr float MINIMUM_MIN_LOAD_FACTOR = 0.0f;
+    static constexpr float MAXIMUM_MIN_LOAD_FACTOR = 0.15f;
+    
+    static_assert(MINIMUM_MAX_LOAD_FACTOR < MAXIMUM_MAX_LOAD_FACTOR, 
+                  "MINIMUM_MAX_LOAD_FACTOR should be < MAXIMUM_MAX_LOAD_FACTOR");
+    static_assert(MINIMUM_MIN_LOAD_FACTOR < MAXIMUM_MIN_LOAD_FACTOR, 
+                  "MINIMUM_MIN_LOAD_FACTOR should be < MAXIMUM_MIN_LOAD_FACTOR");
+    static_assert(MAXIMUM_MIN_LOAD_FACTOR < MINIMUM_MAX_LOAD_FACTOR, 
+                  "MAXIMUM_MIN_LOAD_FACTOR should be < MINIMUM_MAX_LOAD_FACTOR");
     
 private:
     static const distance_type REHASH_ON_HIGH_NB_PROBES__NPROBES = 128;
@@ -1329,6 +1390,16 @@ private:
     float m_max_load_factor;
     
     bool m_grow_on_next_insert;
+    
+    float m_min_load_factor;
+    
+    /**
+     * We can't shrink down the map on erase operations as the erase methods need to return the next iterator.
+     * Shrinking the map would invalidate all the iterators and we could not return the next iterator in a meaningful way,
+     * On erase, we thus just indicate on erase that we should try to shrink the hash table on the next insert
+     * if we go below the min_load_factor. 
+     */
+    bool m_try_skrink_on_next_insert;
 };
 
 }
