@@ -546,7 +546,8 @@ public:
                                        m_buckets(static_empty_bucket_ptr()), 
                                        m_bucket_count(bucket_count),
                                        m_nb_elements(0), 
-                                       m_grow_on_next_insert(false)
+                                       m_grow_on_next_insert(false),
+                                       m_try_skrink_on_next_insert(false)
     {
         if(bucket_count > max_bucket_count()) {
             TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum bucket count.");
