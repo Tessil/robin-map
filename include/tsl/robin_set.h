@@ -470,6 +470,14 @@ public:
     float min_load_factor() const { return m_ht.min_load_factor(); }
     float max_load_factor() const { return m_ht.max_load_factor(); }
     
+    /**
+     * Set the `min_load_factor` to `ml`. When the `load_factor` of the set goes
+     * below `min_load_factor` after some erase operations, the set will be
+     * shrunk when an insertion occurs. The erase method itself never shrinks
+     * the set.
+     * 
+     * The default value of `min_load_factor` is 0.0f, the set never shrinks by default.
+     */
     void min_load_factor(float ml) { m_ht.min_load_factor(ml); }
     void max_load_factor(float ml) { m_ht.max_load_factor(ml); }
     
