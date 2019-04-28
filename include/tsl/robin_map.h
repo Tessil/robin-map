@@ -140,7 +140,7 @@ public:
                        const Hash& hash = Hash(),
                        const KeyEqual& equal = KeyEqual(),
                        const Allocator& alloc = Allocator()): 
-                m_ht(bucket_count, hash, equal, alloc, ht::DEFAULT_MAX_LOAD_FACTOR)
+                m_ht(bucket_count, hash, equal, alloc)
     {
     }
     
@@ -600,7 +600,19 @@ public:
      *  Hash policy 
      */
     float load_factor() const { return m_ht.load_factor(); }
+    
+    float min_load_factor() const { return m_ht.min_load_factor(); }
     float max_load_factor() const { return m_ht.max_load_factor(); }
+    
+    /**
+     * Set the `min_load_factor` to `ml`. When the `load_factor` of the map goes
+     * below `min_load_factor` after some erase operations, the map will be
+     * shrunk when an insertion occurs. The erase method itself never shrinks
+     * the map.
+     * 
+     * The default value of `min_load_factor` is 0.0f, the map never shrinks by default.
+     */
+    void min_load_factor(float ml) { m_ht.min_load_factor(ml); }
     void max_load_factor(float ml) { m_ht.max_load_factor(ml); }
     
     void rehash(size_type count) { m_ht.rehash(count); }

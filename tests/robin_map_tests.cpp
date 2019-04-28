@@ -488,6 +488,69 @@ BOOST_AUTO_TEST_CASE(test_range_erase_same_iterators) {
 }
 
 /**
+ * max_load_factor
+ */
+BOOST_AUTO_TEST_CASE(test_max_load_factor_extreme_factors) {
+    tsl::robin_map<std::int64_t, std::int64_t> map;
+    
+    map.max_load_factor(0.0f);
+    BOOST_CHECK_GT(map.max_load_factor(), 0.0f);
+    
+    map.max_load_factor(10.0f);
+    BOOST_CHECK_LT(map.max_load_factor(), 1.0f);
+}
+
+/**
+ * min_load_factor
+ */
+BOOST_AUTO_TEST_CASE(test_min_load_factor_extreme_factors) {
+    tsl::robin_map<std::int64_t, std::int64_t> map;
+    
+    BOOST_CHECK_EQUAL(map.min_load_factor(), 0.0f);
+    BOOST_CHECK_LT(map.min_load_factor(), map.max_load_factor());
+    
+    map.min_load_factor(-10.0f);
+    BOOST_CHECK_EQUAL(map.min_load_factor(), 0.0f);
+    
+    map.min_load_factor(0.9f);
+    map.max_load_factor(0.1f);
+    
+    // max_load_factor should always be > min_load_factor. 
+    // Factors should have been clamped.
+    BOOST_CHECK_LT(map.min_load_factor(), map.max_load_factor());
+}
+
+BOOST_AUTO_TEST_CASE(test_min_load_factor) {
+    tsl::robin_map<std::int64_t, std::int64_t> map;
+    
+    map.min_load_factor(0.15f);
+    BOOST_CHECK_EQUAL(map.min_load_factor(), 0.15f);
+    
+    map.max_load_factor(0.5f);
+    BOOST_CHECK_EQUAL(map.max_load_factor(), 0.5f);
+    
+    
+    map.rehash(100);
+    for(std::size_t i = 0; i < map.bucket_count()/2; i++) {
+        map.insert({utils::get_key<std::int64_t>(i), 
+                    utils::get_value<std::int64_t>(i)});
+    }
+    
+    BOOST_CHECK_GT(map.load_factor(), map.min_load_factor());
+    BOOST_CHECK_CLOSE(map.load_factor(), 0.5f, 0.05f);
+    
+    
+    while(map.load_factor() >= map.min_load_factor()) {
+        map.erase(map.begin());
+    }
+    
+    // Shrink is done on insert.
+    map.insert({utils::get_key<std::int64_t>(map.bucket_count()), 
+                utils::get_value<std::int64_t>(map.bucket_count())});
+    BOOST_CHECK_GT(map.load_factor(), map.min_load_factor());
+}
+
+/**
  * rehash
  */
 BOOST_AUTO_TEST_CASE(test_rehash_empty) {
