@@ -88,6 +88,8 @@ target_link_libraries(your_target PRIVATE tsl::robin_map)
 
 If the project has been installed through `make install`, you can also use `find_package(tsl-robin-map REQUIRED)` instead of `add_subdirectory`.
 
+The library is available in [vcpkg](https://github.com/Microsoft/vcpkg/tree/master/ports/robin-map) and [conan](https://bintray.com/tessil/tsl/tsl-robin-map%3Atessil). It's also present in [Debian](https://packages.debian.org/buster/robin-map-dev), [Ubuntu](https://packages.ubuntu.com/disco/robin-map-dev) and [Fedora](https://apps.fedoraproject.org/packages/robin-map-devel) package repositories.
+
 The code should work with any C++11 standard-compliant compiler and has been tested with GCC 4.8.4, Clang 3.5.0 and Visual Studio 2015.
 
 To run the tests you will need the Boost Test library and CMake.
