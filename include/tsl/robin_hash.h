@@ -505,10 +505,14 @@ public:
                                        KeyEqual(equal),
                                        GrowthPolicy(bucket_count),
                                        m_buckets_data(
-                                           ((bucket_count > max_bucket_count())?
-                                               TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum bucket count."):
-                                               bucket_count), 
-                                           alloc
+                                           [&]() {
+                                               if(bucket_count > max_bucket_count()) {
+                                                   TSL_RH_THROW_OR_TERMINATE(std::length_error, 
+                                                                             "The map exceeds its maximum bucket count.");
+                                               }
+                                               
+                                               return bucket_count;
+                                           }(), alloc
                                        ),
                                        m_buckets(m_buckets_data.empty()?static_empty_bucket_ptr():m_buckets_data.data()),
                                        m_bucket_count(bucket_count),
