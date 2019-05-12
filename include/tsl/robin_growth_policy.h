@@ -53,7 +53,7 @@
 #        define TSL_RH_THROW_OR_TERMINATE(ex, msg) std::terminate()
 #    else
 #        include <cstdio>
-#        define TSL_RH_THROW_OR_TERMINATE(ex, msg) do { std::fprintf(stderr, msg); std::terminate(); } while(0)
+#        define TSL_RH_THROW_OR_TERMINATE(ex, msg) (int)((std::fprintf(stderr, msg)),(std::terminate()), 1)
 #    endif
 #endif
 
