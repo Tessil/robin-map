@@ -64,6 +64,8 @@ namespace tsl {
  * Other growth policies are available and you may define your own growth policy, 
  * check `tsl::rh::power_of_two_growth_policy` for the interface.
  * 
+ * `Key` must be swappable.
+ * 
  * If the destructor of `Key` throws an exception, the behaviour of the class is undefined.
  * 
  * Iterators invalidation:
