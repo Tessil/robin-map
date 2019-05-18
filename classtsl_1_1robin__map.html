@@ -283,8 +283,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a69155fc70ea3d6887fa90a48ffb9bd3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a026a2c4cb29290d42d410f409b44ec7c"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__map.html#a026a2c4cb29290d42d410f409b44ec7c">load_factor</a> () const</td></tr>
 <tr class="separator:a026a2c4cb29290d42d410f409b44ec7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03e6ecde5671971af02348e2059f9a7a"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__map.html#a03e6ecde5671971af02348e2059f9a7a">min_load_factor</a> () const</td></tr>
+<tr class="separator:a03e6ecde5671971af02348e2059f9a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90603aafb683e936dbad92c585ccdeab"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__map.html#a90603aafb683e936dbad92c585ccdeab">max_load_factor</a> () const</td></tr>
 <tr class="separator:a90603aafb683e936dbad92c585ccdeab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d8531a86434e6d837cb71c938be56f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__map.html#a8d8531a86434e6d837cb71c938be56f5">min_load_factor</a> (float ml)</td></tr>
+<tr class="separator:a8d8531a86434e6d837cb71c938be56f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac98a20f47db5ad7fcecf22adec84c422"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__map.html#ac98a20f47db5ad7fcecf22adec84c422">max_load_factor</a> (float ml)</td></tr>
 <tr class="separator:ac98a20f47db5ad7fcecf22adec84c422"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46f1634ce93a6e4913ae089400de23d2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__map.html#a46f1634ce93a6e4913ae089400de23d2">rehash</a> (<a class="el" href="classtsl_1_1robin__map.html#ae42652a724ddc26237783a8a8e0a3545">size_type</a> <a class="el" href="classtsl_1_1robin__map.html#a18c8de895c524cf166a7c8866e634218">count</a>)</td></tr>
@@ -315,6 +319,8 @@ class tsl::robin_map&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPol
 <p>For operations modifying the hash map (insert, erase, rehash, ...), the strong exception guarantee is only guaranteed when the expression <code>std::is_nothrow_swappable&lt;std::pair&lt;Key, T&gt;&gt;::value &amp;&amp; std::is_nothrow_move_constructible&lt;std::pair&lt;Key, T&gt;&gt;::value</code> is true, otherwise if an exception is thrown during the swap or the move, the hash map may end up in a undefined state. Per the standard a <code>Key</code> or <code>T</code> with a noexcept copy constructor and no move constructor also satisfies the <code>std::is_nothrow_move_constructible&lt;std::pair&lt;Key, T&gt;&gt;::value</code> criterion (and will thus guarantee the strong exception for the map).</p>
 <p>When <code>StoreHash</code> is true, 32 bits of the hash are stored alongside the values. It can improve the performance during lookups if the <code>KeyEqual</code> function takes time (if it engenders a cache-miss for example) as we then compare the stored hashes before comparing the keys. When <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> is used as <code>GrowthPolicy</code>, it may also speed-up the rehash process as we can avoid to recalculate the hash. When it is detected that storing the hash will not incur any memory penality due to alignement (i.e. <code>sizeof(tsl::detail_robin_hash::bucket_entry&lt;ValueType, true&gt;) == sizeof(tsl::detail_robin_hash::bucket_entry&lt;ValueType, false&gt;)</code>) and <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> is used, the hash will be stored even if <code>StoreHash</code> is false so that we can speed-up the rehash (but it will not be used on lookups unless <code>StoreHash</code> is true).</p>
 <p><code>GrowthPolicy</code> defines how the map grows and consequently how a hash value is mapped to a bucket. By default the map uses <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code>. This policy keeps the number of buckets to a power of two and uses a mask to map the hash to a bucket instead of the slow modulo. Other growth policies are available and you may define your own growth policy, check <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> for the interface.</p>
+<p><code>std::pair&lt;Key, T&gt;</code> must be swappable.</p>
+<p><code>Key</code> and <code>T</code> must be copy and/or move constructible.</p>
 <p>If the destructor of <code>Key</code> or <code>T</code> throws an exception, the behaviour of the class is undefined.</p>
 <p>Iterators invalidation:</p><ul>
 <li>clear, operator=, reserve, rehash: always invalidate the iterators.</li>
@@ -3277,6 +3283,63 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 
 </div>
 </div>
+<a id="a03e6ecde5671971af02348e2059f9a7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03e6ecde5671971af02348e2059f9a7a">&#9670;&nbsp;</a></span>min_load_factor() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">float <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::min_load_factor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8d8531a86434e6d837cb71c938be56f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d8531a86434e6d837cb71c938be56f5">&#9670;&nbsp;</a></span>min_load_factor() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;std::pair&lt;Key, T&gt;&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classtsl_1_1robin__map.html">tsl::robin_map</a>&lt; Key, T, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::min_load_factor </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>ml</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Set the <code>min_load_factor</code> to <code>ml</code>. When the <code>load_factor</code> of the map goes below <code>min_load_factor</code> after some erase operations, the map will be shrunk when an insertion occurs. The erase method itself never shrinks the map.</p>
+<p>The default value of <code>min_load_factor</code> is 0.0f, the map never shrinks by default. </p>
+
+</div>
+</div>
 <a id="a4250011f568c4ebedee82aa93f94657f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4250011f568c4ebedee82aa93f94657f">&#9670;&nbsp;</a></span>mutable_iterator()</h2>
 
@@ -3789,7 +3852,7 @@ template&lt;class Key , class T , class Hash  = std::hash&lt;Key&gt;, class KeyE
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>tsl/<a class="el" href="robin__map_8h_source.html">robin_map.h</a></li>
+<li>include/tsl/<a class="el" href="robin__map_8h_source.html">robin_map.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -227,8 +227,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af63a2baee29b4680f49e55f9f8e8b2ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5096d0194960278c43b23382b93c9f8f"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__set.html#a5096d0194960278c43b23382b93c9f8f">load_factor</a> () const</td></tr>
 <tr class="separator:a5096d0194960278c43b23382b93c9f8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac59a301ebfa46d5fcd35ce529008deb5"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__set.html#ac59a301ebfa46d5fcd35ce529008deb5">min_load_factor</a> () const</td></tr>
+<tr class="separator:ac59a301ebfa46d5fcd35ce529008deb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa1e914c188cba804978004b25e39abe"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__set.html#afa1e914c188cba804978004b25e39abe">max_load_factor</a> () const</td></tr>
 <tr class="separator:afa1e914c188cba804978004b25e39abe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a57104ad0c718dcf4a3d94fb94e8cb1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__set.html#a8a57104ad0c718dcf4a3d94fb94e8cb1">min_load_factor</a> (float ml)</td></tr>
+<tr class="separator:a8a57104ad0c718dcf4a3d94fb94e8cb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ecaa65ec84bf3b33aecc891ece46b6a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__set.html#a3ecaa65ec84bf3b33aecc891ece46b6a">max_load_factor</a> (float ml)</td></tr>
 <tr class="separator:a3ecaa65ec84bf3b33aecc891ece46b6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a299dc10b59d8fea28916790b3e8c0bdb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1robin__set.html#a299dc10b59d8fea28916790b3e8c0bdb">rehash</a> (<a class="el" href="classtsl_1_1robin__set.html#a5190354763170ba325832a003505209a">size_type</a> <a class="el" href="classtsl_1_1robin__set.html#a10b45514e20f2916a386d62fb3adc2ae">count</a>)</td></tr>
@@ -259,6 +263,8 @@ class tsl::robin_set&lt; Key, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy
 <p>For operations modifying the hash set (insert, erase, rehash, ...), the strong exception guarantee is only guaranteed when the expression <code>std::is_nothrow_swappable&lt;Key&gt;::value &amp;&amp; std::is_nothrow_move_constructible&lt;Key&gt;::value</code> is true, otherwise if an exception is thrown during the swap or the move, the hash set may end up in a undefined state. Per the standard a <code>Key</code> with a noexcept copy constructor and no move constructor also satisfies the <code>std::is_nothrow_move_constructible&lt;Key&gt;::value</code> criterion (and will thus guarantee the strong exception for the set).</p>
 <p>When <code>StoreHash</code> is true, 32 bits of the hash are stored alongside the values. It can improve the performance during lookups if the <code>KeyEqual</code> function takes time (or engenders a cache-miss for example) as we then compare the stored hashes before comparing the keys. When <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> is used as <code>GrowthPolicy</code>, it may also speed-up the rehash process as we can avoid to recalculate the hash. When it is detected that storing the hash will not incur any memory penality due to alignement (i.e. <code>sizeof(tsl::detail_robin_hash::bucket_entry&lt;ValueType, true&gt;) == sizeof(tsl::detail_robin_hash::bucket_entry&lt;ValueType, false&gt;)</code>) and <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> is used, the hash will be stored even if <code>StoreHash</code> is false so that we can speed-up the rehash (but it will not be used on lookups unless <code>StoreHash</code> is true).</p>
 <p><code>GrowthPolicy</code> defines how the set grows and consequently how a hash value is mapped to a bucket. By default the set uses <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code>. This policy keeps the number of buckets to a power of two and uses a mask to set the hash to a bucket instead of the slow modulo. Other growth policies are available and you may define your own growth policy, check <code><a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a></code> for the interface.</p>
+<p><code>Key</code> must be swappable.</p>
+<p><code>Key</code> must be copy and/or move constructible.</p>
 <p>If the destructor of <code>Key</code> throws an exception, the behaviour of the class is undefined.</p>
 <p>Iterators invalidation:</p><ul>
 <li>clear, operator=, reserve, rehash: always invalidate the iterators.</li>
@@ -2675,6 +2681,63 @@ template&lt;class Key , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = st
 
 </div>
 </div>
+<a id="ac59a301ebfa46d5fcd35ce529008deb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac59a301ebfa46d5fcd35ce529008deb5">&#9670;&nbsp;</a></span>min_load_factor() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;Key&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">float <a class="el" href="classtsl_1_1robin__set.html">tsl::robin_set</a>&lt; Key, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::min_load_factor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8a57104ad0c718dcf4a3d94fb94e8cb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a57104ad0c718dcf4a3d94fb94e8cb1">&#9670;&nbsp;</a></span>min_load_factor() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Key , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = std::equal_to&lt;Key&gt;, class Allocator  = std::allocator&lt;Key&gt;, bool StoreHash = false, class GrowthPolicy  = tsl::rh::power_of_two_growth_policy&lt;2&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classtsl_1_1robin__set.html">tsl::robin_set</a>&lt; Key, Hash, KeyEqual, Allocator, StoreHash, GrowthPolicy &gt;::min_load_factor </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>ml</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Set the <code>min_load_factor</code> to <code>ml</code>. When the <code>load_factor</code> of the set goes below <code>min_load_factor</code> after some erase operations, the set will be shrunk when an insertion occurs. The erase method itself never shrinks the set.</p>
+<p>The default value of <code>min_load_factor</code> is 0.0f, the set never shrinks by default. </p>
+
+</div>
+</div>
 <a id="aebd376e4762e1e4091df9cc19917334e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aebd376e4762e1e4091df9cc19917334e">&#9670;&nbsp;</a></span>mutable_iterator()</h2>
 
@@ -2959,7 +3022,7 @@ template&lt;class Key , class Hash  = std::hash&lt;Key&gt;, class KeyEqual  = st
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>tsl/<a class="el" href="robin__set_8h_source.html">robin_set.h</a></li>
+<li>include/tsl/<a class="el" href="robin__set_8h_source.html">robin_set.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

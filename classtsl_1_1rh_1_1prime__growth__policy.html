@@ -61,6 +61,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3682e02287eba843471537f582ca8156"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb93687c90dad0e1b6ae31f7443d2a33"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1rh_1_1prime__growth__policy.html#adb93687c90dad0e1b6ae31f7443d2a33">max_bucket_count</a> () const</td></tr>
 <tr class="separator:adb93687c90dad0e1b6ae31f7443d2a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef14e2429e8bf134e8aeb40de6ed9856"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1rh_1_1prime__growth__policy.html#aef14e2429e8bf134e8aeb40de6ed9856">clear</a> () noexcept</td></tr>
+<tr class="separator:aef14e2429e8bf134e8aeb40de6ed9856"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Grow the hash table by using prime numbers as bucket count. Slower than <a class="el" href="classtsl_1_1rh_1_1power__of__two__growth__policy.html">tsl::rh::power_of_two_growth_policy</a> in general but will probably distribute the values around better in the buckets with a poor hash function.</p>
@@ -87,7 +89,7 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -110,6 +112,31 @@ Public Member Functions</h2></td></tr>
           <td class="paramtype">std::size_t&#160;</td>
           <td class="paramname"><em>hash</em></td><td>)</td>
           <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aef14e2429e8bf134e8aeb40de6ed9856"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef14e2429e8bf134e8aeb40de6ed9856">&#9670;&nbsp;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tsl::rh::prime_growth_policy::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -172,7 +199,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>tsl/<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a></li>
+<li>include/tsl/<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

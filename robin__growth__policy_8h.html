@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>robin-map: tsl/robin_growth_policy.h File Reference</title>
+<title>robin-map: include/tsl/robin_growth_policy.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,13 +37,14 @@ $(function() {
 <div id="main-nav"></div>
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_5a75f45df5587768cfca46117d7f7a37.html">tsl</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_4b4deafff36e7cc612a7df4d61a70473.html">tsl</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
 <div class="title">robin_growth_policy.h File Reference</div>  </div>
 </div><!--header-->
@@ -57,6 +58,7 @@ $(function() {
 <code>#include &lt;limits&gt;</code><br />
 <code>#include &lt;ratio&gt;</code><br />
 <code>#include &lt;stdexcept&gt;</code><br />
+<code>#include &lt;cstdio&gt;</code><br />
 </div>
 <p><a href="robin__growth__policy_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -77,7 +79,87 @@ Namespaces</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacetsl_1_1rh_1_1detail"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetsl_1_1rh_1_1detail.html">tsl::rh::detail</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:abf43b6f27a3bf5120e9d61e5f5d0d0ee"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robin__growth__policy_8h.html#abf43b6f27a3bf5120e9d61e5f5d0d0ee">tsl_rh_assert</a>(expr)&#160;&#160;&#160;(static_cast&lt;void&gt;(0))</td></tr>
+<tr class="separator:abf43b6f27a3bf5120e9d61e5f5d0d0ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6763b674ae3f1893aa7524c5c8a8e9b2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robin__growth__policy_8h.html#a6763b674ae3f1893aa7524c5c8a8e9b2">TSL_RH_THROW_OR_TERMINATE</a>(ex,  msg)&#160;&#160;&#160;do { std::fprintf(stderr, msg); std::terminate(); } while(0)</td></tr>
+<tr class="separator:a6763b674ae3f1893aa7524c5c8a8e9b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15c2bc0fd0ed52be3b0bc91b814b69cb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robin__growth__policy_8h.html#a15c2bc0fd0ed52be3b0bc91b814b69cb">TSL_RH_LIKELY</a>(exp)&#160;&#160;&#160;(exp)</td></tr>
+<tr class="separator:a15c2bc0fd0ed52be3b0bc91b814b69cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="abf43b6f27a3bf5120e9d61e5f5d0d0ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf43b6f27a3bf5120e9d61e5f5d0d0ee">&#9670;&nbsp;</a></span>tsl_rh_assert</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define tsl_rh_assert</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">expr</td><td>)</td>
+          <td>&#160;&#160;&#160;(static_cast&lt;void&gt;(0))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>MIT License</p>
+<p>Copyright (c) 2017 Tessil</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. </p>
+
+</div>
+</div>
+<a id="a15c2bc0fd0ed52be3b0bc91b814b69cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15c2bc0fd0ed52be3b0bc91b814b69cb">&#9670;&nbsp;</a></span>TSL_RH_LIKELY</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TSL_RH_LIKELY</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">exp</td><td>)</td>
+          <td>&#160;&#160;&#160;(exp)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6763b674ae3f1893aa7524c5c8a8e9b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6763b674ae3f1893aa7524c5c8a8e9b2">&#9670;&nbsp;</a></span>TSL_RH_THROW_OR_TERMINATE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TSL_RH_THROW_OR_TERMINATE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ex, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">msg&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;do { std::fprintf(stderr, msg); std::terminate(); } while(0)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>If exceptions are enabled, throw the exception passed in parameter, otherwise call std::terminate. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

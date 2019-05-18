@@ -61,12 +61,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4b19b624612cd19ecbfcba6ae38b9166"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a758984fba37f1fecc39a674d4471d309"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1rh_1_1mod__growth__policy.html#a758984fba37f1fecc39a674d4471d309">max_bucket_count</a> () const</td></tr>
 <tr class="separator:a758984fba37f1fecc39a674d4471d309"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a5edf253f35ca5eb6a803cf15811ed9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtsl_1_1rh_1_1mod__growth__policy.html#a8a5edf253f35ca5eb6a803cf15811ed9">clear</a> () noexcept</td></tr>
+<tr class="separator:a8a5edf253f35ca5eb6a803cf15811ed9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class GrowthFactor = std::ratio&lt;3, 2&gt;&gt;<br />
 class tsl::rh::mod_growth_policy&lt; GrowthFactor &gt;</h3>
 
-<p>Grow the hash table by GrowthFactor::num / GrowthFactor::den and use a modulo to map a hash to a bucket. Slower but it can be usefull if you want a slower growth. </p>
+<p>Grow the hash table by GrowthFactor::num / GrowthFactor::den and use a modulo to map a hash to a bucket. Slower but it can be useful if you want a slower growth. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab4b91e3953a09ae9432bba3c7b35e3c2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab4b91e3953a09ae9432bba3c7b35e3c2">&#9670;&nbsp;</a></span>mod_growth_policy()</h2>
@@ -89,7 +91,7 @@ template&lt;class GrowthFactor  = std::ratio&lt;3, 2&gt;&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -114,6 +116,33 @@ template&lt;class GrowthFactor  = std::ratio&lt;3, 2&gt;&gt; </div>
           <td class="paramtype">std::size_t&#160;</td>
           <td class="paramname"><em>hash</em></td><td>)</td>
           <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8a5edf253f35ca5eb6a803cf15811ed9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a5edf253f35ca5eb6a803cf15811ed9">&#9670;&nbsp;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class GrowthFactor  = std::ratio&lt;3, 2&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classtsl_1_1rh_1_1mod__growth__policy.html">tsl::rh::mod_growth_policy</a>&lt; GrowthFactor &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -180,7 +209,7 @@ template&lt;class GrowthFactor  = std::ratio&lt;3, 2&gt;&gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>tsl/<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a></li>
+<li>include/tsl/<a class="el" href="robin__growth__policy_8h_source.html">robin_growth_policy.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
