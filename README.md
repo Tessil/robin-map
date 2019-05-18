@@ -27,7 +27,7 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 - The type `Key`, and also `T` in case of map, must be swappable.
 - Iterator invalidation doesn't behave in the same way, any operation modifying the hash table invalidate them (see [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) for details).
 - References and pointers to keys or values in the map are invalidated in the same way as iterators to these keys-values.
-- For iterators, `operator*()` and `operator->()` return a reference and a pointer to `const std::pair<Key, T>` instead of `std::pair<const Key, T>` making the value `T` not modifiable. To modify the value you have to call the `value()` method of the iterator to get a mutable reference. Example:
+- For iterators of `tsl::robin_map`, `operator*()` and `operator->()` return a reference and a pointer to `const std::pair<Key, T>` instead of `std::pair<const Key, T>` making the value `T` not modifiable. To modify the value you have to call the `value()` method of the iterator to get a mutable reference. Example:
 ```c++
 tsl::robin_map<int, int> map = {{1, 1}, {2, 1}, {3, 1}};
 for(auto it = map.begin(); it != map.end(); ++it) {
