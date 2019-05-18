@@ -66,6 +66,8 @@ namespace tsl {
  * 
  * `Key` must be swappable.
  * 
+ * `Key` must be copy and/or move constructible.
+ * 
  * If the destructor of `Key` throws an exception, the behaviour of the class is undefined.
  * 
  * Iterators invalidation:

@@ -66,6 +66,8 @@ namespace tsl {
  * 
  * `std::pair<Key, T>` must be swappable.
  * 
+ * `Key` and `T` must be copy and/or move constructible.
+ * 
  * If the destructor of `Key` or `T` throws an exception, the behaviour of the class is undefined.
  * 
  * Iterators invalidation:

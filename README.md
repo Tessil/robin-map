@@ -24,7 +24,7 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 
 `tsl::robin_map` tries to have an interface similar to `std::unordered_map`, but some differences exist.
 - The **strong exception guarantee only holds** if the following statement is true `std::is_nothrow_swappable<value_type>::value && std::is_nothrow_move_constructible<value_type>::value` (where `value_type` is `Key` for `tsl::robin_set` and `std::pair<Key, T>` for `tsl::robin_map`). Otherwise if an exception is thrown during the swap or the move, the structure may end up in a undefined state. Note that per the standard, a `value_type` with a noexcept copy constructor and no move constructor also satisfies this condition and will thus guarantee the strong exception guarantee for the structure (see [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) for details).
-- The type `Key`, and also `T` in case of map, must be swappable.
+- The type `Key`, and also `T` in case of map, must be swappable. They must also be copy and/or move constructible.
 - Iterator invalidation doesn't behave in the same way, any operation modifying the hash table invalidate them (see [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) for details).
 - References and pointers to keys or values in the map are invalidated in the same way as iterators to these keys-values.
 - For iterators of `tsl::robin_map`, `operator*()` and `operator->()` return a reference and a pointer to `const std::pair<Key, T>` instead of `std::pair<const Key, T>` making the value `T` not modifiable. To modify the value you have to call the `value()` method of the iterator to get a mutable reference. Example:
