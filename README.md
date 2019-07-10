@@ -20,7 +20,7 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 - The library can be used with exceptions disabled (through `-fno-exceptions` option on Clang and GCC, without an `/EH` option on MSVC or simply by defining `TSL_NO_EXCEPTIONS`). `std::terminate` is used in replacement of the `throw` instruction when exceptions are disabled.
 - API closely similar to `std::unordered_map` and `std::unordered_set`.
 
-### Differences compare to `std::unordered_map`
+### Differences compared to `std::unordered_map`
 
 `tsl::robin_map` tries to have an interface similar to `std::unordered_map`, but some differences exist.
 - The **strong exception guarantee only holds** if the following statement is true `std::is_nothrow_swappable<value_type>::value && std::is_nothrow_move_constructible<value_type>::value` (where `value_type` is `Key` for `tsl::robin_set` and `std::pair<Key, T>` for `tsl::robin_map`). Otherwise if an exception is thrown during the swap or the move, the structure may end up in a undefined state. Note that per the standard, a `value_type` with a noexcept copy constructor and no move constructor also satisfies this condition and will thus guarantee the strong exception guarantee for the structure (see [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) for details).
