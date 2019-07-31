@@ -487,6 +487,62 @@ BOOST_AUTO_TEST_CASE(test_range_erase_same_iterators) {
     BOOST_CHECK_EQUAL(it_const.value(), -100);
 }
 
+BOOST_AUTO_TEST_CASE(test_erase_backward_shiftwrap_around_1) {
+    struct hash {
+        std::size_t operator()(std::uint32_t v) const {
+            return static_cast<std::size_t>(v);
+        }
+    };
+    
+    tsl::robin_map<std::uint32_t, int> map(32);
+    BOOST_REQUIRE_EQUAL(map.bucket_count(), 32);
+    
+    map.insert({31, 1});
+    map.insert({32+31, 2});
+    
+    auto it = map.begin();
+    BOOST_CHECK_EQUAL(it->first, 32 + 31);
+    
+    ++it;
+    BOOST_CHECK_EQUAL(it->first, 31);
+    
+    it = map.erase(it);
+    BOOST_CHECK(it == map.end());
+    BOOST_CHECK_EQUAL(map.size(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_erase_backward_shiftwrap_around_2) {
+    struct hash {
+        std::size_t operator()(std::uint32_t v) const {
+            return static_cast<std::size_t>(v);
+        }
+    };
+    
+    tsl::robin_map<std::uint32_t, int> map(32);
+    BOOST_REQUIRE_EQUAL(map.bucket_count(), 32);
+    
+    map.insert({31, 1});
+    map.insert({32+31, 2});
+    map.insert({64+31, 3});
+    map.insert({96+31, 3});
+    
+    auto it = map.begin();
+    BOOST_CHECK_EQUAL(it->first, 32 + 31);
+    
+    ++it;
+    BOOST_CHECK_EQUAL(it->first, 64 + 31);
+    
+    ++it;
+    BOOST_CHECK_EQUAL(it->first, 96 + 31);
+    
+    ++it;
+    BOOST_CHECK_EQUAL(it->first, 31);
+    
+    it = map.erase(it);
+    BOOST_CHECK(it == map.end());
+    BOOST_CHECK_EQUAL(map.size(), 3);
+}
+
 /**
  * max_load_factor
  */

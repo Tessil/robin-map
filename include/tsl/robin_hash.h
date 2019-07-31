@@ -805,7 +805,12 @@ public:
      * we use an `iterator` instead of a `const_iterator`.
      */
     iterator erase(iterator pos) {
-        erase_from_bucket(pos);
+        const bool end_reached = erase_from_bucket(pos);
+        m_try_skrink_on_next_insert = true;
+        
+        if(end_reached) {
+            return end();
+        }
         
         /**
          * Erase bucket used a backward shift after clearing the bucket.
@@ -814,8 +819,6 @@ public:
         if(pos.m_bucket->empty()) {
             ++pos;
         }
-        
-        m_try_skrink_on_next_insert = true;
         
         return pos;
     }
@@ -1146,7 +1149,10 @@ private:
         return cend();
     }
     
-    void erase_from_bucket(iterator pos) {
+    /**
+     * Return true if we have have reached the end of the bucket.
+     */
+    bool erase_from_bucket(iterator pos) {
         pos.m_bucket->clear();
         m_nb_elements--;
         
@@ -1156,7 +1162,8 @@ private:
          * 
          * We try to move the values closer to their ideal bucket.
          */
-        std::size_t previous_ibucket = static_cast<std::size_t>(pos.m_bucket - m_buckets);
+        const std::size_t initial_ibucket = static_cast<std::size_t>(pos.m_bucket - m_buckets);
+        std::size_t previous_ibucket = initial_ibucket;
         std::size_t ibucket = next_bucket(previous_ibucket);
         
         while(m_buckets[ibucket].dist_from_ideal_bucket() > 0) {
@@ -1170,6 +1177,13 @@ private:
             previous_ibucket = ibucket;
             ibucket = next_bucket(ibucket);
         }
+        
+        /**
+         * If we have wrapped around during the backward shift, we then have reached the end.
+         * TODO Improve documentation.
+         */
+        const bool end_reached = initial_ibucket > previous_ibucket;
+        return end_reached;
     }
     
     template<class K, class... Args>
