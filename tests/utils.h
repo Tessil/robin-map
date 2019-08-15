@@ -25,7 +25,6 @@
 #define TSL_UTILS_H
 
 
-#include <boost/numeric/conversion/cast.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -34,6 +33,13 @@
 #include <string>
 #include <utility>
 
+#include <tsl/robin_hash.h>
+
+#ifdef TSL_RH_NO_EXCEPTIONS
+#define TSL_RH_CHECK_THROW(S, E)
+#else
+#define TSL_RH_CHECK_THROW(S, E) BOOST_CHECK_THROW(S, E)
+#endif
 
 template<typename T>
 class identity_hash {
@@ -251,12 +257,12 @@ public:
 
 template<>
 inline std::int64_t utils::get_key<std::int64_t>(std::size_t counter) {
-    return boost::numeric_cast<std::int64_t>(counter);
+    return tsl::detail_robin_hash::numeric_cast<std::int64_t>(counter);
 }
 
 template<>
 inline self_reference_member_test utils::get_key<self_reference_member_test>(std::size_t counter) {
-    return self_reference_member_test(boost::numeric_cast<std::int64_t>(counter));
+    return self_reference_member_test(tsl::detail_robin_hash::numeric_cast<std::int64_t>(counter));
 }
 
 template<>
@@ -266,12 +272,12 @@ inline std::string utils::get_key<std::string>(std::size_t counter) {
 
 template<>
 inline move_only_test utils::get_key<move_only_test>(std::size_t counter) {
-    return move_only_test(boost::numeric_cast<std::int64_t>(counter));
+    return move_only_test(tsl::detail_robin_hash::numeric_cast<std::int64_t>(counter));
 }
 
 template<>
 inline copy_only_test utils::get_key<copy_only_test>(std::size_t counter) {
-    return copy_only_test(boost::numeric_cast<std::int64_t>(counter));
+    return copy_only_test(tsl::detail_robin_hash::numeric_cast<std::int64_t>(counter));
 }
 
 
@@ -279,12 +285,12 @@ inline copy_only_test utils::get_key<copy_only_test>(std::size_t counter) {
 
 template<>
 inline std::int64_t utils::get_value<std::int64_t>(std::size_t counter) {
-    return boost::numeric_cast<std::int64_t>(counter*2);
+    return tsl::detail_robin_hash::numeric_cast<std::int64_t>(counter*2);
 }
 
 template<>
 inline self_reference_member_test utils::get_value<self_reference_member_test>(std::size_t counter) {
-    return self_reference_member_test(boost::numeric_cast<std::int64_t>(counter*2));
+    return self_reference_member_test(tsl::detail_robin_hash::numeric_cast<std::int64_t>(counter*2));
 }
 
 template<>
@@ -294,12 +300,12 @@ inline std::string utils::get_value<std::string>(std::size_t counter) {
 
 template<>
 inline move_only_test utils::get_value<move_only_test>(std::size_t counter) {
-    return move_only_test(boost::numeric_cast<std::int64_t>(counter*2));
+    return move_only_test(tsl::detail_robin_hash::numeric_cast<std::int64_t>(counter*2));
 }
 
 template<>
 inline copy_only_test utils::get_value<copy_only_test>(std::size_t counter) {
-    return copy_only_test(boost::numeric_cast<std::int64_t>(counter*2));
+    return copy_only_test(tsl::detail_robin_hash::numeric_cast<std::int64_t>(counter*2));
 }
 
 

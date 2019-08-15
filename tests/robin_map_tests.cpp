@@ -537,7 +537,8 @@ BOOST_AUTO_TEST_CASE(test_min_load_factor) {
     }
     
     BOOST_CHECK_GT(map.load_factor(), map.min_load_factor());
-    BOOST_CHECK_CLOSE(map.load_factor(), 0.5f, 0.05f);
+    // Can't use BOOST_CHECK_CLOSE with -fno-exceptions
+    BOOST_CHECK(std::abs(map.load_factor() - 0.5f) < 0.005f);
     
     
     while(map.load_factor() >= map.min_load_factor()) {
@@ -674,31 +675,31 @@ BOOST_AUTO_TEST_CASE(test_modify_value_through_iterator) {
  * constructor
  */
 BOOST_AUTO_TEST_CASE(test_extreme_bucket_count_value_construction) {
-    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+    TSL_RH_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
                                       std::allocator<std::pair<int, int>>, false,
                                       tsl::rh::power_of_two_growth_policy<2>>
                             (std::numeric_limits<std::size_t>::max())), std::length_error);
     
-    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+    TSL_RH_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
                                       std::allocator<std::pair<int, int>>, false, 
                                       tsl::rh::power_of_two_growth_policy<2>>
                             (std::numeric_limits<std::size_t>::max()/2 + 1)), std::length_error);
     
     
     
-    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+    TSL_RH_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
                                       std::allocator<std::pair<int, int>>, false, 
                                       tsl::rh::prime_growth_policy>
                             (std::numeric_limits<std::size_t>::max())), std::length_error);
     
-    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+    TSL_RH_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
                                       std::allocator<std::pair<int, int>>, false, 
                                       tsl::rh::prime_growth_policy>
                             (std::numeric_limits<std::size_t>::max()/2)), std::length_error);
     
     
     
-    BOOST_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
+    TSL_RH_CHECK_THROW((tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>, 
                                       std::allocator<std::pair<int, int>>, false, 
                                       tsl::rh::mod_growth_policy<>>
                             (std::numeric_limits<std::size_t>::max())), std::length_error);
@@ -901,7 +902,7 @@ BOOST_AUTO_TEST_CASE(test_at) {
     
     BOOST_CHECK_EQUAL(map.at(0), 10);
     BOOST_CHECK_EQUAL(map.at(-2), 20);
-    BOOST_CHECK_THROW(map.at(1), std::out_of_range);
+    TSL_RH_CHECK_THROW(map.at(1), std::out_of_range);
 }
 
 /**
@@ -1076,7 +1077,7 @@ BOOST_AUTO_TEST_CASE(test_heterogeneous_lookups) {
     
     BOOST_CHECK_EQUAL(map.at(addr1), 4);
     BOOST_CHECK_EQUAL(map.at(addr2), 5);
-    BOOST_CHECK_THROW(map.at(addr_unknown), std::out_of_range);
+    TSL_RH_CHECK_THROW(map.at(addr_unknown), std::out_of_range);
     
     
     BOOST_REQUIRE(map.find(addr1) != map.end());
@@ -1124,8 +1125,8 @@ BOOST_AUTO_TEST_CASE(test_empty_map) {
     BOOST_CHECK_EQUAL(map.count(""), 0);
     BOOST_CHECK_EQUAL(map.count("test"), 0);
     
-    BOOST_CHECK_THROW(map.at(""), std::out_of_range);
-    BOOST_CHECK_THROW(map.at("test"), std::out_of_range);
+    TSL_RH_CHECK_THROW(map.at(""), std::out_of_range);
+    TSL_RH_CHECK_THROW(map.at("test"), std::out_of_range);
     
     auto range = map.equal_range("test");
     BOOST_CHECK(range.first == range.second);
@@ -1162,7 +1163,7 @@ BOOST_AUTO_TEST_CASE(test_precalculated_hash) {
     BOOST_CHECK_EQUAL(map_const.at(3, map_const.hash_function()(3)), -3);
     
     BOOST_REQUIRE_NE(map.hash_function()(2), map.hash_function()(3));
-    BOOST_CHECK_THROW(map.at(3, map.hash_function()(2)), std::out_of_range);
+    TSL_RH_CHECK_THROW(map.at(3, map.hash_function()(2)), std::out_of_range);
     
     /**
      * count

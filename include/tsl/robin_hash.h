@@ -73,6 +73,22 @@ const T& clamp( const T& v, const T& lo, const T& hi) {
     return std::min(hi, std::max(lo, v));
 }
 
+template<typename T, typename U>
+static T numeric_cast(U value, const char* error_message = "numeric_cast() failed.") {
+    T ret = static_cast<T>(value);
+    if(static_cast<U>(ret) != value) {
+        TSL_RH_THROW_OR_TERMINATE(std::runtime_error, error_message);
+    }
+    
+    const bool is_same_signedness = (std::is_unsigned<T>::value && std::is_unsigned<U>::value) ||
+                                    (std::is_signed<T>::value && std::is_signed<U>::value);
+    if(!is_same_signedness && (ret < T{}) != (value < U{})) {
+        TSL_RH_THROW_OR_TERMINATE(std::runtime_error, error_message);
+    }
+    
+    return ret;
+}
+
 
 using truncated_hash_type = std::uint_least32_t;
 
