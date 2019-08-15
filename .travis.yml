@@ -29,7 +29,6 @@ matrix:
       dist: xenial
       env:
         - CBUILD_TYPE="Release"
-        - TYPE="sanitize"
         - CXXFLAGS="-fsanitize=address,undefined"
       
     - os: linux
@@ -37,6 +36,12 @@ matrix:
       env:
         - TYPE="coverage"
         - CXXFLAGS="--coverage"
+      
+    - os: linux
+      compiler: gcc
+      env:
+        - CBUILD_TYPE="Release"
+        - CXXFLAGS="-fno-exceptions"
 
 addons:
   apt:
