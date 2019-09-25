@@ -295,9 +295,9 @@ private:
     }
 
 public:
-    static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 512;
+    static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 4096;
     static_assert(DIST_FROM_IDEAL_BUCKET_LIMIT <= std::numeric_limits<distance_type>::max() - 1,
-                "DIST_FROM_IDEAL_BUCKET_LIMIT must be <= std::numeric_limits<distance_type>::max() - 1.");
+                 "DIST_FROM_IDEAL_BUCKET_LIMIT must be <= std::numeric_limits<distance_type>::max() - 1.");
     
 private:
     using storage = typename std::aligned_storage<sizeof(value_type), alignof(value_type)>::type;
