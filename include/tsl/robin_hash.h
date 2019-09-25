@@ -1017,6 +1017,17 @@ public:
     
     
     template<class K>
+    bool contains(const K& key) const {
+        return contains(key, hash_key(key));
+    }
+    
+    template<class K>
+    bool contains(const K& key, std::size_t hash) const {
+        return count(key, hash) != 0;
+    }
+    
+    
+    template<class K>
     std::pair<iterator, iterator> equal_range(const K& key) {
         return equal_range(key, hash_key(key));
     }
