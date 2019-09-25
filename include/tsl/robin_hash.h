@@ -1258,7 +1258,7 @@ private:
     /*
      * We don't use `value_type&& value` as last argument due to a bug in MSVC when `value_type` is a pointer,
      * The compiler is not able to see the difference between `std::string*` and `std::string*&&` resulting in 
-     * compile error.
+     * a compilation error.
      * 
      * The `value` will be in a moved state at the end of the function.
      */
