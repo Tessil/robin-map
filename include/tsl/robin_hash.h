@@ -293,6 +293,11 @@ private:
         tsl_rh_assert(!empty());
         value().~value_type();
     }
+
+public:
+    static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 512;
+    static_assert(DIST_FROM_IDEAL_BUCKET_LIMIT <= std::numeric_limits<distance_type>::max() - 1,
+                "DIST_FROM_IDEAL_BUCKET_LIMIT must be <= std::numeric_limits<distance_type>::max() - 1.");
     
 private:
     using storage = typename std::aligned_storage<sizeof(value_type), alignof(value_type)>::type;
@@ -1266,9 +1271,7 @@ private:
         
         while(!m_buckets[ibucket].empty()) {
             if(dist_from_ideal_bucket > m_buckets[ibucket].dist_from_ideal_bucket()) {
-                if(dist_from_ideal_bucket >= REHASH_ON_HIGH_NB_PROBES__NPROBES && 
-                   load_factor() >= REHASH_ON_HIGH_NB_PROBES__MIN_LOAD_FACTOR) 
-                {
+                if(dist_from_ideal_bucket >= bucket_entry::DIST_FROM_IDEAL_BUCKET_LIMIT) {
                     /**
                      * The number of probes is really high, rehash the map on the next insert.
                      * Difficult to do now as rehash may throw an exception.
@@ -1376,10 +1379,6 @@ public:
                   "MAXIMUM_MIN_LOAD_FACTOR should be < MINIMUM_MAX_LOAD_FACTOR");
     
 private:
-    static const distance_type REHASH_ON_HIGH_NB_PROBES__NPROBES = 128;
-    static constexpr float REHASH_ON_HIGH_NB_PROBES__MIN_LOAD_FACTOR = 0.15f;
-    
-    
     /**
      * Return an always valid pointer to an static empty bucket_entry with last_bucket() == true.
      */            
