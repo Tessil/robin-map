@@ -169,6 +169,7 @@ public:
         tsl_rh_assert(empty());
     }
     
+    template<typename ElementType = ValueType, typename = std::enable_if<std::is_copy_constructible<ElementType>::value>::type>
     bucket_entry(const bucket_entry& other) noexcept(std::is_nothrow_copy_constructible<value_type>::value): 
             bucket_hash(other),
             m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET), 
@@ -184,6 +185,7 @@ public:
      * Never really used, but still necessary as we must call resize on an empty `std::vector<bucket_entry>`.
      * and we need to support move-only types. See robin_hash constructor for details.
      */
+    template<typename ElementType = ValueType, typename = std::enable_if<std::is_move_constructible<ElementType>::value>::type>
     bucket_entry(bucket_entry&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value): 
             bucket_hash(std::move(other)),
             m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET), 
