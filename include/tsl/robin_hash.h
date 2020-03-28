@@ -1393,7 +1393,7 @@ private:
     /**
      * Return an always valid pointer to an static empty bucket_entry with last_bucket() == true.
      */            
-    bucket_entry* static_empty_bucket_ptr() {
+    bucket_entry* static_empty_bucket_ptr() noexcept {
         static bucket_entry empty_bucket(true);
         return &empty_bucket;
     }
