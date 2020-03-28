@@ -646,6 +646,25 @@ BOOST_AUTO_TEST_CASE(test_clear) {
     BOOST_CHECK(map == (HMap({{5, -5}, {1, -1}, {2, -1}, {4, -4}, {3, -3}})));
 }
 
+BOOST_AUTO_TEST_CASE(test_clear_with_min_load_factor) {
+    // insert x values, clear map, test insert
+    using HMap = tsl::robin_map<std::int64_t, std::int64_t>;
+    
+    const std::size_t nb_values = 1000;
+    auto map = utils::get_filled_hash_map<HMap>(nb_values);
+    map.min_load_factor(0.1f);
+    
+    map.clear();
+    BOOST_CHECK_EQUAL(map.bucket_count(), 0);
+    BOOST_CHECK_EQUAL(map.size(), 0);
+    BOOST_CHECK_EQUAL(std::distance(map.begin(), map.end()), 0);
+    
+    map.insert({5, -5});
+    map.insert({{1, -1}, {2, -1}, {4, -4}, {3, -3}});
+    
+    BOOST_CHECK(map == (HMap({{5, -5}, {1, -1}, {2, -1}, {4, -4}, {3, -3}})));
+}
+
 
 /**
  * iterator.value()

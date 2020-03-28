@@ -623,14 +623,7 @@ public:
                                             m_min_load_factor(other.m_min_load_factor),
                                             m_try_skrink_on_next_insert(other.m_try_skrink_on_next_insert)
     {
-        other.GrowthPolicy::clear();
-        other.m_buckets_data.clear();
-        other.m_buckets = static_empty_bucket_ptr();
-        other.m_bucket_count = 0;
-        other.m_nb_elements = 0;
-        other.m_load_threshold = 0;
-        other.m_grow_on_next_insert = false;
-        other.m_try_skrink_on_next_insert = false;
+        other.clear_and_shrink();
     }
     
     robin_hash& operator=(const robin_hash& other) {
@@ -725,12 +718,17 @@ public:
      * Modifiers
      */
     void clear() noexcept {
-        for(auto& bucket: m_buckets_data) {
-            bucket.clear();
+        if(m_min_load_factor > 0.0f) {
+            clear_and_shrink();
         }
-        
-        m_nb_elements = 0;
-        m_grow_on_next_insert = false;
+        else {
+            for(auto& bucket: m_buckets_data) {
+                bucket.clear();
+            }
+            
+            m_nb_elements = 0;
+            m_grow_on_next_insert = false;
+        }
     }
     
     
@@ -1320,6 +1318,18 @@ private:
         
         new_table.m_nb_elements = m_nb_elements;
         new_table.swap(*this);
+    }
+    
+    // Same as rehash(0) but noexcept and faster.
+    void clear_and_shrink() noexcept {
+        GrowthPolicy::clear();
+        m_buckets_data.clear();
+        m_buckets = static_empty_bucket_ptr();
+        m_bucket_count = 0;
+        m_nb_elements = 0;
+        m_load_threshold = 0;
+        m_grow_on_next_insert = false;
+        m_try_skrink_on_next_insert = false;
     }
     
     void insert_value_on_rehash(std::size_t ibucket, distance_type dist_from_ideal_bucket, 
