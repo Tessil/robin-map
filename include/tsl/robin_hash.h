@@ -1320,7 +1320,6 @@ private:
         new_table.swap(*this);
     }
     
-    // Same as rehash(0) but noexcept and faster.
     void clear_and_shrink() noexcept {
         GrowthPolicy::clear();
         m_buckets_data.clear();
