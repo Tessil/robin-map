@@ -599,9 +599,9 @@ public:
                                          m_bucket_count(other.m_bucket_count),
                                          m_nb_elements(other.m_nb_elements),
                                          m_load_threshold(other.m_load_threshold),
+                                         m_min_load_factor(other.m_min_load_factor),
                                          m_max_load_factor(other.m_max_load_factor),
                                          m_grow_on_next_insert(other.m_grow_on_next_insert),
-                                         m_min_load_factor(other.m_min_load_factor),
                                          m_try_skrink_on_next_insert(other.m_try_skrink_on_next_insert)
     {
     }
@@ -618,9 +618,9 @@ public:
                                             m_bucket_count(other.m_bucket_count),
                                             m_nb_elements(other.m_nb_elements),
                                             m_load_threshold(other.m_load_threshold),
+                                            m_min_load_factor(other.m_min_load_factor),
                                             m_max_load_factor(other.m_max_load_factor),
                                             m_grow_on_next_insert(other.m_grow_on_next_insert),
-                                            m_min_load_factor(other.m_min_load_factor),
                                             m_try_skrink_on_next_insert(other.m_try_skrink_on_next_insert)
     {
         other.clear_and_shrink();
@@ -639,10 +639,10 @@ public:
             m_nb_elements = other.m_nb_elements;
             
             m_load_threshold = other.m_load_threshold;
-            m_max_load_factor = other.m_max_load_factor;
-            m_grow_on_next_insert = other.m_grow_on_next_insert;
-            
             m_min_load_factor = other.m_min_load_factor;
+            m_max_load_factor = other.m_max_load_factor;
+            
+            m_grow_on_next_insert = other.m_grow_on_next_insert;
             m_try_skrink_on_next_insert = other.m_try_skrink_on_next_insert;
         }
         
@@ -933,9 +933,9 @@ public:
         swap(m_bucket_count, other.m_bucket_count);
         swap(m_nb_elements, other.m_nb_elements);
         swap(m_load_threshold, other.m_load_threshold);
+        swap(m_min_load_factor, other.m_min_load_factor);
         swap(m_max_load_factor, other.m_max_load_factor);
         swap(m_grow_on_next_insert, other.m_grow_on_next_insert);
-        swap(m_min_load_factor, other.m_min_load_factor);
         swap(m_try_skrink_on_next_insert, other.m_try_skrink_on_next_insert);
     }
     
@@ -1428,11 +1428,11 @@ private:
     size_type m_nb_elements;
     
     size_type m_load_threshold;
+    
+    float m_min_load_factor;
     float m_max_load_factor;
     
     bool m_grow_on_next_insert;
-    
-    float m_min_load_factor;
     
     /**
      * We can't shrink down the map on erase operations as the erase methods need to return the next iterator.
