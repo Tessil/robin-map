@@ -858,6 +858,7 @@ public:
         }
         
         if(last_mutable == end()) {
+            m_try_skrink_on_next_insert = true;
             return end();
         }
         
