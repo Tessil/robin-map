@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_policy, Policy, test_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_policy_min_bucket_count, Policy, test_types) {
-    // Check polcy when a bucket_count of 0 is asked.
+    // Check policy when a bucket_count of 0 is asked.
     std::size_t bucket_count = 0;
     Policy policy(bucket_count);
     

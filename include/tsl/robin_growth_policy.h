@@ -88,7 +88,7 @@ public:
      */
     explicit power_of_two_growth_policy(std::size_t& min_bucket_count_in_out) {
         if(min_bucket_count_in_out > max_bucket_count()) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maximum size.");
         }
         
         if(min_bucket_count_in_out > 0) {
@@ -113,7 +113,7 @@ public:
      */
     std::size_t next_bucket_count() const {
         if((m_mask + 1) > max_bucket_count() / GrowthFactor) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maximum size.");
         }
         
         return (m_mask + 1) * GrowthFactor;
@@ -173,7 +173,7 @@ class mod_growth_policy {
 public:
     explicit mod_growth_policy(std::size_t& min_bucket_count_in_out) {
         if(min_bucket_count_in_out > max_bucket_count()) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maximum size.");
         }
         
         if(min_bucket_count_in_out > 0) {
@@ -190,12 +190,12 @@ public:
     
     std::size_t next_bucket_count() const {
         if(m_mod == max_bucket_count()) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maximum size.");
         }
         
         const double next_bucket_count = std::ceil(double(m_mod) * REHASH_SIZE_MULTIPLICATION_FACTOR);
         if(!std::isnormal(next_bucket_count)) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maximum size.");
         }
         
         if(next_bucket_count > double(max_bucket_count())) {
@@ -295,7 +295,7 @@ static constexpr const std::array<std::size_t(*)(std::size_t), TSL_RH_NB_PRIMES>
  * Due to the constant variable in the modulo the compiler is able to optimize the operation
  * by a series of multiplications, substractions and shifts. 
  * 
- * The 'hash % 5' could become something like 'hash - (hash * 0xCCCCCCCD) >> 34) * 5' in a 64 bits environement.
+ * The 'hash % 5' could become something like 'hash - (hash * 0xCCCCCCCD) >> 34) * 5' in a 64 bits environment.
  */
 class prime_growth_policy {
 public:
@@ -303,7 +303,7 @@ public:
         auto it_prime = std::lower_bound(detail::PRIMES.begin(), 
                                          detail::PRIMES.end(), min_bucket_count_in_out);
         if(it_prime == detail::PRIMES.end()) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maximum size.");
         }
         
         m_iprime = static_cast<unsigned int>(std::distance(detail::PRIMES.begin(), it_prime));
@@ -321,7 +321,7 @@ public:
     
     std::size_t next_bucket_count() const {
         if(m_iprime + 1 >= detail::PRIMES.size()) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maxmimum size.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The hash table exceeds its maximum size.");
         }
         
         return detail::PRIMES[m_iprime + 1];
