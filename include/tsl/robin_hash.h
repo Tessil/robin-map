@@ -468,7 +468,7 @@ public:
         }
 
         template<class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value && !IsConst>::type* = nullptr>
-        typename U::value_type& value() {
+        typename U::value_type& value() const {
             return U()(m_bucket->value());
         }
         
