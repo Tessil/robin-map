@@ -722,7 +722,7 @@ BOOST_AUTO_TEST_CASE(test_modify_value_through_iterator) {
 }
 
 BOOST_AUTO_TEST_CASE(test_modify_value_through_iterator_with_const_qualifier) {
-    tsl::robin_map<int, int> map = {{0, 1}, {1, 2}};
+    tsl::robin_map<int, int> map = {{0, 1}};
     const auto it = map.begin();
 
     BOOST_CHECK_EQUAL(it->second, 1);
