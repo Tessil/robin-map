@@ -484,8 +484,8 @@ public:
     
     
     
-    
-    iterator find(const Key& key) { return m_ht.find(key); }
+    template<class SimilarToKey>
+    iterator find(const SimilarToKey& key) { return m_ht.find(key); }
     
     /**
      * Use the hash value 'precalculated_hash' instead of hashing the key. The hash value should be the same
