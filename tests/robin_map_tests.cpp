@@ -521,6 +521,10 @@ BOOST_AUTO_TEST_CASE(test_min_load_factor_extreme_factors) {
 }
 
 BOOST_AUTO_TEST_CASE(test_min_load_factor) {
+    // set min_load_factor to 0.15 and max_load_factor to 0.5.
+    // rehash to 100 buckets, insert 50 elements, erase until load_factor() < min_load_factor(), 
+    // insert an element, check if map has shrinked.
+    const std::size_t nb_values = 50;
     tsl::robin_map<std::int64_t, std::int64_t> map;
     
     map.min_load_factor(0.15f);
@@ -530,15 +534,11 @@ BOOST_AUTO_TEST_CASE(test_min_load_factor) {
     BOOST_CHECK_EQUAL(map.max_load_factor(), 0.5f);
     
     
-    map.rehash(100);
-    for(std::size_t i = 0; i < map.bucket_count()/2; i++) {
-        map.insert({utils::get_key<std::int64_t>(i), 
-                    utils::get_value<std::int64_t>(i)});
+    map.rehash(nb_values*2);
+    for(std::size_t i = 0; i < nb_values; i++) {
+        map.insert({utils::get_key<std::int64_t>(i), utils::get_value<std::int64_t>(i)});
     }
-    
     BOOST_CHECK_GT(map.load_factor(), map.min_load_factor());
-    // Can't use BOOST_CHECK_CLOSE with -fno-exceptions
-    BOOST_CHECK(std::abs(map.load_factor() - 0.5f) < 0.005f);
     
     
     while(map.load_factor() >= map.min_load_factor()) {
@@ -549,6 +549,37 @@ BOOST_AUTO_TEST_CASE(test_min_load_factor) {
     map.insert({utils::get_key<std::int64_t>(map.bucket_count()), 
                 utils::get_value<std::int64_t>(map.bucket_count())});
     BOOST_CHECK_GT(map.load_factor(), map.min_load_factor());
+}
+
+BOOST_AUTO_TEST_CASE(test_min_load_factor_range_erase) {
+    // set min_load_factor to 0.15 and max_load_factor to 0.5.
+    // rehash to 100 buckets, insert 50 elements, erase 40 with range erase, insert an element, 
+    // check if map has shrinked.
+    const std::size_t nb_values = 50;
+    const std::size_t nb_values_erase = 40;
+    tsl::robin_map<std::int64_t, std::int64_t> map;
+    
+    map.min_load_factor(0.15f);
+    BOOST_CHECK_EQUAL(map.min_load_factor(), 0.15f);
+    
+    map.max_load_factor(0.5f);
+    BOOST_CHECK_EQUAL(map.max_load_factor(), 0.5f);
+    
+    
+    map.rehash(nb_values*2);
+    for(std::size_t i = 0; i < nb_values; i++) {
+        map.insert({utils::get_key<std::int64_t>(i), utils::get_value<std::int64_t>(i)});
+    }
+    BOOST_CHECK_GT(map.load_factor(), map.min_load_factor());
+    
+    
+    map.erase(std::next(map.begin(), nb_values - nb_values_erase) , map.end());
+    
+    // Shrink is done on insert.
+    map.insert({utils::get_key<std::int64_t>(map.bucket_count()), 
+                utils::get_value<std::int64_t>(map.bucket_count())});
+    BOOST_CHECK_GT(map.load_factor(), map.min_load_factor());
+    BOOST_CHECK_LT(map.bucket_count(), nb_values*2);
 }
 
 /**
@@ -688,6 +719,15 @@ BOOST_AUTO_TEST_CASE(test_modify_value_through_iterator) {
             BOOST_CHECK_NE(val.second, -1);
         }
     }
+}
+
+BOOST_AUTO_TEST_CASE(test_modify_value_through_iterator_with_const_qualifier) {
+    tsl::robin_map<int, int> map = {{0, 1}};
+    const auto it = map.begin();
+
+    BOOST_CHECK_EQUAL(it->second, 1);
+    it.value() += 10;
+    BOOST_CHECK_EQUAL(it->second, 11);
 }
 
 /**

@@ -144,7 +144,7 @@ private:
  *   iterator of the hash table).
  * - If `StoreHash` is true, 32 bits of the hash of the value, if any, are also stored in the bucket. 
  *   If the size of the hash is more than 32 bits, it is truncated. We don't store the full hash
- *   as storing the hash is a potential opportunity to use the unused space due to the alignement
+ *   as storing the hash is a potential opportunity to use the unused space due to the alignment
  *   of the bucket_entry structure. We can thus potentially store the hash without any extra space 
  *   (which would not be possible with 64 bits of the hash).
  */
@@ -381,7 +381,7 @@ private:
                                        );
                                         
     /**
-     * Only use the stored hash on lookup if we are explictly asked. We are not sure how slow
+     * Only use the stored hash on lookup if we are explicitly asked. We are not sure how slow
      * the KeyEqual operation is. An extra comparison may slow things down with a fast KeyEqual.
      */
     static constexpr bool USE_STORED_HASH_ON_LOOKUP = StoreHash;
@@ -468,7 +468,7 @@ public:
         }
 
         template<class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value && !IsConst>::type* = nullptr>
-        typename U::value_type& value() {
+        typename U::value_type& value() const {
             return U()(m_bucket->value());
         }
         
@@ -539,7 +539,7 @@ public:
                                        m_bucket_count(bucket_count),
                                        m_nb_elements(0), 
                                        m_grow_on_next_insert(false),
-                                       m_try_skrink_on_next_insert(false)
+                                       m_try_shrink_on_next_insert(false)
     {
         if(m_bucket_count > 0) {
             tsl_rh_assert(!m_buckets_data.empty());
@@ -572,10 +572,10 @@ public:
                                        m_bucket_count(bucket_count),
                                        m_nb_elements(0), 
                                        m_grow_on_next_insert(false),
-                                       m_try_skrink_on_next_insert(false)
+                                       m_try_shrink_on_next_insert(false)
     {
         if(bucket_count > max_bucket_count()) {
-            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maxmimum bucket count.");
+            TSL_RH_THROW_OR_TERMINATE(std::length_error, "The map exceeds its maximum bucket count.");
         }
         
         if(m_bucket_count > 0) {
@@ -602,7 +602,7 @@ public:
                                          m_min_load_factor(other.m_min_load_factor),
                                          m_max_load_factor(other.m_max_load_factor),
                                          m_grow_on_next_insert(other.m_grow_on_next_insert),
-                                         m_try_skrink_on_next_insert(other.m_try_skrink_on_next_insert)
+                                         m_try_shrink_on_next_insert(other.m_try_shrink_on_next_insert)
     {
     }
     
@@ -621,7 +621,7 @@ public:
                                             m_min_load_factor(other.m_min_load_factor),
                                             m_max_load_factor(other.m_max_load_factor),
                                             m_grow_on_next_insert(other.m_grow_on_next_insert),
-                                            m_try_skrink_on_next_insert(other.m_try_skrink_on_next_insert)
+                                            m_try_shrink_on_next_insert(other.m_try_shrink_on_next_insert)
     {
         other.clear_and_shrink();
     }
@@ -643,7 +643,7 @@ public:
             m_max_load_factor = other.m_max_load_factor;
             
             m_grow_on_next_insert = other.m_grow_on_next_insert;
-            m_try_skrink_on_next_insert = other.m_try_skrink_on_next_insert;
+            m_try_shrink_on_next_insert = other.m_try_shrink_on_next_insert;
         }
         
         return *this;
@@ -834,7 +834,7 @@ public:
             ++pos;
         }
         
-        m_try_skrink_on_next_insert = true;
+        m_try_shrink_on_next_insert = true;
         
         return pos;
     }
@@ -858,6 +858,7 @@ public:
         }
         
         if(last_mutable == end()) {
+            m_try_shrink_on_next_insert = true;
             return end();
         }
         
@@ -893,7 +894,7 @@ public:
             ++ito_move_closer_value;
         }
         
-        m_try_skrink_on_next_insert = true;
+        m_try_shrink_on_next_insert = true;
         
         return iterator(m_buckets + ireturn_bucket);
     }
@@ -909,7 +910,7 @@ public:
         auto it = find(key, hash);
         if(it != end()) {
             erase_from_bucket(it);
-            m_try_skrink_on_next_insert = true;
+            m_try_shrink_on_next_insert = true;
             
             return 1;
         }
@@ -936,7 +937,7 @@ public:
         swap(m_min_load_factor, other.m_min_load_factor);
         swap(m_max_load_factor, other.m_max_load_factor);
         swap(m_grow_on_next_insert, other.m_grow_on_next_insert);
-        swap(m_try_skrink_on_next_insert, other.m_try_skrink_on_next_insert);
+        swap(m_try_shrink_on_next_insert, other.m_try_shrink_on_next_insert);
     }
     
     
@@ -1328,7 +1329,7 @@ private:
         m_nb_elements = 0;
         m_load_threshold = 0;
         m_grow_on_next_insert = false;
-        m_try_skrink_on_next_insert = false;
+        m_try_shrink_on_next_insert = false;
     }
     
     void insert_value_on_rehash(std::size_t ibucket, distance_type dist_from_ideal_bucket, 
@@ -1354,7 +1355,7 @@ private:
     
     /**
      * Grow the table if m_grow_on_next_insert is true or we reached the max_load_factor.
-     * Shrink the table if m_try_skrink_on_next_insert is true (an erase occured) and
+     * Shrink the table if m_try_shrink_on_next_insert is true (an erase occurred) and
      * we're below the min_load_factor.
      * 
      * Return true if the table has been rehashed.
@@ -1367,8 +1368,8 @@ private:
             return true;
         }
         
-        if(m_try_skrink_on_next_insert) {
-            m_try_skrink_on_next_insert = false;
+        if(m_try_shrink_on_next_insert) {
+            m_try_shrink_on_next_insert = false;
             if(m_min_load_factor != 0.0f && load_factor() < m_min_load_factor) {
                 reserve(size() + 1);
                 
@@ -1440,7 +1441,7 @@ private:
      * On erase, we thus just indicate on erase that we should try to shrink the hash table on the next insert
      * if we go below the min_load_factor. 
      */
-    bool m_try_skrink_on_next_insert;
+    bool m_try_shrink_on_next_insert;
 };
 
 }
