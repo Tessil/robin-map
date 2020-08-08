@@ -1068,6 +1068,137 @@ BOOST_AUTO_TEST_CASE(test_swap_empty) {
 }
 
 /**
+ * serialize and deserialize
+ */
+BOOST_AUTO_TEST_CASE(test_serialize_desearialize_empty) {
+    // serialize empty map; deserialize in new map; check equal.
+    // for deserialization, test it with and without hash compatibility.
+    const tsl::robin_map<std::string, move_only_test> empty_map(0);
+    
+    
+    serializer serial;
+    empty_map.serialize(serial);
+
+    deserializer dserial(serial.str());
+    auto empty_map_deserialized = decltype(empty_map)::deserialize(dserial, true);
+    BOOST_CHECK(empty_map_deserialized == empty_map);
+
+    deserializer dserial2(serial.str());
+    empty_map_deserialized = decltype(empty_map)::deserialize(dserial2, false);
+    BOOST_CHECK(empty_map_deserialized == empty_map);
+}
+
+BOOST_AUTO_TEST_CASE(test_serialize_desearialize) {
+    // insert x values; delete some values; serialize map; deserialize in new map; check equal.
+    // for deserialization, test it with and without hash compatibility.
+    const std::size_t nb_values = 1000;
+    
+    
+    tsl::robin_map<std::int32_t, move_only_test> map;
+    for(std::size_t i = 0; i < nb_values + 40; i++) {
+        map.insert({utils::get_key<std::int32_t>(i), utils::get_value<move_only_test>(i)});
+    }
+    
+    for(std::size_t i = nb_values; i < nb_values + 40; i++) {
+        map.erase(utils::get_key<std::int32_t>(i));
+    }
+    BOOST_CHECK_EQUAL(map.size(), nb_values);
+
+    
+    
+    serializer serial;
+    map.serialize(serial);
+
+    deserializer dserial(serial.str());
+    auto map_deserialized = decltype(map)::deserialize(dserial, true);
+    BOOST_CHECK(map == map_deserialized);
+
+    deserializer dserial2(serial.str());
+    map_deserialized = decltype(map)::deserialize(dserial2, false);
+    BOOST_CHECK(map_deserialized == map);
+    
+    // Deserializing a map with StoreHash=true from a map serialized with StoreHash=false with
+    // hash_compatible=true should throw an exception.
+    deserializer dserial3(serial.str());
+    TSL_RH_CHECK_THROW((tsl::robin_map<std::int32_t, move_only_test,
+                                       std::hash<std::int32_t>, std::equal_to<std::int32_t>, 
+                                       std::allocator<std::pair<std::int32_t, move_only_test>>,
+                                       true> ::deserialize(dserial3, true)),
+                       std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_serialize_desearialize_with_store_hash) {
+    // insert x values; delete some values; serialize map; deserialize in new map; check equal.
+    // for deserialization, test it with and without hash compatibility.
+    const std::size_t nb_values = 1000;
+    
+    
+    tsl::robin_map<std::int32_t, move_only_test,
+                   std::hash<std::int32_t>, std::equal_to<std::int32_t>, 
+                   std::allocator<std::pair<std::int32_t, move_only_test>>,
+                   true> map;
+    for(std::size_t i = 0; i < nb_values + 40; i++) {
+        map.insert({utils::get_key<std::int32_t>(i), utils::get_value<move_only_test>(i)});
+    }
+    
+    for(std::size_t i = nb_values; i < nb_values + 40; i++) {
+        map.erase(utils::get_key<std::int32_t>(i));
+    }
+    BOOST_CHECK_EQUAL(map.size(), nb_values);
+
+    
+    
+    serializer serial;
+    map.serialize(serial);
+
+    deserializer dserial(serial.str());
+    auto map_deserialized = decltype(map)::deserialize(dserial, true);
+    BOOST_CHECK(map == map_deserialized);
+
+    deserializer dserial2(serial.str());
+    map_deserialized = decltype(map)::deserialize(dserial2, false);
+    BOOST_CHECK(map_deserialized == map);
+    
+    // Deserializing a map with StoreHash=false from a map serialized with StoreHash=true with
+    // hash_compatible=true should throw an exception.
+    deserializer dserial3(serial.str());
+    TSL_RH_CHECK_THROW((tsl::robin_map<std::int32_t, move_only_test>::deserialize(dserial3, true)),
+                       std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_serialize_desearialize_with_different_hash) {
+    // insert x values; serialize map; deserialize in new map which has a different hash; check equal
+    struct hash_str_diff {
+        std::size_t operator()(const std::string& str) const {
+            return std::hash<std::string>()(str) + 123;
+        }
+    };
+    
+    
+    const std::size_t nb_values = 1000;
+    
+    
+    tsl::robin_map<std::string, move_only_test> map;
+    for(std::size_t i = 0; i < nb_values; i++) {
+        map.insert({utils::get_key<std::string>(i), utils::get_value<move_only_test>(i)});
+    }
+    BOOST_CHECK_EQUAL(map.size(), nb_values);
+
+    
+    
+    serializer serial;
+    map.serialize(serial);
+
+    deserializer dserial(serial.str());
+    auto map_deserialized = tsl::robin_map<std::string, move_only_test, hash_str_diff>::deserialize(dserial, false);
+    
+    BOOST_CHECK_EQUAL(map_deserialized.size(), map.size());
+    for(const auto& val: map) {
+        BOOST_CHECK(map_deserialized.find(val.first) != map_deserialized.end());
+    }
+}
+
+/**
  * KeyEqual
  */
 BOOST_AUTO_TEST_CASE(test_key_equal) {
