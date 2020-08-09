@@ -67,6 +67,9 @@
 #endif
 
 
+#define TSL_RH_UNUSED(x) static_cast<void>(x)
+
+
 namespace tsl {
 namespace rh {
     

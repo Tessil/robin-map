@@ -275,12 +275,14 @@ public:
         swap(value, this->value());
         swap(dist_from_ideal_bucket, m_dist_from_ideal_bucket);
         
-        // Avoid warning of unused variable if StoreHash is false
-        (void) hash;
         if(StoreHash) {
             const truncated_hash_type tmp_hash = this->truncated_hash();
             this->set_hash(hash);
             hash = tmp_hash;
+        }
+        else {
+            // Avoid warning of unused variable if StoreHash is false
+            TSL_RH_UNUSED(hash);
         }
     }
     
@@ -393,8 +395,8 @@ private:
      * more bytes.
      */
     static bool USE_STORED_HASH_ON_REHASH(size_type bucket_count) {
-        (void) bucket_count;
         if(STORE_HASH && sizeof(std::size_t) == sizeof(truncated_hash_type)) {
+            TSL_RH_UNUSED(bucket_count);
             return true;
         }
         else if(STORE_HASH && is_power_of_two_policy<GrowthPolicy>::value) {
@@ -402,6 +404,7 @@ private:
             return (bucket_count - 1) <= std::numeric_limits<truncated_hash_type>::max();
         }
         else {
+            TSL_RH_UNUSED(bucket_count);
             return false;   
         }
     }
