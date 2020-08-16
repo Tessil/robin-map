@@ -441,7 +441,7 @@ namespace boost { namespace serialization {
 
 
 int main() {
-    const tsl::robin_map<std::int64_t, std::int64_t> map = {{1, -1}, {2, -2}, {3, -3}, {4, -4}};
+    tsl::robin_map<std::int64_t, std::int64_t> map = {{1, -1}, {2, -2}, {3, -3}, {4, -4}};
     
     
     const char* file_name = "robin_map.data";
