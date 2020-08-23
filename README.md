@@ -17,6 +17,7 @@ A **benchmark** of `tsl::robin_map` against other hash maps may be found [here](
 - No need to reserve any sentinel value from the keys.
 - Possibility to store the hash value alongside the stored key-value for faster rehash and lookup if the hash or the key equal functions are expensive to compute. Note that hash may be stored even if not asked explicitly when the library can detect that it will have no impact on the size of the structure in memory due to alignment. See the [StoreHash](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#details) template parameter for details.
 - If the hash is known before a lookup, it is possible to pass it as parameter to speed-up the lookup (see `precalculated_hash` parameter in [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html#a35021b11aabb61820236692a54b3a0f8)).
+- Support for efficient serialization and deserialization (see [example](#serialization) and the `serialize/deserialize` methods in the [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html) for details).
 - The library can be used with exceptions disabled (through `-fno-exceptions` option on Clang and GCC, without an `/EH` option on MSVC or simply by defining `TSL_NO_EXCEPTIONS`). `std::terminate` is used in replacement of the `throw` instruction when exceptions are disabled.
 - API closely similar to `std::unordered_map` and `std::unordered_set`.
 
@@ -275,6 +276,207 @@ int main() {
 ```
 
 
+#### Serialization
+
+The library provides an efficient way to serialize and deserialize a map or a set so that it can be saved to a file or send through the network.
+To do so, it requires the user to provide a function object for both serialization and deserialization.
+
+```c++
+struct serializer {
+    // Must support the following types for U: std::int16_t, std::uint32_t, 
+    // std::uint64_t, float and std::pair<Key, T> if a map is used or Key for 
+    // a set.
+    template<typename U>
+    void operator()(const U& value);
+};
+```
+
+```c++
+struct deserializer {
+    // Must support the following types for U: std::int16_t, std::uint32_t, 
+    // std::uint64_t, float and std::pair<Key, T> if a map is used or Key for 
+    // a set.
+    template<typename U>
+    U operator()();
+};
+```
+
+Note that the implementation leaves binary compatibility (endianness, float binary representation, size of int, ...) of the types it serializes/deserializes in the hands of the provided function objects if compatibility is required.
+
+More details regarding the `serialize` and `deserialize` methods can be found in the [API](https://tessil.github.io/robin-map/classtsl_1_1robin__map.html).
+
+```c++
+#include <cassert>
+#include <cstdint>
+#include <fstream>
+#include <type_traits>
+#include <tsl/robin_map.h>
+
+
+class serializer {
+public:
+    serializer(const char* file_name) {
+        m_ostream.exceptions(m_ostream.badbit | m_ostream.failbit);
+        m_ostream.open(file_name, std::ios::binary);
+    }
+    
+    template<class T,
+             typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+    void operator()(const T& value) {
+        m_ostream.write(reinterpret_cast<const char*>(&value), sizeof(T));
+    }
+    
+    void operator()(const std::pair<std::int64_t, std::int64_t>& value) {
+        (*this)(value.first);
+        (*this)(value.second);
+    }
+
+private:
+    std::ofstream m_ostream;
+};
+
+class deserializer {
+public:
+    deserializer(const char* file_name) {
+        m_istream.exceptions(m_istream.badbit | m_istream.failbit | m_istream.eofbit);
+        m_istream.open(file_name, std::ios::binary);
+    }
+    
+    template<class T>
+    T operator()() {
+        T value;
+        deserialize(value);
+        
+        return value;
+    }
+    
+private:
+    template<class T,
+             typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+    void deserialize(T& value) {
+        m_istream.read(reinterpret_cast<char*>(&value), sizeof(T));
+    }
+    
+    void deserialize(std::pair<std::int64_t, std::int64_t>& value) {
+        deserialize(value.first);
+        deserialize(value.second);
+    }
+
+private:
+    std::ifstream m_istream;
+};
+
+
+int main() {
+    const tsl::robin_map<std::int64_t, std::int64_t> map = {{1, -1}, {2, -2}, {3, -3}, {4, -4}};
+    
+    
+    const char* file_name = "robin_map.data";
+    {
+        serializer serial(file_name);
+        map.serialize(serial);
+    }
+    
+    {
+        deserializer dserial(file_name);
+        auto map_deserialized = tsl::robin_map<std::int64_t, std::int64_t>::deserialize(dserial);
+        
+        assert(map == map_deserialized);
+    }
+    
+    {
+        deserializer dserial(file_name);
+        
+        /**
+         * If the serialized and deserialized map are hash compatibles (see conditions in API), 
+         * setting the argument to true speed-up the deserialization process as we don't have 
+         * to recalculate the hash of each key. We also know how much space each bucket needs.
+         */
+        const bool hash_compatible = true;
+        auto map_deserialized = 
+            tsl::robin_map<std::int64_t, std::int64_t>::deserialize(dserial, hash_compatible);
+        
+        assert(map == map_deserialized);
+    }
+} 
+```
+
+##### Serialization with Boost Serialization and compression with zlib
+
+It is possible to use a serialization library to avoid the boilerplate. 
+
+The following example uses Boost Serialization with the Boost zlib compression stream to reduce the size of the resulting serialized file. The example requires C++20 due to the usage of the template parameter list syntax in lambdas, but it can be adapted to less recent versions.
+
+```c++
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/serialization/split_free.hpp>
+#include <boost/serialization/utility.hpp>
+#include <cassert>
+#include <cstdint>
+#include <fstream>
+#include <tsl/robin_map.h>
+
+
+namespace boost { namespace serialization {
+    template<class Archive, class Key, class T>
+    void serialize(Archive & ar, tsl::robin_map<Key, T>& map, const unsigned int version) {
+        split_free(ar, map, version); 
+    }
+
+    template<class Archive, class Key, class T>
+    void save(Archive & ar, const tsl::robin_map<Key, T>& map, const unsigned int /*version*/) {
+        auto serializer = [&ar](const auto& v) { ar & v; };
+        map.serialize(serializer);
+    }
+
+    template<class Archive, class Key, class T>
+    void load(Archive & ar, tsl::robin_map<Key, T>& map, const unsigned int /*version*/) {
+        auto deserializer = [&ar]<typename U>() { U u; ar & u; return u; };
+        map = tsl::robin_map<Key, T>::deserialize(deserializer);
+    }
+}}
+
+
+int main() {
+    tsl::robin_map<std::int64_t, std::int64_t> map = {{1, -1}, {2, -2}, {3, -3}, {4, -4}};
+    
+    
+    const char* file_name = "robin_map.data";
+    {
+        std::ofstream ofs;
+        ofs.exceptions(ofs.badbit | ofs.failbit);
+        ofs.open(file_name, std::ios::binary);
+        
+        boost::iostreams::filtering_ostream fo;
+        fo.push(boost::iostreams::zlib_compressor());
+        fo.push(ofs);
+        
+        boost::archive::binary_oarchive oa(fo);
+        
+        oa << map;
+    }
+    
+    {
+        std::ifstream ifs;
+        ifs.exceptions(ifs.badbit | ifs.failbit | ifs.eofbit);
+        ifs.open(file_name, std::ios::binary);
+        
+        boost::iostreams::filtering_istream fi;
+        fi.push(boost::iostreams::zlib_decompressor());
+        fi.push(ifs);
+        
+        boost::archive::binary_iarchive ia(fi);
+     
+        tsl::robin_map<std::int64_t, std::int64_t> map_deserialized;   
+        ia >> map_deserialized;
+        
+        assert(map == map_deserialized);
+    }
+}
+```
 
 ### License
 

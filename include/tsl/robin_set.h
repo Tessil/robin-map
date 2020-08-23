@@ -552,6 +552,47 @@ public:
         
         return true;
     }
+    
+    /**
+     * Serialize the set through the `serializer` parameter.
+     * 
+     * The `serializer` parameter must be a function object that supports the following call:
+     *  - `template<typename U> void operator()(const U& value);` where the types `std::int16_t`, `std::uint32_t`, 
+     *    `std::uint64_t`, `float` and `Key` must be supported for U.
+     * 
+     * The implementation leaves binary compatibility (endianness, IEEE 754 for floats, ...) of the types it serializes
+     * in the hands of the `Serializer` function object if compatibility is required.
+     */
+    template<class Serializer>
+    void serialize(Serializer& serializer) const {
+        m_ht.serialize(serializer);
+    }
+
+    /**
+     * Deserialize a previously serialized set through the `deserializer` parameter.
+     * 
+     * The `deserializer` parameter must be a function object that supports the following call:
+     *  - `template<typename U> U operator()();` where the types `std::int16_t`, `std::uint32_t`, `std::uint64_t`, `float` and 
+     *    `Key` must be supported for U.
+     * 
+     * If the deserialized hash set type is hash compatible with the serialized set, the deserialization process can be
+     * sped up by setting `hash_compatible` to true. To be hash compatible, the Hash, KeyEqual and GrowthPolicy must behave the 
+     * same way than the ones used on the serialized set and the StoreHash must have the same value. The `std::size_t` must also 
+     * be of the same size as the one on the platform used to serialize the set. If these criteria are not met, the behaviour is 
+     * undefined with `hash_compatible` sets to true.
+     *
+     * The behaviour is undefined if the type `Key` of the `robin_set` is not the same as the type used during serialization.
+     * 
+     * The implementation leaves binary compatibility (endianness, IEEE 754 for floats, size of int, ...) of the types it 
+     * deserializes in the hands of the `Deserializer` function object if compatibility is required.
+     */
+    template<class Deserializer>
+    static robin_set deserialize(Deserializer& deserializer, bool hash_compatible = false) {
+        robin_set set(0);
+        set.m_ht.deserialize(deserializer, hash_compatible);
+
+        return set;
+    }
 
     friend bool operator!=(const robin_set& lhs, const robin_set& rhs) {
         return !operator==(lhs, rhs);
@@ -579,4 +620,3 @@ using robin_pg_set = robin_set<Key, Hash, KeyEqual, Allocator, StoreHash, tsl::r
 } // end namespace tsl
 
 #endif
- 

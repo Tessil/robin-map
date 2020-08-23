@@ -89,8 +89,27 @@ static T numeric_cast(U value, const char* error_message = "numeric_cast() faile
     return ret;
 }
 
+template<class T, class Deserializer>
+static T deserialize_value(Deserializer& deserializer) {
+    // MSVC < 2017 is not conformant, circumvent the problem by removing the template keyword
+#if defined (_MSC_VER) && _MSC_VER < 1910
+    return deserializer.Deserializer::operator()<T>();
+#else
+    return deserializer.Deserializer::template operator()<T>();
+#endif
+}
 
-using truncated_hash_type = std::uint_least32_t;
+
+/**
+ * Fixed size type used to represent size_type values on serialization. Need to be big enough
+ * to represent a std::size_t on 32 and 64 bits platforms, and must be the same size on both platforms.
+ */
+using slz_size_type = std::uint64_t;
+static_assert(std::numeric_limits<slz_size_type>::max() >= std::numeric_limits<std::size_t>::max(),
+              "slz_size_type must be >= std::size_t");
+
+using truncated_hash_type = std::uint32_t;
+
 
 /**
  * Helper class that stores a truncated hash if StoreHash is true and nothing otherwise.
@@ -154,7 +173,7 @@ class bucket_entry: public bucket_entry_hash<StoreHash> {
     
 public:
     using value_type = ValueType;
-    using distance_type = std::int_least16_t;
+    using distance_type = std::int16_t;
     
     
     bucket_entry() noexcept: bucket_hash(), m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
@@ -297,14 +316,13 @@ private:
     }
 
 public:
+    static const distance_type EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET = -1;
     static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 4096;
     static_assert(DIST_FROM_IDEAL_BUCKET_LIMIT <= std::numeric_limits<distance_type>::max() - 1,
                  "DIST_FROM_IDEAL_BUCKET_LIMIT must be <= std::numeric_limits<distance_type>::max() - 1.");
     
 private:
     using storage = typename std::aligned_storage<sizeof(value_type), alignof(value_type)>::type;
-    
-    static const distance_type EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET = -1;
     
     distance_type m_dist_from_ideal_bucket;
     bool m_last_bucket;
@@ -1121,6 +1139,16 @@ public:
         return iterator(const_cast<bucket_entry*>(pos.m_bucket));
     }
     
+    template<class Serializer>
+    void serialize(Serializer& serializer) const {
+        serialize_impl(serializer);
+    }
+    
+    template<class Deserializer>
+    void deserialize(Deserializer& deserializer, bool hash_compatible) {
+        deserialize_impl(deserializer, hash_compatible);
+    }
+    
 private:
     template<class K>
     std::size_t hash_key(const K& key) const {
@@ -1382,6 +1410,138 @@ private:
         
         return false;
     }
+    
+    template<class Serializer>
+    void serialize_impl(Serializer& serializer) const {
+        const slz_size_type version = SERIALIZATION_PROTOCOL_VERSION;
+        serializer(version);
+        
+        // Indicate if the truncated hash of each bucket is stored. Use a std::int16_t instead 
+        // of a bool to avoid the need for the serializer to support an extra 'bool' type.
+        const std::int16_t hash_stored_for_bucket = static_cast<std::int16_t>(STORE_HASH);
+        serializer(hash_stored_for_bucket);
+        
+        const slz_size_type nb_elements = m_nb_elements;
+        serializer(nb_elements);
+        
+        const slz_size_type bucket_count = m_buckets_data.size();
+        serializer(bucket_count);
+        
+        const float min_load_factor = m_min_load_factor;
+        serializer(min_load_factor);
+        
+        const float max_load_factor = m_max_load_factor;
+        serializer(max_load_factor);
+       
+        for(const bucket_entry& bucket: m_buckets_data) {
+            if(bucket.empty()) {
+                const std::int16_t empty_bucket = bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET;
+                serializer(empty_bucket);
+            }
+            else {
+                const std::int16_t dist_from_ideal_bucket = bucket.dist_from_ideal_bucket();
+                serializer(dist_from_ideal_bucket);
+                if(STORE_HASH) {
+                    const std::uint32_t truncated_hash = bucket.truncated_hash();
+                    serializer(truncated_hash);
+                }
+                serializer(bucket.value());
+            }
+        }
+    }
+    
+    template<class Deserializer>
+    void deserialize_impl(Deserializer& deserializer, bool hash_compatible) {
+        tsl_rh_assert(m_buckets_data.empty()); // Current hash table must be empty
+        
+        const slz_size_type version = deserialize_value<slz_size_type>(deserializer);
+        // For now we only have one version of the serialization protocol. 
+        // If it doesn't match there is a problem with the file.
+        if(version != SERIALIZATION_PROTOCOL_VERSION) {
+            TSL_RH_THROW_OR_TERMINATE(std::runtime_error, "Can't deserialize the ordered_map/set. "
+                                                          "The protocol version header is invalid.");
+        }
+        
+        const bool hash_stored_for_bucket = deserialize_value<std::int16_t>(deserializer)?true:false;
+        if(hash_compatible && STORE_HASH != hash_stored_for_bucket) {
+            TSL_RH_THROW_OR_TERMINATE(std::runtime_error, "Can't deserialize a map with a different StoreHash "
+                                                           "than the one used during the serialization when "
+                                                           "hash compatibility is used");
+        }
+        
+        const slz_size_type nb_elements = deserialize_value<slz_size_type>(deserializer);
+        const slz_size_type bucket_count_ds = deserialize_value<slz_size_type>(deserializer);
+        const float min_load_factor = deserialize_value<float>(deserializer);
+        const float max_load_factor = deserialize_value<float>(deserializer);
+        
+        if(min_load_factor < MINIMUM_MIN_LOAD_FACTOR || min_load_factor > MAXIMUM_MIN_LOAD_FACTOR) {
+            TSL_RH_THROW_OR_TERMINATE(std::runtime_error, "Invalid min_load_factor. Check that the serializer "
+                                                          "and deserializer support floats correctly as they "
+                                                          "can be converted implicitly to ints.");
+        }
+        
+        if(max_load_factor < MINIMUM_MAX_LOAD_FACTOR || max_load_factor > MAXIMUM_MAX_LOAD_FACTOR) {
+            TSL_RH_THROW_OR_TERMINATE(std::runtime_error, "Invalid max_load_factor. Check that the serializer "
+                                                          "and deserializer support floats correctly as they "
+                                                          "can be converted implicitly to ints.");
+        }
+        
+        this->min_load_factor(min_load_factor);
+        this->max_load_factor(max_load_factor);
+        
+        if(bucket_count_ds == 0) {
+            tsl_rh_assert(nb_elements == 0);
+            return;
+        }
+        
+        
+        if(!hash_compatible) {
+            reserve(numeric_cast<size_type>(nb_elements, "Deserialized nb_elements is too big."));
+            for(slz_size_type ibucket = 0; ibucket < bucket_count_ds; ibucket++) {
+                const distance_type dist_from_ideal_bucket = deserialize_value<std::int16_t>(deserializer);
+                if(dist_from_ideal_bucket != bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET) {
+                    if(hash_stored_for_bucket) {
+                        TSL_RH_UNUSED(deserialize_value<std::uint32_t>(deserializer));
+                    }
+                    
+                    insert(deserialize_value<value_type>(deserializer));
+                }
+            }
+            
+            tsl_rh_assert(nb_elements == size());
+        }
+        else {
+            m_bucket_count = numeric_cast<size_type>(bucket_count_ds, "Deserialized bucket_count is too big.");
+            
+            GrowthPolicy::operator=(GrowthPolicy(m_bucket_count));
+            // GrowthPolicy should not modify the bucket count we got from deserialization
+            if(m_bucket_count != bucket_count_ds) {
+                TSL_RH_THROW_OR_TERMINATE(std::runtime_error, "The GrowthPolicy is not the same even though hash_compatible is true.");
+            }
+            
+            m_nb_elements = numeric_cast<size_type>(nb_elements, "Deserialized nb_elements is too big.");
+            m_buckets_data.resize(m_bucket_count);
+            m_buckets = m_buckets_data.data();
+            
+            for(bucket_entry& bucket: m_buckets_data) {
+                const distance_type dist_from_ideal_bucket = deserialize_value<std::int16_t>(deserializer);
+                if(dist_from_ideal_bucket != bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET) {
+                    truncated_hash_type truncated_hash = 0;
+                    if(hash_stored_for_bucket) {
+                        tsl_rh_assert(hash_stored_for_bucket);
+                        truncated_hash = deserialize_value<std::uint32_t>(deserializer);
+                    }
+                    
+                    bucket.set_value_of_empty_bucket(dist_from_ideal_bucket, truncated_hash,
+                                                     deserialize_value<value_type>(deserializer));
+                }
+            }
+            
+            if(!m_buckets_data.empty()) {
+                m_buckets_data.back().set_as_last_bucket();
+            }
+        }
+    }
 
     
 public:
@@ -1403,6 +1563,11 @@ public:
                   "MAXIMUM_MIN_LOAD_FACTOR should be < MINIMUM_MAX_LOAD_FACTOR");
     
 private:
+    /**
+     * Protocol version currenlty used for serialization.
+     */
+    static const slz_size_type SERIALIZATION_PROTOCOL_VERSION = 1;
+
     /**
      * Return an always valid pointer to an static empty bucket_entry with last_bucket() == true.
      */            
