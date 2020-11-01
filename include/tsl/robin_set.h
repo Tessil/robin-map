@@ -89,12 +89,14 @@ private:
     class KeySelect {
     public:
         using key_type = Key;
-        
-        const key_type& operator()(const Key& key) const noexcept {
+
+        template<class K>
+        const K& operator()(const K& key) const noexcept {
             return key;
         }
         
-        key_type& operator()(Key& key) noexcept {
+        template<class K>
+        K& operator()(K& key) noexcept {
             return key;
         }
     };
@@ -233,8 +235,55 @@ public:
     void clear() noexcept { m_ht.clear(); }
     
     
-    
-    
+
+    template<
+        class K,
+        class KE = KeyEqual,
+        typename std::enable_if<
+            has_is_transparent<KE>::value &&
+            std::is_constructible<key_type, K>::value
+        >::type* = nullptr
+    >
+    std::pair<iterator, bool> insert(const K& value) { 
+        return m_ht.insert(value); 
+    }
+
+    template<
+        class K,
+        class KE = KeyEqual,
+        typename std::enable_if<
+            has_is_transparent<KE>::value &&
+            std::is_constructible<key_type, K>::value
+        >::type* = nullptr
+    >
+    std::pair<iterator, bool> insert(K&& value) { 
+        return m_ht.insert(std::move(value)); 
+    }
+
+    template<
+        class K,
+        class KE = KeyEqual,
+        typename std::enable_if<
+            has_is_transparent<KE>::value &&
+            std::is_constructible<key_type, K>::value
+        >::type* = nullptr
+    >
+    iterator insert(const_iterator hint, const K& value) { 
+        return m_ht.insert_hint(hint, value); 
+    }
+
+    template<
+        class K,
+        class KE = KeyEqual,
+        typename std::enable_if<
+            has_is_transparent<KE>::value &&
+            std::is_constructible<key_type, K>::value
+        >::type* = nullptr
+    >
+    iterator insert(const_iterator hint, K&& value) { 
+        return m_ht.insert_hint(hint, std::move(value)); 
+    }
+
     std::pair<iterator, bool> insert(const value_type& value) { 
         return m_ht.insert(value); 
     }
@@ -250,7 +299,7 @@ public:
     iterator insert(const_iterator hint, value_type&& value) { 
         return m_ht.insert_hint(hint, std::move(value)); 
     }
-    
+
     template<class InputIt>
     void insert(InputIt first, InputIt last) { 
         m_ht.insert(first, last);

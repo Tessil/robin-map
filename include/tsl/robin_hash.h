@@ -1281,7 +1281,6 @@ private:
         return std::make_pair(iterator(m_buckets + ibucket), true);
     }
     
-    
     template<class... Args>
     void insert_value(std::size_t ibucket, distance_type dist_from_ideal_bucket, 
                       truncated_hash_type hash, Args&&... value_type_args) 
@@ -1295,6 +1294,13 @@ private:
     {
         insert_value_impl(ibucket, dist_from_ideal_bucket, hash, value);
     }
+
+    void insert_value(std::size_t ibucket, distance_type dist_from_ideal_bucket,
+                      truncated_hash_type hash, key_equal&& value)
+    {
+        insert_value_impl(ibucket, dist_from_ideal_bucket, hash, value_type(value));
+    }
+
 
     /*
      * We don't use `value_type&& value` as last argument due to a bug in MSVC when `value_type` is a pointer,
