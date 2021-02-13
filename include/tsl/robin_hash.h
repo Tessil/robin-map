@@ -1075,14 +1075,14 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     m_load_threshold = size_type(float(bucket_count()) * m_max_load_factor);
   }
 
-  void rehash(size_type count) {
-    count = std::max(count,
+  void rehash(size_type count_) {
+    count_ = std::max(count_,
                      size_type(std::ceil(float(size()) / max_load_factor())));
-    rehash_impl(count);
+    rehash_impl(count_);
   }
 
-  void reserve(size_type count) {
-    rehash(size_type(std::ceil(float(count) / max_load_factor())));
+  void reserve(size_type count_) {
+    rehash(size_type(std::ceil(float(count_) / max_load_factor())));
   }
 
   /*
@@ -1305,8 +1305,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
                                                  std::move(value));
   }
 
-  void rehash_impl(size_type count) {
-    robin_hash new_table(count, static_cast<Hash&>(*this),
+  void rehash_impl(size_type count_) {
+    robin_hash new_table(count_, static_cast<Hash&>(*this),
                          static_cast<KeyEqual&>(*this), get_allocator(),
                          m_min_load_factor, m_max_load_factor);
 

@@ -692,8 +692,8 @@ class robin_map {
   void min_load_factor(float ml) { m_ht.min_load_factor(ml); }
   void max_load_factor(float ml) { m_ht.max_load_factor(ml); }
 
-  void rehash(size_type count) { m_ht.rehash(count); }
-  void reserve(size_type count) { m_ht.reserve(count); }
+  void rehash(size_type count_) { m_ht.rehash(count_); }
+  void reserve(size_type count_) { m_ht.reserve(count_); }
 
   /*
    * Observers
