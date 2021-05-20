@@ -406,10 +406,10 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
    * to check that the truncated_hash_type didn't truncated more bytes.
    */
   static bool USE_STORED_HASH_ON_REHASH(size_type bucket_count) {
-    if (STORE_HASH && sizeof(std::size_t) == sizeof(truncated_hash_type)) {
+    if constexpr (STORE_HASH && sizeof(std::size_t) == sizeof(truncated_hash_type)) {
       TSL_RH_UNUSED(bucket_count);
       return true;
-    } else if (STORE_HASH && is_power_of_two_policy<GrowthPolicy>::value) {
+    } else if constexpr (STORE_HASH && is_power_of_two_policy<GrowthPolicy>::value) {
       tsl_rh_assert(bucket_count > 0);
       return (bucket_count - 1) <=
              std::numeric_limits<truncated_hash_type>::max();
