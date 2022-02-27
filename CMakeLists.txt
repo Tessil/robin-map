@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
+
+project(tsl-robin-map VERSION 0.6.3 LANGUAGES CXX)
+
 include(GNUInstallDirs)
 
-
-project(tsl-robin-map VERSION 0.6.3)
 
 add_library(robin_map INTERFACE)
 # Use tsl::robin_map as target, more consistent with other libraries conventions (Boost, Qt, ...)
