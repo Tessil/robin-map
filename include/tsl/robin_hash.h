@@ -410,9 +410,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       TSL_RH_UNUSED(bucket_count);
       return true;
     } else if (STORE_HASH && is_power_of_two_policy<GrowthPolicy>::value) {
-      tsl_rh_assert(bucket_count > 0);
-      return (bucket_count - 1) <=
-             std::numeric_limits<truncated_hash_type>::max();
+      return bucket_count == 0 ||
+             (bucket_count - 1) <=
+                 std::numeric_limits<truncated_hash_type>::max();
     } else {
       TSL_RH_UNUSED(bucket_count);
       return false;

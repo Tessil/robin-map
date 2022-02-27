@@ -140,6 +140,14 @@ BOOST_AUTO_TEST_CASE(test_range_insert) {
   }
 }
 
+BOOST_AUTO_TEST_CASE(test_rehash_0) {
+  tsl::robin_map<int, int, std::hash<int>,
+                   std::equal_to<int>,
+                   std::allocator<std::pair<int, int>>,
+                   true> map;
+  map.rehash(0);
+}
+
 BOOST_AUTO_TEST_CASE(test_insert_with_hint) {
   tsl::robin_map<int, int> map{{1, 0}, {2, 1}, {3, 2}};
 
