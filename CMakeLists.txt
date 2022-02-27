@@ -52,8 +52,10 @@ if(${CMAKE_VERSION} VERSION_GREATER "3.2")
             DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/tsl-robin-map")
 
 
+    ## Create local tsl-robin-mapTargets.cmake
+    export(TARGETS robin_map NAMESPACE tsl:: FILE "${CMAKE_CURRENT_BINARY_DIR}/tsl-robin-mapTargets.cmake")
 
-    ## Create and install tsl-robin-mapTargets.cmake
+    ## Create and install global tsl-robin-mapTargets.cmake
     install(TARGETS robin_map
             EXPORT tsl-robin-mapTargets)
 
