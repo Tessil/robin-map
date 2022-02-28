@@ -1,0 +1,104 @@
+name: CMake
+
+on: [push, pull_request, release]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: linux-gcc-7,
+            os: ubuntu-18.04,
+            cxx: g++-7,
+            cmake-build-type: Release,
+            boost-toolset: gcc,
+            boost-platform-version: 18.04
+          }
+        - {
+            name: linux-gcc-7-no-exceptions,
+            os: ubuntu-18.04,
+            cxx: g++-7,
+            cxx-flags: -fno-exceptions,
+            cmake-build-type: Release,
+            boost-toolset: gcc,
+            boost-platform-version: 18.04
+          }
+        - {
+            name: linux-clang-9,
+            os: ubuntu-18.04,
+            cxx: clang++-9,
+            cmake-build-type: Release,
+            boost-toolset: gcc,
+            boost-platform-version: 18.04
+          }
+        - {
+            name: macos-gcc,
+            os:  macos-10.15,
+            cxx: g++,
+            cmake-build-type: Release,
+            boost-toolset: clang,
+            boost-platform-version: 10.15
+          }
+        - {
+            name: macos-clang,
+            os:  macos-10.15,
+            cxx: clang++,
+            cmake-build-type: Release,
+            boost-toolset: clang,
+            boost-platform-version: 10.15
+          }
+        - {
+            name: linux-gcc-10-sanitize,
+            os: ubuntu-18.04,
+            cxx: g++-10,
+            cxx-flags: "-fsanitize=address,undefined",
+            cmake-build-type: Release,
+            boost-toolset: gcc,
+            boost-platform-version: 18.04
+          }
+        - {
+            name: linux-gcc-10-coverage,
+            os: ubuntu-18.04,
+            cxx: g++-10,
+            cxx-flags: --coverage,
+            cmake-build-type: Debug,
+            boost-toolset: gcc,
+            boost-platform-version: 18.04
+          }
+    name: ${{matrix.config.name}}
+    runs-on: ${{matrix.config.os}}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.1.0
+      id: install-boost
+      with:
+        boost_version: 1.78.0
+        platform_version: ${{matrix.config.boost-platform-version}}
+        toolset: ${{matrix.config.boost-toolset}}
+
+    - name: Configure CMake
+      run: cmake -DCMAKE_BUILD_TYPE=${{matrix.config.cmake-build-type}} -S ${{github.workspace}}/tests -B ${{github.workspace}}/build
+      env:
+        CXX: ${{matrix.config.cxx}}
+        CXXFLAGS: ${{matrix.config.cxx-flags}}
+        BOOST_ROOT: ${{steps.install-boost.outputs.BOOST_ROOT}}
+        BOOST_LIBRARYDIR:  ${{steps.install-boost.outputs.BOOST_ROOT}}/lib
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --verbose
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ./tsl_robin_map_tests
+
+    - name: Coverage
+      working-directory: ${{github.workspace}}/build
+      run: |
+        sudo apt-get install -y lcov
+        lcov -c -b ../include/ -d . -o coverage.info --no-external
+        bash <(curl -s https://codecov.io/bash) -f coverage.info
+      if: ${{matrix.config.name == 'linux-gcc-10-coverage'}}
