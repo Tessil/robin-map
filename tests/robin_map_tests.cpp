@@ -21,8 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define BOOST_TEST_DYN_LINK
-
 #include <tsl/robin_map.h>
 
 #include <boost/mpl/list.hpp>
