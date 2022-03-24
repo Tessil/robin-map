@@ -9,96 +9,129 @@ jobs:
       matrix:
         config:
         - {
-            name: linux-gcc-7,
+            name: linux-x64-gcc-7,
             os: ubuntu-18.04,
             cxx: g++-7,
-            cmake-build-type: Release,
-            boost-toolset: gcc,
-            boost-platform-version: 18.04
+            cmake-build-type: Release
           }
         - {
-            name: linux-gcc-7-no-exceptions,
+            name: linux-x64-gcc-7-no-exceptions,
             os: ubuntu-18.04,
             cxx: g++-7,
             cxx-flags: -fno-exceptions,
-            cmake-build-type: Release,
-            boost-toolset: gcc,
-            boost-platform-version: 18.04
+            cmake-build-type: Release
           }
         - {
-            name: linux-clang-9,
+            name: linux-x64-clang-9,
             os: ubuntu-18.04,
             cxx: clang++-9,
-            cmake-build-type: Release,
-            boost-toolset: gcc,
-            boost-platform-version: 18.04
+            cmake-build-type: Release
           }
         - {
-            name: macos-gcc,
+            name: macos-x64-gcc,
             os:  macos-10.15,
             cxx: g++,
-            cmake-build-type: Release,
-            boost-toolset: clang,
-            boost-platform-version: 10.15
+            cmake-build-type: Release
           }
         - {
-            name: macos-clang,
+            name: macos-x64-clang,
             os:  macos-10.15,
             cxx: clang++,
-            cmake-build-type: Release,
-            boost-toolset: clang,
-            boost-platform-version: 10.15
+            cmake-build-type: Release
           }
         - {
-            name: linux-gcc-10-sanitize,
-            os: ubuntu-18.04,
-            cxx: g++-10,
+            name: linux-x64-clang-12-sanitize,
+            os: ubuntu-20.04,
+            cxx: clang++-12,
             cxx-flags: "-fsanitize=address,undefined",
-            cmake-build-type: Release,
-            boost-toolset: gcc,
-            boost-platform-version: 18.04
+            cmake-build-type: Release
           }
         - {
-            name: linux-gcc-10-coverage,
-            os: ubuntu-18.04,
+            name: linux-x64-gcc-10-coverage,
+            os: ubuntu-20.04,
             cxx: g++-10,
             cxx-flags: --coverage,
-            cmake-build-type: Debug,
-            boost-toolset: gcc,
-            boost-platform-version: 18.04
+            gcov-tool: gcov-10,
+            cmake-build-type: Debug
+          }
+        - {
+            name: windows-x64-vs-2019,
+            os: windows-2019,
+            cmake-build-type: Release,
+            cmake-generator: Visual Studio 16 2019,
+            cmake-platform: x64,
+            vcpkg-triplet: x64-windows-static-md
+          }
+        - {
+            name: windows-x86-vs-2019,
+            os: windows-2019,
+            cmake-build-type: Release,
+            cmake-generator: Visual Studio 16 2019,
+            cmake-platform: Win32,
+            vcpkg-triplet: x86-windows-static-md
+          }
+        - {
+            name: windows-x64-vs-2022,
+            os: windows-2022,
+            cmake-build-type: Release,
+            cmake-generator: Visual Studio 17 2022,
+            cmake-platform: x64,
+            vcpkg-triplet: x64-windows-static-md
+          }
+        - {
+            name: windows-x86-vs-2022,
+            os: windows-2022,
+            cmake-build-type: Release,
+            cmake-generator: Visual Studio 17 2022,
+            cmake-platform: Win32,
+            vcpkg-triplet: x86-windows-static-md
           }
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install boost
-      uses: MarkusJx/install-boost@v2.1.0
-      id: install-boost
-      with:
-        boost_version: 1.78.0
-        platform_version: ${{matrix.config.boost-platform-version}}
-        toolset: ${{matrix.config.boost-toolset}}
+    # Windows
+    - name: Install boost (Windows)
+      run: vcpkg install boost-test:${{matrix.config.vcpkg-triplet}}
+      if: runner.os == 'Windows'
 
-    - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE=${{matrix.config.cmake-build-type}} -S ${{github.workspace}}/tests -B ${{github.workspace}}/build
+    - name: Configure CMake (Windows)
+      run: cmake -G "${{matrix.config.cmake-generator}}" -A ${{matrix.config.cmake-platform}} -DCMAKE_BUILD_TYPE=${{matrix.config.cmake-build-type}} -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{matrix.config.vcpkg-triplet}} -S ${{github.workspace}}/tests -B ${{github.workspace}}/build
+      if: runner.os == 'Windows'
+
+    - name: Build (Windows)
+      run: cmake --build ${{github.workspace}}/build --config ${{matrix.config.cmake-build-type}} --verbose
+      if: runner.os == 'Windows'
+
+    - name: Test (Windows)
+      working-directory: ${{github.workspace}}/build
+      run: ./${{matrix.config.cmake-build-type}}/tsl_robin_map_tests.exe
+      if: runner.os == 'Windows'
+
+    # Linux or macOS
+    - name: Install boost (Linux or macOS)
+      run: vcpkg install boost-test
+      if: runner.os == 'Linux' || runner.os == 'macOS'
+
+    - name: Configure CMake (Linux or macOS)
+      run: cmake -DCMAKE_BUILD_TYPE=${{matrix.config.cmake-build-type}} -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -S ${{github.workspace}}/tests -B ${{github.workspace}}/build
       env:
         CXX: ${{matrix.config.cxx}}
         CXXFLAGS: ${{matrix.config.cxx-flags}}
-        BOOST_ROOT: ${{steps.install-boost.outputs.BOOST_ROOT}}
-        BOOST_LIBRARYDIR:  ${{steps.install-boost.outputs.BOOST_ROOT}}/lib
+      if: runner.os == 'Linux' || runner.os == 'macOS'
 
-    - name: Build
+    - name: Build (Linux or macOS)
       run: cmake --build ${{github.workspace}}/build --verbose
+      if: runner.os == 'Linux' || runner.os == 'macOS'
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ./tsl_robin_map_tests
+    - name: Test (Linux or macOS)
+      run: ${{github.workspace}}/build/tsl_robin_map_tests
+      if: runner.os == 'Linux' || runner.os == 'macOS'
 
     - name: Coverage
-      working-directory: ${{github.workspace}}/build
       run: |
         sudo apt-get install -y lcov
-        lcov -c -b ../include/ -d . -o coverage.info --no-external
-        bash <(curl -s https://codecov.io/bash) -f coverage.info
+        lcov -c -b ${{github.workspace}}/include -d ${{github.workspace}}/build -o ${{github.workspace}}/coverage.info --no-external --gcov-tool ${{matrix.config.gcov-tool}}
+        bash <(curl -s https://codecov.io/bash) -f ${{github.workspace}}/coverage.info
       if: ${{matrix.config.name == 'linux-gcc-10-coverage'}}
