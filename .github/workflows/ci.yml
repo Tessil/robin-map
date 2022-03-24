@@ -134,4 +134,4 @@ jobs:
         sudo apt-get install -y lcov
         lcov -c -b ${{github.workspace}}/include -d ${{github.workspace}}/build -o ${{github.workspace}}/coverage.info --no-external --gcov-tool ${{matrix.config.gcov-tool}}
         bash <(curl -s https://codecov.io/bash) -f ${{github.workspace}}/coverage.info
-      if: ${{matrix.config.name == 'linux-gcc-10-coverage'}}
+      if: ${{matrix.config.name == 'linux-x64-gcc-10-coverage'}}
