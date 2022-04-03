@@ -17,6 +17,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 endif()
 
 # Boost::unit_test_framework
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.54.0 REQUIRED COMPONENTS unit_test_framework)
 target_link_libraries(tsl_robin_map_tests PRIVATE Boost::unit_test_framework)   
 
