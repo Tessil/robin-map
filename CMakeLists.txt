@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(tsl-robin-map VERSION 1.0.0 LANGUAGES CXX)
+project(tsl-robin-map VERSION 1.0.1 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
