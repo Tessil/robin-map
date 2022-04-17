@@ -536,23 +536,18 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       : Hash(hash),
         KeyEqual(equal),
         GrowthPolicy(bucket_count),
-        m_buckets_data(
-            [&]() {
-              if (bucket_count > max_bucket_count()) {
-                TSL_RH_THROW_OR_TERMINATE(
-                    std::length_error,
-                    "The map exceeds its maximum bucket count.");
-              }
-
-              return bucket_count;
-            }(),
-            alloc),
+        m_buckets_data(bucket_count, alloc),
         m_buckets(m_buckets_data.empty() ? static_empty_bucket_ptr()
                                          : m_buckets_data.data()),
         m_bucket_count(bucket_count),
         m_nb_elements(0),
         m_grow_on_next_insert(false),
         m_try_shrink_on_next_insert(false) {
+    if (bucket_count > max_bucket_count()) {
+      TSL_RH_THROW_OR_TERMINATE(std::length_error,
+                                "The map exceeds its maximum bucket count.");
+    }
+
     if (m_bucket_count > 0) {
       tsl_rh_assert(!m_buckets_data.empty());
       m_buckets_data.back().set_as_last_bucket();
