@@ -745,41 +745,44 @@ BOOST_AUTO_TEST_CASE(test_modify_value_through_iterator_with_const_qualifier) {
 /**
  * constructor
  */
+
 BOOST_AUTO_TEST_CASE(test_extreme_bucket_count_value_construction) {
-  TSL_RH_CHECK_THROW(
+  // std::bad_alloc or std::length_error will be thrown depending on the
+  // platform overcommit
+  TSL_RH_CHECK_THROW_EITHER(
       (tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>,
                       std::allocator<std::pair<int, int>>, false,
                       tsl::rh::power_of_two_growth_policy<2>>(
           std::numeric_limits<std::size_t>::max())),
-      std::length_error);
+      std::bad_alloc, std::length_error);
 
-  TSL_RH_CHECK_THROW(
+  TSL_RH_CHECK_THROW_EITHER(
       (tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>,
                       std::allocator<std::pair<int, int>>, false,
                       tsl::rh::power_of_two_growth_policy<2>>(
           std::numeric_limits<std::size_t>::max() / 2 + 1)),
-      std::length_error);
+      std::bad_alloc, std::length_error);
 
-  TSL_RH_CHECK_THROW(
+  TSL_RH_CHECK_THROW_EITHER(
       (tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>,
                       std::allocator<std::pair<int, int>>, false,
                       tsl::rh::prime_growth_policy>(
           std::numeric_limits<std::size_t>::max())),
-      std::length_error);
+      std::bad_alloc, std::length_error);
 
-  TSL_RH_CHECK_THROW(
+  TSL_RH_CHECK_THROW_EITHER(
       (tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>,
                       std::allocator<std::pair<int, int>>, false,
                       tsl::rh::prime_growth_policy>(
           std::numeric_limits<std::size_t>::max() / 2)),
-      std::length_error);
+      std::bad_alloc, std::length_error);
 
-  TSL_RH_CHECK_THROW(
+  TSL_RH_CHECK_THROW_EITHER(
       (tsl::robin_map<int, int, std::hash<int>, std::equal_to<int>,
                       std::allocator<std::pair<int, int>>, false,
                       tsl::rh::mod_growth_policy<>>(
           std::numeric_limits<std::size_t>::max())),
-      std::length_error);
+      std::bad_alloc, std::length_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_range_construct) {

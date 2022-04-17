@@ -36,8 +36,18 @@
 
 #ifdef TSL_RH_NO_EXCEPTIONS
 #define TSL_RH_CHECK_THROW(S, E)
+#define TSL_RH_CHECK_THROW_EITHER(S, E1, E2)
 #else
 #define TSL_RH_CHECK_THROW(S, E) BOOST_CHECK_THROW(S, E)
+#define TSL_RH_CHECK_THROW_EITHER(S, E1, E2) \
+  do {                                       \
+    try {                                    \
+      S;                                     \
+      BOOST_CHECK(false);                    \
+    } catch (const E1&) {                    \
+    } catch (const E2&) {                    \
+    }                                        \
+  } while (0)
 #endif
 
 template <typename T>
