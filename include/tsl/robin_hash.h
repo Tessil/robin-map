@@ -1072,7 +1072,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
   void rehash(size_type count_) {
     count_ = std::max(count_,
-                     size_type(std::ceil(float(size()) / max_load_factor())));
+                      size_type(std::ceil(float(size()) / max_load_factor())));
     rehash_impl(count_);
   }
 
