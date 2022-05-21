@@ -33,6 +33,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <new>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
@@ -249,12 +250,22 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
 
   value_type& value() noexcept {
     tsl_rh_assert(!empty());
+#if defined(__cplusplus) && __cplusplus >= 201703L
+    return *std::launder(
+        reinterpret_cast<value_type*>(std::addressof(m_value)));
+#else
     return *reinterpret_cast<value_type*>(std::addressof(m_value));
+#endif
   }
 
   const value_type& value() const noexcept {
     tsl_rh_assert(!empty());
+#if defined(__cplusplus) && __cplusplus >= 201703L
+    return *std::launder(
+        reinterpret_cast<const value_type*>(std::addressof(m_value)));
+#else
     return *reinterpret_cast<const value_type*>(std::addressof(m_value));
+#endif
   }
 
   distance_type dist_from_ideal_bucket() const noexcept {
