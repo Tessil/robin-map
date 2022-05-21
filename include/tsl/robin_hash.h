@@ -196,6 +196,7 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
           value_type(other.value());
       m_dist_from_ideal_bucket = other.m_dist_from_ideal_bucket;
     }
+    tsl_rh_assert(empty() == other.empty());
   }
 
   /**
@@ -213,6 +214,7 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
           value_type(std::move(other.value()));
       m_dist_from_ideal_bucket = other.m_dist_from_ideal_bucket;
     }
+    tsl_rh_assert(empty() == other.empty());
   }
 
   bucket_entry& operator=(const bucket_entry& other) noexcept(
@@ -294,6 +296,7 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
   void swap_with_value_in_bucket(distance_type& dist_from_ideal_bucket,
                                  truncated_hash_type& hash, value_type& value) {
     tsl_rh_assert(!empty());
+    tsl_rh_assert(dist_from_ideal_bucket > m_dist_from_ideal_bucket);
 
     using std::swap;
     swap(value, this->value());
@@ -1079,6 +1082,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     m_max_load_factor = clamp(ml, float(MINIMUM_MAX_LOAD_FACTOR),
                               float(MAXIMUM_MAX_LOAD_FACTOR));
     m_load_threshold = size_type(float(bucket_count()) * m_max_load_factor);
+    tsl_rh_assert(bucket_count() == 0 || m_load_threshold < bucket_count());
   }
 
   void rehash(size_type count_) {
@@ -1282,6 +1286,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   void insert_value_impl(std::size_t ibucket,
                          distance_type dist_from_ideal_bucket,
                          truncated_hash_type hash, value_type& value) {
+    tsl_rh_assert(dist_from_ideal_bucket >
+                  m_buckets[ibucket].dist_from_ideal_bucket());
     m_buckets[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket, hash,
                                                  value);
     ibucket = next_bucket(ibucket);
@@ -1315,6 +1321,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     robin_hash new_table(count_, static_cast<Hash&>(*this),
                          static_cast<KeyEqual&>(*this), get_allocator(),
                          m_min_load_factor, m_max_load_factor);
+    tsl_rh_assert(size() <= new_table.m_load_threshold);
 
     const bool use_stored_hash =
         USE_STORED_HASH_ON_REHASH(new_table.bucket_count());
