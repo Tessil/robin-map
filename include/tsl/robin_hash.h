@@ -670,7 +670,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
   robin_hash& operator=(robin_hash&& other) {
     other.swap(*this);
-    other.clear();
+    other.clear_and_shrink();
 
     return *this;
   }
