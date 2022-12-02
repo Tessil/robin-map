@@ -28,8 +28,13 @@ endif()
 
 
 
+set(IS_SUBPROJECT TRUE)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  set(IS_SUBPROJECT FALSE)
+endif()
+
 # Installation (only compatible with CMake version >= 3.3)
-if(${CMAKE_VERSION} VERSION_GREATER "3.2")
+if(NOT IS_SUBPROJECT AND ${CMAKE_VERSION} VERSION_GREATER "3.2")
     include(CMakePackageConfigHelpers)
 
     ## Install include directory and potential natvis file
