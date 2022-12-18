@@ -324,7 +324,7 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
 
  public:
   static const distance_type EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET = -1;
-  static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 4096;
+  static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 8192;
   static_assert(DIST_FROM_IDEAL_BUCKET_LIMIT <=
                     std::numeric_limits<distance_type>::max() - 1,
                 "DIST_FROM_IDEAL_BUCKET_LIMIT must be <= "
