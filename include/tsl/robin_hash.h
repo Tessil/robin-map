@@ -463,10 +463,14 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
    public:
     using iterator_category = std::forward_iterator_tag;
-    using value_type = const typename robin_hash::value_type;
+    using value_type = typename robin_hash::value_type;
     using difference_type = std::ptrdiff_t;
-    using reference = value_type&;
-    using pointer = value_type*;
+    using reference =
+        typename std::conditional<IsConst, typename robin_hash::const_reference,
+                                  typename robin_hash::reference>::type;
+    using pointer =
+        typename std::conditional<IsConst, typename robin_hash::const_pointer,
+                                  typename robin_hash::pointer>::type;
 
     robin_iterator() noexcept {}
 
