@@ -43,7 +43,7 @@
 #define TSL_RH_VERSION_MINOR 2
 // A change of the patch version indicates a bugfix without additional
 // functionality
-#define TSL_RH_VERSION_PATCH 1
+#define TSL_RH_VERSION_PATCH 2
 
 #ifdef TSL_DEBUG
 #define tsl_rh_assert(expr) assert(expr)
