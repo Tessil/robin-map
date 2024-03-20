@@ -101,8 +101,9 @@ class robin_set {
     key_type& operator()(Key& key) noexcept { return key; }
   };
 
-  using ht = detail_robin_hash::robin_hash<Key, KeySelect, void, Hash, KeyEqual,
-                                           Allocator, StoreHash, GrowthPolicy>;
+  using ht =
+      detail_robin_hash::robin_hash<Key, KeySelect, void, Hash, KeyEqual,
+                                    Allocator, StoreHash, GrowthPolicy, Key>;
 
  public:
   using key_type = typename ht::key_type;
