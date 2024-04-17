@@ -161,4 +161,14 @@ BOOST_AUTO_TEST_CASE(test_serialize_deserialize) {
   BOOST_CHECK(set_deserialized == set);
 }
 
+BOOST_AUTO_TEST_CASE(test_erase_it) {
+  using Set = tsl::robin_set<int>;
+  Set set;
+  set.emplace(4);
+  auto it = set.find(4);
+  BOOST_CHECK(it != set.end());
+  set.erase(it);
+  BOOST_CHECK(set.size() == 0);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

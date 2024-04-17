@@ -836,8 +836,6 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       ++pos;
     }
 
-    m_try_shrink_on_next_insert = true;
-
     return pos;
   }
 
@@ -916,8 +914,6 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     auto it = find(key, hash);
     if (it != end()) {
       erase_from_bucket(it);
-      m_try_shrink_on_next_insert = true;
-
       return 1;
     } else {
       return 0;
@@ -1211,6 +1207,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       previous_ibucket = ibucket;
       ibucket = next_bucket(ibucket);
     }
+    m_try_shrink_on_next_insert = true;
   }
 
   template <class K, class... Args>

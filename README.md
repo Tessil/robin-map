@@ -275,6 +275,13 @@ int main() {
 }  
 ```
 
+#### Element erasure
+
+Besides the regular ``iterator erase(iterator)`` method also provided by STL
+map and set types, ``robin_map`` and ``robin_set`` provide a ``void
+erase_it(iterator)`` method that does _not_ return an iterator. Computing a
+valid iterator following element erasure comes at a computational cost that can
+be avoided with this method when the return value is not needed.
 
 #### Serialization
 

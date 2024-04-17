@@ -263,6 +263,8 @@ class robin_set {
   }
   size_type erase(const key_type& key) { return m_ht.erase(key); }
 
+  void erase_it(iterator pos) { return m_ht.erase_from_bucket(pos); }
+
   /**
    * Use the hash value 'precalculated_hash' instead of hashing the key. The
    * hash value should be the same as hash_function()(key). Useful to speed-up
