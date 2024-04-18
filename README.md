@@ -513,7 +513,7 @@ Two potential performance pitfalls involving `tsl::robin_map` and
 
    In such cases, an iterator return value is often not even needed, so the
    cost is entirely unnecessary. Both `tsl::robin_set` and `tsl::robin_map`
-   therefore provide an alternative erasure method `void erase_it(iterator)`
+   therefore provide an alternative erasure method `void erase_fast(iterator)`
    that does not return an iterator to avoid having to find the next element.
 
 ### License

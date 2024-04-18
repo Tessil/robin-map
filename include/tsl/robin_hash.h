@@ -820,6 +820,10 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return try_emplace(std::forward<K>(key), std::forward<Args>(args)...).first;
   }
 
+  void erase_fast(iterator pos) {
+    erase_from_bucket(pos);
+  }
+
   /**
    * Here to avoid `template<class K> size_type erase(const K& key)` being used
    * when we use an `iterator` instead of a `const_iterator`.
