@@ -1448,4 +1448,15 @@ BOOST_AUTO_TEST_CASE(test_precalculated_hash) {
   BOOST_CHECK_EQUAL(map.erase(4, map.hash_function()(2)), 0);
 }
 
+BOOST_AUTO_TEST_CASE(test_erase_fast) {
+  using Map = tsl::robin_map<int, int>;
+  Map map;
+  map.emplace(4, 5);
+  auto it = map.find(4);
+  BOOST_CHECK(it != map.end());
+  map.erase_fast(it);
+  BOOST_CHECK(map.size() == 0);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
