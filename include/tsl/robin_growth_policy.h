@@ -40,10 +40,10 @@
 #define TSL_RH_VERSION_MAJOR 1
 // A change of the minor version indicates the addition of a feature without
 // impact on the API/ABI
-#define TSL_RH_VERSION_MINOR 2
+#define TSL_RH_VERSION_MINOR 3
 // A change of the patch version indicates a bugfix without additional
 // functionality
-#define TSL_RH_VERSION_PATCH 2
+#define TSL_RH_VERSION_PATCH 0
 
 #ifdef TSL_DEBUG
 #define tsl_rh_assert(expr) assert(expr)
