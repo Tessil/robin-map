@@ -83,7 +83,7 @@ namespace tsl {
  * insert, invalidate the iterators.
  *  - erase: always invalidate the iterators.
  */
-template <class Key, class Hash = std::hash<Key>,
+template <class Key, class Hash = tsl::hash<Key>,
           class KeyEqual = std::equal_to<Key>,
           class Allocator = std::allocator<Key>, bool StoreHash = false,
           class GrowthPolicy = tsl::rh::power_of_two_growth_policy<2>>
@@ -657,7 +657,7 @@ class robin_set {
  * Same as `tsl::robin_set<Key, Hash, KeyEqual, Allocator, StoreHash,
  * tsl::rh::prime_growth_policy>`.
  */
-template <class Key, class Hash = std::hash<Key>,
+template <class Key, class Hash = tsl::hash<Key>,
           class KeyEqual = std::equal_to<Key>,
           class Allocator = std::allocator<Key>, bool StoreHash = false>
 using robin_pg_set = robin_set<Key, Hash, KeyEqual, Allocator, StoreHash,
