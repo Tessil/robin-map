@@ -403,7 +403,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         is_power_of_two_policy<GrowthPolicy>::value) &&
        // Don't store the hash for primitive types with default hash.
        (!std::is_arithmetic<key_type>::value ||
-        !std::is_same<Hash, std::hash<key_type>>::value));
+        !std::is_same<Hash, tsl::hash<key_type>>::value));
 
   /**
    * Only use the stored hash on lookup if we are explicitly asked. We are not

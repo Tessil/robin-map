@@ -413,4 +413,35 @@ class prime_growth_policy {
 }  // namespace rh
 }  // namespace tsl
 
+namespace tsl {
+
+/**
+ * Wrapper around std::hash which adds hash finalizer missing in libstd-c++ and
+ * libc++. It should be used with power_of_two_growth_policy.
+ */
+template <class Key>
+struct hash : public std::hash<Key> {
+  std::size_t operator()(const Key& key) const {
+    std::size_t h = std::hash<Key>::operator()(key);
+
+#if defined(__GLIBCXX__) || defined(_LIBCPP_VERSION)
+#if SIZE_MAX >= ULLONG_MAX
+    // 64-bit finalizer from MurmurHash2
+    h ^= h >> 47;
+    h *= 0xc6a4a7935bd1e995ull;
+    h ^= h >> 47;
+#else
+    // 32-bit finalizer from MurmurHash2
+    h ^= h >> 13;
+    h *= 0x5bd1e995u;
+    h ^= h >> 15;
+#endif
+#endif
+
+    return h;
+  }
+};
+
+}  // namespace tsl
+
 #endif

@@ -171,4 +171,23 @@ BOOST_AUTO_TEST_CASE(test_erase_fast) {
   BOOST_CHECK(set.size() == 0);
 }
 
+BOOST_AUTO_TEST_CASE(test_hash_function_default_integer) {
+  // Brief quality check for default integer hash function.
+  // Most importantly, make sure it is not identity function like std::hash on GCC.
+  // See: https://github.com/Tessil/robin-map/issues/73
+  const std::size_t nb_values = 1 << 18;
+  const std::size_t shift = 32;
+
+  using Set = tsl::robin_set<uint64_t>;
+  Set set;
+
+  for (uint64_t i = 0; i < nb_values; i++) {
+    uint64_t hash = set.hash_function()(uint64_t(i) << shift);
+    set.insert(hash & 0xFFFFFF);
+  }
+
+  double imageRatio = double(set.size()) / nb_values;
+  BOOST_CHECK(imageRatio >= 0.9);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
