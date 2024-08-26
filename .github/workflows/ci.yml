@@ -29,13 +29,13 @@ jobs:
           }
         - {
             name: macos-x64-gcc,
-            os:  macos-latest,
+            os:  macos-13,
             cxx: g++,
             cmake-build-type: Release
           }
         - {
             name: macos-x64-clang,
-            os:  macos-latest,
+            os:  macos-13,
             cxx: clang++,
             cmake-build-type: Release
           }
