@@ -253,7 +253,7 @@ namespace detail {
 #define TSL_RH_NB_PRIMES 23
 #endif
 
-static constexpr const std::array<std::size_t, TSL_RH_NB_PRIMES> PRIMES = {{
+inline constexpr std::array<std::size_t, TSL_RH_NB_PRIMES> PRIMES = {{
     1u,
     5u,
     17u,
@@ -319,8 +319,7 @@ static constexpr std::size_t mod(std::size_t hash) {
 // MOD_PRIME[iprime](hash) returns hash % PRIMES[iprime]. This table allows for
 // faster modulo as the compiler can optimize the modulo code better with a
 // constant known at the compilation.
-static constexpr const std::array<std::size_t (*)(std::size_t),
-                                  TSL_RH_NB_PRIMES>
+inline constexpr std::array<std::size_t (*)(std::size_t), TSL_RH_NB_PRIMES>
     MOD_PRIME = {{
         &mod<0>,  &mod<1>,  &mod<2>,  &mod<3>,  &mod<4>,  &mod<5>,
         &mod<6>,  &mod<7>,  &mod<8>,  &mod<9>,  &mod<10>, &mod<11>,
