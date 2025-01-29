@@ -1468,6 +1468,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     } else {
       m_bucket_count = numeric_cast<size_type>(
           bucket_count_ds, "Deserialized bucket_count is too big.");
+      // Recompute m_load_threshold, during max_load_factor() the bucket count
+      // was still 0 which would trigger rehash on first insert
+      m_load_threshold = size_type(float(bucket_count()) * m_max_load_factor);
 
       GrowthPolicy::operator=(GrowthPolicy(m_bucket_count));
       // GrowthPolicy should not modify the bucket count we got from
