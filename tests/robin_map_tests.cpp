@@ -1224,9 +1224,8 @@ BOOST_AUTO_TEST_CASE(test_key_equal) {
     std::size_t operator()(std::uint64_t v) const {
       if (v % 2u == 1u) {
         return std::hash<std::uint64_t>()(v - 1);
-      } else {
-        return std::hash<std::uint64_t>()(v);
       }
+      return std::hash<std::uint64_t>()(v);
     }
   };
 
