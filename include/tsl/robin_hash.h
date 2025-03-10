@@ -75,8 +75,8 @@ static T numeric_cast(U value,
   }
 
   const bool is_same_signedness =
-      (std::is_unsigned<T>::value && std::is_unsigned<U>::value) ||
-      (std::is_signed<T>::value && std::is_signed<U>::value);
+      (std::is_unsigned_v<T> && std::is_unsigned_v<U>) ||
+      (std::is_signed_v<T> && std::is_signed_v<U>);
   if (!is_same_signedness && (ret < T{}) != (value < U{})) {
     TSL_RH_THROW_OR_TERMINATE(std::runtime_error, error_message);
   }
@@ -183,7 +183,7 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
   }
 
   bucket_entry(const bucket_entry& other) noexcept(
-      std::is_nothrow_copy_constructible<value_type>::value)
+      std::is_nothrow_copy_constructible_v<value_type>)
       : bucket_hash(other),
         m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
         m_last_bucket(other.m_last_bucket) {
@@ -201,7 +201,7 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
    * robin_hash constructor for details.
    */
   bucket_entry(bucket_entry&& other) noexcept(
-      std::is_nothrow_move_constructible<value_type>::value)
+      std::is_nothrow_move_constructible_v<value_type>)
       : bucket_hash(std::move(other)),
         m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
         m_last_bucket(other.m_last_bucket) {
@@ -214,7 +214,7 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
   }
 
   bucket_entry& operator=(const bucket_entry& other) noexcept(
-      std::is_nothrow_copy_constructible<value_type>::value) {
+      std::is_nothrow_copy_constructible_v<value_type>) {
     if (this != &other) {
       clear();
 
@@ -349,7 +349,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
  private:
   template <typename U>
   using has_mapped_type =
-      typename std::integral_constant<bool, !std::is_same<U, void>::value>;
+      typename std::integral_constant<bool, !std::is_same_v<U, void>>;
 
   static_assert(
       noexcept(std::declval<GrowthPolicy>().bucket_for_hash(std::size_t(0))),
@@ -388,8 +388,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
        (sizeof(std::size_t) == sizeof(truncated_hash_type) ||
         is_power_of_two_policy<GrowthPolicy>::value) &&
        // Don't store the hash for primitive types with default hash.
-       (!std::is_arithmetic<key_type>::value ||
-        !std::is_same<Hash, std::hash<key_type>>::value));
+       (!std::is_arithmetic_v<key_type> ||
+        !std::is_same_v<Hash, std::hash<key_type>>));
 
   /**
    * Only use the stored hash on lookup if we are explicitly asked. We are not
@@ -444,8 +444,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
    private:
     using bucket_entry_ptr =
-        typename std::conditional<IsConst, const bucket_entry*,
-                                  bucket_entry*>::type;
+        std::conditional_t<IsConst, const bucket_entry*, bucket_entry*>;
 
     robin_iterator(bucket_entry_ptr bucket) noexcept : m_bucket(bucket) {}
 
@@ -459,8 +458,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     robin_iterator() noexcept {}
 
     // Copy constructor from iterator to const_iterator.
-    template <bool TIsConst = IsConst,
-              typename std::enable_if<TIsConst>::type* = nullptr>
+    template <bool TIsConst = IsConst, std::enable_if_t<TIsConst>* = nullptr>
     robin_iterator(const robin_iterator<!TIsConst>& other) noexcept
         : m_bucket(other.m_bucket) {}
 
@@ -474,15 +472,14 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     }
 
     template <class U = ValueSelect,
-              typename std::enable_if<has_mapped_type<U>::value &&
-                                      IsConst>::type* = nullptr>
+              std::enable_if_t<has_mapped_type<U>::value && IsConst>* = nullptr>
     const typename U::value_type& value() const {
       return U()(m_bucket->value());
     }
 
-    template <class U = ValueSelect,
-              typename std::enable_if<has_mapped_type<U>::value &&
-                                      !IsConst>::type* = nullptr>
+    template <
+        class U = ValueSelect,
+        std::enable_if_t<has_mapped_type<U>::value && !IsConst>* = nullptr>
     typename U::value_type& value() const {
       return U()(m_bucket->value());
     }
@@ -571,10 +568,10 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         m_try_shrink_on_next_insert(other.m_try_shrink_on_next_insert) {}
 
   robin_hash(robin_hash&& other) noexcept(
-      std::is_nothrow_move_constructible<
-          Hash>::value&& std::is_nothrow_move_constructible<KeyEqual>::value&&
-          std::is_nothrow_move_constructible<GrowthPolicy>::value&&
-              std::is_nothrow_move_constructible<buckets_container_type>::value)
+      std::is_nothrow_move_constructible_v<Hash> &&
+      std::is_nothrow_move_constructible_v<KeyEqual> &&
+      std::is_nothrow_move_constructible_v<GrowthPolicy> &&
+      std::is_nothrow_move_constructible_v<buckets_container_type>)
       : Hash(std::move(static_cast<Hash&>(other))),
         KeyEqual(std::move(static_cast<KeyEqual&>(other))),
         GrowthPolicy(std::move(static_cast<GrowthPolicy&>(other))),
@@ -698,9 +695,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
   template <class InputIt>
   void insert(InputIt first, InputIt last) {
-    if (std::is_base_of<
+    if (std::is_base_of_v<
             std::forward_iterator_tag,
-            typename std::iterator_traits<InputIt>::iterator_category>::value) {
+            typename std::iterator_traits<InputIt>::iterator_category>) {
       const auto nb_elements_insert = std::distance(first, last);
       const size_type nb_free_buckets = m_load_threshold - size();
       tsl_rh_assert(m_load_threshold >= size());
@@ -764,9 +761,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return try_emplace(std::forward<K>(key), std::forward<Args>(args)...).first;
   }
 
-  void erase_fast(iterator pos) {
-    erase_from_bucket(pos);
-  }
+  void erase_fast(iterator pos) { erase_from_bucket(pos); }
 
   /**
    * Here to avoid `template<class K> size_type erase(const K& key)` being used
@@ -889,26 +884,26 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
    * Lookup
    */
   template <class K, class U = ValueSelect,
-            typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
+            std::enable_if_t<has_mapped_type<U>::value>* = nullptr>
   typename U::value_type& at(const K& key) {
     return at(key, hash_key(key));
   }
 
   template <class K, class U = ValueSelect,
-            typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
+            std::enable_if_t<has_mapped_type<U>::value>* = nullptr>
   typename U::value_type& at(const K& key, std::size_t hash) {
     return const_cast<typename U::value_type&>(
         static_cast<const robin_hash*>(this)->at(key, hash));
   }
 
   template <class K, class U = ValueSelect,
-            typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
+            std::enable_if_t<has_mapped_type<U>::value>* = nullptr>
   const typename U::value_type& at(const K& key) const {
     return at(key, hash_key(key));
   }
 
   template <class K, class U = ValueSelect,
-            typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
+            std::enable_if_t<has_mapped_type<U>::value>* = nullptr>
   const typename U::value_type& at(const K& key, std::size_t hash) const {
     auto it = find(key, hash);
     if (it != cend()) {
@@ -919,7 +914,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   }
 
   template <class K, class U = ValueSelect,
-            typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
+            std::enable_if_t<has_mapped_type<U>::value>* = nullptr>
   typename U::value_type& operator[](K&& key) {
     return try_emplace(std::forward<K>(key)).first.value();
   }
@@ -1082,8 +1077,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   }
 
   template <class U = GrowthPolicy,
-            typename std::enable_if<is_power_of_two_policy<U>::value>::type* =
-                nullptr>
+            std::enable_if_t<is_power_of_two_policy<U>::value>* = nullptr>
   std::size_t next_bucket(std::size_t index) const noexcept {
     tsl_rh_assert(index < bucket_count());
 
@@ -1091,8 +1085,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   }
 
   template <class U = GrowthPolicy,
-            typename std::enable_if<!is_power_of_two_policy<U>::value>::type* =
-                nullptr>
+            std::enable_if_t<!is_power_of_two_policy<U>::value>* = nullptr>
   std::size_t next_bucket(std::size_t index) const noexcept {
     tsl_rh_assert(index < bucket_count());
 
