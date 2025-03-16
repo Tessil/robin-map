@@ -348,7 +348,10 @@ struct is_pair<std::pair<T1, T2>> : std::true_type {};
  */
 class serializer {
  public:
-  serializer() { m_ostream.exceptions(m_ostream.badbit | m_ostream.failbit); }
+  serializer() {
+    m_ostream.exceptions(std::stringstream::badbit |
+                         std::stringstream::failbit);
+  }
 
   template <class T>
   void operator()(const T& val) {
@@ -388,8 +391,9 @@ class deserializer {
  public:
   explicit deserializer(const std::string& init_str = "")
       : m_istream(init_str) {
-    m_istream.exceptions(m_istream.badbit | m_istream.failbit |
-                         m_istream.eofbit);
+    m_istream.exceptions(std::stringstream::badbit |
+                         std::stringstream::failbit |
+                         std::stringstream::eofbit);
   }
 
   template <class T>
