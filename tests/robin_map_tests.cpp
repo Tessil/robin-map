@@ -611,7 +611,7 @@ BOOST_AUTO_TEST_CASE(test_rehash_empty) {
   BOOST_CHECK_EQUAL(map.bucket_count(), 0);
   BOOST_CHECK(map.empty());
 
-  BOOST_CHECK(map.find(1) == map.end());
+  BOOST_CHECK(!map.contains(1));
   BOOST_CHECK_EQUAL(map.erase(1), 0);
   BOOST_CHECK(map.insert({1, 10}).second);
   BOOST_CHECK_EQUAL(map.at(1), 10);
@@ -802,7 +802,7 @@ BOOST_AUTO_TEST_CASE(test_assign_operator) {
   BOOST_CHECK_EQUAL(map.size(), 2);
   BOOST_CHECK_EQUAL(map.at(1), 3);
   BOOST_CHECK_EQUAL(map.at(2), 4);
-  BOOST_CHECK(map.find(0) == map.end());
+  BOOST_CHECK(!map.contains(0));
 
   map = {};
   BOOST_CHECK(map.empty());
@@ -839,8 +839,8 @@ BOOST_AUTO_TEST_CASE(test_move_constructor_empty) {
   BOOST_CHECK(map.empty());
   BOOST_CHECK(map_move.empty());
 
-  BOOST_CHECK(map.find("") == map.end());
-  BOOST_CHECK(map_move.find("") == map_move.end());
+  BOOST_CHECK(!map.contains(""));
+  BOOST_CHECK(!map_move.contains(""));
 }
 
 BOOST_AUTO_TEST_CASE(test_move_operator) {
@@ -873,8 +873,8 @@ BOOST_AUTO_TEST_CASE(test_move_operator_empty) {
   BOOST_CHECK(map.empty());
   BOOST_CHECK(map_move.empty());
 
-  BOOST_CHECK(map.find("") == map.end());
-  BOOST_CHECK(map_move.find("") == map_move.end());
+  BOOST_CHECK(!map.contains(""));
+  BOOST_CHECK(!map_move.contains(""));
 }
 
 BOOST_AUTO_TEST_CASE(test_reassign_moved_object_move_constructor) {
@@ -914,7 +914,7 @@ BOOST_AUTO_TEST_CASE(test_use_after_move_constructor) {
   BOOST_CHECK_EQUAL(map.size(), 0);
   BOOST_CHECK_EQUAL(map.bucket_count(), 0);
   BOOST_CHECK_EQUAL(map.erase("a"), 0);
-  BOOST_CHECK(map.find("a") == map.end());
+  BOOST_CHECK(!map.contains("a"));
 
   for (std::size_t i = 0; i < nb_values; i++) {
     map.insert(
@@ -937,7 +937,7 @@ BOOST_AUTO_TEST_CASE(test_use_after_move_operator) {
   BOOST_CHECK_EQUAL(map.size(), 0);
   BOOST_CHECK_EQUAL(map.bucket_count(), 0);
   BOOST_CHECK_EQUAL(map.erase("a"), 0);
-  BOOST_CHECK(map.find("a") == map.end());
+  BOOST_CHECK(!map.contains("a"));
 
   for (std::size_t i = 0; i < nb_values; i++) {
     map.insert(
@@ -973,8 +973,8 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor_empty) {
   BOOST_CHECK(map.empty());
   BOOST_CHECK(map_copy.empty());
 
-  BOOST_CHECK(map.find("") == map.end());
-  BOOST_CHECK(map_copy.find("") == map_copy.end());
+  BOOST_CHECK(!map.contains(""));
+  BOOST_CHECK(!map_copy.contains(""));
 }
 
 BOOST_AUTO_TEST_CASE(test_copy_operator_empty) {
@@ -985,8 +985,8 @@ BOOST_AUTO_TEST_CASE(test_copy_operator_empty) {
   BOOST_CHECK(map.empty());
   BOOST_CHECK(map_copy.empty());
 
-  BOOST_CHECK(map.find("") == map.end());
-  BOOST_CHECK(map_copy.find("") == map_copy.end());
+  BOOST_CHECK(!map.contains(""));
+  BOOST_CHECK(!map_copy.contains(""));
 }
 
 /**
@@ -1210,7 +1210,7 @@ BOOST_AUTO_TEST_CASE(test_serialize_desearialize_with_different_hash) {
 
   BOOST_CHECK_EQUAL(map_deserialized.size(), map.size());
   for (const auto& val : map) {
-    BOOST_CHECK(map_deserialized.find(val.first) != map_deserialized.end());
+    BOOST_CHECK(map_deserialized.contains(val.first));
   }
 }
 
@@ -1353,8 +1353,8 @@ BOOST_AUTO_TEST_CASE(test_empty_map) {
   BOOST_CHECK(map.begin() == map.cend());
   BOOST_CHECK(map.cbegin() == map.cend());
 
-  BOOST_CHECK(map.find("") == map.end());
-  BOOST_CHECK(map.find("test") == map.end());
+  BOOST_CHECK(!map.contains(""));
+  BOOST_CHECK(!map.contains("test"));
 
   BOOST_CHECK_EQUAL(map.count(""), 0);
   BOOST_CHECK_EQUAL(map.count("test"), 0);
