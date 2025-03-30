@@ -40,7 +40,7 @@
 #define TSL_RH_VERSION_MAJOR 1
 // A change of the minor version indicates the addition of a feature without
 // impact on the API/ABI
-#define TSL_RH_VERSION_MINOR 3
+#define TSL_RH_VERSION_MINOR 4
 // A change of the patch version indicates a bugfix without additional
 // functionality
 #define TSL_RH_VERSION_PATCH 0
