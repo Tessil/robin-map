@@ -29,13 +29,13 @@ jobs:
           }
         - {
             name: macos-x64-gcc,
-            os:  macos-13,
+            os:  macos-latest,
             cxx: g++,
             cmake-build-type: Release
           }
         - {
             name: macos-x64-clang,
-            os:  macos-13,
+            os:  macos-latest,
             cxx: clang++,
             cmake-build-type: Release
           }
@@ -55,32 +55,16 @@ jobs:
             cmake-build-type: Debug
           }
         - {
-            name: windows-x64-vs-2019,
-            os: windows-2019,
-            cmake-build-type: Release,
-            cmake-generator: Visual Studio 16 2019,
-            cmake-platform: x64,
-            vcpkg-triplet: x64-windows-static-md
-          }
-        - {
-            name: windows-x86-vs-2019,
-            os: windows-2019,
-            cmake-build-type: Release,
-            cmake-generator: Visual Studio 16 2019,
-            cmake-platform: Win32,
-            vcpkg-triplet: x86-windows-static-md
-          }
-        - {
-            name: windows-x64-vs-2022,
-            os: windows-2022,
+            name: windows-x64-vs-2025,
+            os: windows-2025,
             cmake-build-type: Release,
             cmake-generator: Visual Studio 17 2022,
             cmake-platform: x64,
             vcpkg-triplet: x64-windows-static-md
           }
         - {
-            name: windows-x86-vs-2022,
-            os: windows-2022,
+            name: windows-x86-vs-2025,
+            os: windows-2025,
             cmake-build-type: Release,
             cmake-generator: Visual Studio 17 2022,
             cmake-platform: Win32,
