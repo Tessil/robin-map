@@ -343,9 +343,7 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
  *
  * Behaviour is undefined if the destructor of `ValueType` throws.
  */
-template <class ValueType, class KeySelect, class ValueSelect, class Hash,
-          class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy>
-class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
+template <class ValueType, class KeySelect, class ValueSelect, class Hash, class KeyEqual, class Allocator, bool StoreHash, class GrowthPolicy, bool AllowTransparent = false> class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
  private:
   template <typename U>
   using has_mapped_type =
@@ -716,27 +714,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     }
   }
 
-  template <class K, class M>
-  std::pair<iterator, bool> insert_or_assign(K&& key, M&& obj) {
-    auto it = try_emplace(std::forward<K>(key), std::forward<M>(obj));
-    if (!it.second) {
-      it.first.value() = std::forward<M>(obj);
-    }
+  template <class K, class M, typename std::enable_if<!AllowTransparent>::type* = nullptr>  std::pair<iterator, bool> insert_or_assign(K&& key, M&& obj) {    static_assert(std::is_same<typename std::decay<K>::type, key_type>::value, "K must be same as key_type when AllowTransparent is false");    auto it = try_emplace(std::forward<K>(key), std::forward<M>(obj));    if (!it.second) {      it.first.value() = std::forward<M>(obj);    }    return it;  }    template <class K, class M, typename std::enable_if<AllowTransparent>::type* = nullptr>  std::pair<iterator, bool> insert_or_assign(K&& key, M&& obj) {    auto it = try_emplace(std::forward<K>(key), std::forward<M>(obj));    if (!it.second) {      it.first.value() = std::forward<M>(obj);    }    return it;  }
 
-    return it;
-  }
-
-  template <class K, class M>
-  iterator insert_or_assign(const_iterator hint, K&& key, M&& obj) {
-    if (hint != cend() && compare_keys(KeySelect()(*hint), key)) {
-      auto it = mutable_iterator(hint);
-      it.value() = std::forward<M>(obj);
-
-      return it;
-    }
-
-    return insert_or_assign(std::forward<K>(key), std::forward<M>(obj)).first;
-  }
+  template <class K, class M, typename std::enable_if<!AllowTransparent>::type* = nullptr>  iterator insert_or_assign(const_iterator hint, K&& key, M&& obj) {    static_assert(std::is_same<typename std::decay<K>::type, key_type>::value, "K must be same as key_type when AllowTransparent is false");    if (hint != cend() && compare_keys(KeySelect()(*hint), key)) {      auto it = mutable_iterator(hint);      it.value() = std::forward<M>(obj);      return it;    }    return insert_or_assign(std::forward<K>(key), std::forward<M>(obj)).first;  }    template <class K, class M, typename std::enable_if<AllowTransparent>::type* = nullptr>  iterator insert_or_assign(const_iterator hint, K&& key, M&& obj) {    if (hint != cend() && compare_keys(KeySelect()(*hint), key)) {      auto it = mutable_iterator(hint);      it.value() = std::forward<M>(obj);      return it;    }    return insert_or_assign(std::forward<K>(key), std::forward<M>(obj)).first;  }
 
   template <class... Args>
   std::pair<iterator, bool> emplace(Args&&... args) {
@@ -748,21 +728,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return insert_hint(hint, value_type(std::forward<Args>(args)...));
   }
 
-  template <class K, class... Args>
-  std::pair<iterator, bool> try_emplace(K&& key, Args&&... args) {
-    return insert_impl(key, std::piecewise_construct,
-                       std::forward_as_tuple(std::forward<K>(key)),
-                       std::forward_as_tuple(std::forward<Args>(args)...));
-  }
+  template <class K, class... Args, typename std::enable_if<!AllowTransparent>::type* = nullptr>  std::pair<iterator, bool> try_emplace(K&& key, Args&&... args) {    static_assert(std::is_same<typename std::decay<K>::type, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return insert_impl(key, std::piecewise_construct,                       std::forward_as_tuple(std::forward<K>(key)),                       std::forward_as_tuple(std::forward<Args>(args)...));  }    template <class K, class... Args, typename std::enable_if<AllowTransparent>::type* = nullptr>  std::pair<iterator, bool> try_emplace(K&& key, Args&&... args) {    return insert_impl(key, std::piecewise_construct,                       std::forward_as_tuple(std::forward<K>(key)),                       std::forward_as_tuple(std::forward<Args>(args)...));  }
 
-  template <class K, class... Args>
-  iterator try_emplace_hint(const_iterator hint, K&& key, Args&&... args) {
-    if (hint != cend() && compare_keys(KeySelect()(*hint), key)) {
-      return mutable_iterator(hint);
-    }
-
-    return try_emplace(std::forward<K>(key), std::forward<Args>(args)...).first;
-  }
+  template <class K, class... Args, typename std::enable_if<!AllowTransparent>::type* = nullptr>  iterator try_emplace_hint(const_iterator hint, K&& key, Args&&... args) {    static_assert(std::is_same<typename std::decay<K>::type, key_type>::value, "K must be same as key_type when AllowTransparent is false");    if (hint != cend() && compare_keys(KeySelect()(*hint), key)) {      return mutable_iterator(hint);    }    return try_emplace(std::forward<K>(key), std::forward<Args>(args)...).first;  }    template <class K, class... Args, typename std::enable_if<AllowTransparent>::type* = nullptr>  iterator try_emplace_hint(const_iterator hint, K&& key, Args&&... args) {    if (hint != cend() && compare_keys(KeySelect()(*hint), key)) {      return mutable_iterator(hint);    }    return try_emplace(std::forward<K>(key), std::forward<Args>(args)...).first;  }
 
   void erase_fast(iterator pos) {
     erase_from_bucket(pos);
@@ -888,11 +856,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   /*
    * Lookup
    */
-  template <class K, class U = ValueSelect,
-            typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
-  typename U::value_type& at(const K& key) {
-    return at(key, hash_key(key));
-  }
+  template <class K, class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr, typename std::enable_if<!AllowTransparent>::type* = nullptr>  typename U::value_type& at(const K& key) {    static_assert(std::is_same<K, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return at(key, hash_key(key));  }    template <class K, class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr, typename std::enable_if<AllowTransparent>::type* = nullptr>  typename U::value_type& at(const K& key) {    return at(key, hash_key(key));  }
 
   template <class K, class U = ValueSelect,
             typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
@@ -901,11 +865,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         static_cast<const robin_hash*>(this)->at(key, hash));
   }
 
-  template <class K, class U = ValueSelect,
-            typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
-  const typename U::value_type& at(const K& key) const {
-    return at(key, hash_key(key));
-  }
+  template <class K, class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr, typename std::enable_if<!AllowTransparent>::type* = nullptr>  const typename U::value_type& at(const K& key) const {    static_assert(std::is_same<K, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return at(key, hash_key(key));  }    template <class K, class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr, typename std::enable_if<AllowTransparent>::type* = nullptr>  const typename U::value_type& at(const K& key) const {    return at(key, hash_key(key));  }
 
   template <class K, class U = ValueSelect,
             typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
@@ -918,16 +878,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     }
   }
 
-  template <class K, class U = ValueSelect,
-            typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr>
-  typename U::value_type& operator[](K&& key) {
-    return try_emplace(std::forward<K>(key)).first.value();
-  }
+  template <class K, class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr, typename std::enable_if<!AllowTransparent>::type* = nullptr>  typename U::value_type& operator[](K&& key) {    static_assert(std::is_same<typename std::decay<K>::type, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return try_emplace(std::forward<K>(key)).first.value();  }    template <class K, class U = ValueSelect, typename std::enable_if<has_mapped_type<U>::value>::type* = nullptr, typename std::enable_if<AllowTransparent>::type* = nullptr>  typename U::value_type& operator[](K&& key) {    return try_emplace(std::forward<K>(key)).first.value();  }
 
-  template <class K>
-  size_type count(const K& key) const {
-    return count(key, hash_key(key));
-  }
+  template <class K, typename std::enable_if<!AllowTransparent>::type* = nullptr>  size_type count(const K& key) const {    static_assert(std::is_same<K, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return count(key, hash_key(key));  }    template <class K, typename std::enable_if<AllowTransparent>::type* = nullptr>  size_type count(const K& key) const {    return count(key, hash_key(key));  }
 
   template <class K>
   size_type count(const K& key, std::size_t hash) const {
@@ -938,40 +891,28 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     }
   }
 
-  template <class K>
-  iterator find(const K& key) {
-    return find_impl(key, hash_key(key));
-  }
+  template <class K, typename std::enable_if<!AllowTransparent>::type* = nullptr>  iterator find(const K& key) {    static_assert(std::is_same<K, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return find_impl(key, hash_key(key));  }    template <class K, typename std::enable_if<AllowTransparent>::type* = nullptr>  iterator find(const K& key) {    return find_impl(key, hash_key(key));  }
 
   template <class K>
   iterator find(const K& key, std::size_t hash) {
     return find_impl(key, hash);
   }
 
-  template <class K>
-  const_iterator find(const K& key) const {
-    return find_impl(key, hash_key(key));
-  }
+  template <class K, typename std::enable_if<!AllowTransparent>::type* = nullptr>  const_iterator find(const K& key) const {    static_assert(std::is_same<K, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return find_impl(key, hash_key(key));  }    template <class K, typename std::enable_if<AllowTransparent>::type* = nullptr>  const_iterator find(const K& key) const {    return find_impl(key, hash_key(key));  }
 
   template <class K>
   const_iterator find(const K& key, std::size_t hash) const {
     return find_impl(key, hash);
   }
 
-  template <class K>
-  bool contains(const K& key) const {
-    return contains(key, hash_key(key));
-  }
+  template <class K, typename std::enable_if<!AllowTransparent>::type* = nullptr>  bool contains(const K& key) const {    static_assert(std::is_same<K, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return contains(key, hash_key(key));  }    template <class K, typename std::enable_if<AllowTransparent>::type* = nullptr>  bool contains(const K& key) const {    return contains(key, hash_key(key));  }
 
   template <class K>
   bool contains(const K& key, std::size_t hash) const {
     return count(key, hash) != 0;
   }
 
-  template <class K>
-  std::pair<iterator, iterator> equal_range(const K& key) {
-    return equal_range(key, hash_key(key));
-  }
+  template <class K, typename std::enable_if<!AllowTransparent>::type* = nullptr>  std::pair<iterator, iterator> equal_range(const K& key) {    static_assert(std::is_same<K, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return equal_range(key, hash_key(key));  }    template <class K, typename std::enable_if<AllowTransparent>::type* = nullptr>  std::pair<iterator, iterator> equal_range(const K& key) {    return equal_range(key, hash_key(key));  }
 
   template <class K>
   std::pair<iterator, iterator> equal_range(const K& key, std::size_t hash) {
@@ -979,10 +920,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return std::make_pair(it, (it == end()) ? it : std::next(it));
   }
 
-  template <class K>
-  std::pair<const_iterator, const_iterator> equal_range(const K& key) const {
-    return equal_range(key, hash_key(key));
-  }
+  template <class K, typename std::enable_if<!AllowTransparent>::type* = nullptr>  std::pair<const_iterator, const_iterator> equal_range(const K& key) const {    static_assert(std::is_same<K, key_type>::value, "K must be same as key_type when AllowTransparent is false");    return equal_range(key, hash_key(key));  }    template <class K, typename std::enable_if<AllowTransparent>::type* = nullptr>  std::pair<const_iterator, const_iterator> equal_range(const K& key) const {    return equal_range(key, hash_key(key));  }
 
   template <class K>
   std::pair<const_iterator, const_iterator> equal_range(
@@ -1063,15 +1001,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   }
 
  private:
-  template <class K>
-  std::size_t hash_key(const K& key) const {
-    return Hash::operator()(key);
-  }
+  template <class K>  std::size_t hash_key(const K& key) const {    return Hash::operator()(key);  }
 
-  template <class K1, class K2>
-  bool compare_keys(const K1& key1, const K2& key2) const {
-    return KeyEqual::operator()(key1, key2);
-  }
+  template <class K1, class K2>  bool compare_keys(const K1& key1, const K2& key2) const {    return KeyEqual::operator()(key1, key2);  }
 
   std::size_t bucket_for_hash(std::size_t hash) const {
     const std::size_t bucket = GrowthPolicy::bucket_for_hash(hash);

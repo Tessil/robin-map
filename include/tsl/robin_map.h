@@ -87,7 +87,8 @@ template <class Key, class T, class Hash = std::hash<Key>,
           class KeyEqual = std::equal_to<Key>,
           class Allocator = std::allocator<std::pair<Key, T>>,
           bool StoreHash = false,
-          class GrowthPolicy = tsl::rh::power_of_two_growth_policy<2>>
+          class GrowthPolicy = tsl::rh::power_of_two_growth_policy<2>,
+          bool AllowTransparent = false>
 class robin_map {
  private:
   template <typename U>
@@ -123,7 +124,8 @@ class robin_map {
 
   using ht = detail_robin_hash::robin_hash<std::pair<Key, T>, KeySelect,
                                            ValueSelect, Hash, KeyEqual,
-                                           Allocator, StoreHash, GrowthPolicy>;
+                                           Allocator, StoreHash, GrowthPolicy,
+                                           AllowTransparent>;
 
  public:
   using key_type = typename ht::key_type;

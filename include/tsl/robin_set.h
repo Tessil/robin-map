@@ -86,7 +86,7 @@ namespace tsl {
 template <class Key, class Hash = std::hash<Key>,
           class KeyEqual = std::equal_to<Key>,
           class Allocator = std::allocator<Key>, bool StoreHash = false,
-          class GrowthPolicy = tsl::rh::power_of_two_growth_policy<2>>
+          class GrowthPolicy = tsl::rh::power_of_two_growth_policy<2>, bool AllowTransparent = false>
 class robin_set {
  private:
   template <typename U>
@@ -102,7 +102,7 @@ class robin_set {
   };
 
   using ht = detail_robin_hash::robin_hash<Key, KeySelect, void, Hash, KeyEqual,
-                                           Allocator, StoreHash, GrowthPolicy>;
+                                           Allocator, StoreHash, GrowthPolicy, AllowTransparent>;
 
  public:
   using key_type = typename ht::key_type;
