@@ -83,7 +83,7 @@ namespace tsl {
  * insert, invalidate the iterators.
  *  - erase: always invalidate the iterators.
  */
-template <class Key, class T, class Hash = std::hash<Key>,
+template <class Key, class T, class Hash = tsl::hash<Key>,
           class KeyEqual = std::equal_to<Key>,
           class Allocator = std::allocator<std::pair<Key, T>>,
           bool StoreHash = false,
@@ -803,7 +803,7 @@ class robin_map {
  * Same as `tsl::robin_map<Key, T, Hash, KeyEqual, Allocator, StoreHash,
  * tsl::rh::prime_growth_policy>`.
  */
-template <class Key, class T, class Hash = std::hash<Key>,
+template <class Key, class T, class Hash = tsl::hash<Key>,
           class KeyEqual = std::equal_to<Key>,
           class Allocator = std::allocator<std::pair<Key, T>>,
           bool StoreHash = false>
