@@ -42,9 +42,7 @@
 
 #include "robin_growth_policy.h"
 
-namespace tsl {
-
-namespace detail_robin_hash {
+namespace tsl::detail_robin_hash {
 
 template <typename T>
 struct make_void {
@@ -1582,8 +1580,6 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   bool m_try_shrink_on_next_insert;
 };
 
-}  // namespace detail_robin_hash
-
-}  // namespace tsl
+}  // namespace tsl::detail_robin_hash
 
 #endif
