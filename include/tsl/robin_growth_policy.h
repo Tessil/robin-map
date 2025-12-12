@@ -221,9 +221,8 @@ class mod_growth_policy {
 
     if (next_bucket_count > double(max_bucket_count())) {
       return max_bucket_count();
-    } else {
-      return std::size_t(next_bucket_count);
     }
+    return std::size_t(next_bucket_count);
   }
 
   std::size_t max_bucket_count() const { return MAX_BUCKET_COUNT; }

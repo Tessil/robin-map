@@ -408,14 +408,14 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     if (STORE_HASH && sizeof(std::size_t) == sizeof(truncated_hash_type)) {
       TSL_RH_UNUSED(bucket_count);
       return true;
-    } else if (STORE_HASH && is_power_of_two_policy<GrowthPolicy>::value) {
+    }
+    if (STORE_HASH && is_power_of_two_policy<GrowthPolicy>::value) {
       return bucket_count == 0 ||
              (bucket_count - 1) <=
                  std::numeric_limits<truncated_hash_type>::max();
-    } else {
-      TSL_RH_UNUSED(bucket_count);
-      return false;
     }
+    TSL_RH_UNUSED(bucket_count);
+    return false;
   }
 
   using bucket_entry =
@@ -863,9 +863,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     if (it != end()) {
       erase_from_bucket(it);
       return 1;
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   void swap(robin_hash& other) {
@@ -913,9 +912,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     auto it = find(key, hash);
     if (it != cend()) {
       return it.value();
-    } else {
-      TSL_RH_THROW_OR_TERMINATE(std::out_of_range, "Couldn't find key.");
     }
+    TSL_RH_THROW_OR_TERMINATE(std::out_of_range, "Couldn't find key.");
   }
 
   template <class K, class U = ValueSelect,
@@ -933,9 +931,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   size_type count(const K& key, std::size_t hash) const {
     if (find(key, hash) != cend()) {
       return 1;
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   template <class K>
@@ -1308,10 +1305,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
           m_buckets[ibucket].set_value_of_empty_bucket(dist_from_ideal_bucket,
                                                        hash, std::move(value));
           return;
-        } else {
-          m_buckets[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket,
-                                                       hash, value);
         }
+        m_buckets[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket,
+                                                     hash, value);
       }
 
       dist_from_ideal_bucket++;
