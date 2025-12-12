@@ -234,8 +234,8 @@ class robin_map {
     return m_ht.insert(value);
   }
 
-  template <class P, typename std::enable_if<std::is_constructible<
-                         value_type, P&&>::value>::type* = nullptr>
+  template <class P, std::enable_if_t<
+                         std::is_constructible_v<value_type, P&&>>* = nullptr>
   std::pair<iterator, bool> insert(P&& value) {
     return m_ht.emplace(std::forward<P>(value));
   }
@@ -248,8 +248,8 @@ class robin_map {
     return m_ht.insert_hint(hint, value);
   }
 
-  template <class P, typename std::enable_if<std::is_constructible<
-                         value_type, P&&>::value>::type* = nullptr>
+  template <class P, std::enable_if_t<
+                         std::is_constructible_v<value_type, P&&>>* = nullptr>
   iterator insert(const_iterator hint, P&& value) {
     return m_ht.emplace_hint(hint, std::forward<P>(value));
   }
@@ -361,9 +361,8 @@ class robin_map {
    * KeyEqual::is_transparent exists. If so, K must be hashable and comparable
    * to Key.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   size_type erase(const K& key) {
     return m_ht.erase(key);
   }
@@ -375,9 +374,8 @@ class robin_map {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup to the value if you already have the hash.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   size_type erase(const K& key, std::size_t precalculated_hash) {
     return m_ht.erase(key, precalculated_hash);
   }
@@ -412,9 +410,8 @@ class robin_map {
    * KeyEqual::is_transparent exists. If so, K must be hashable and comparable
    * to Key.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   T& at(const K& key) {
     return m_ht.at(key);
   }
@@ -426,9 +423,8 @@ class robin_map {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   T& at(const K& key, std::size_t precalculated_hash) {
     return m_ht.at(key, precalculated_hash);
   }
@@ -436,9 +432,8 @@ class robin_map {
   /**
    * @copydoc at(const K& key)
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   const T& at(const K& key) const {
     return m_ht.at(key);
   }
@@ -446,9 +441,8 @@ class robin_map {
   /**
    * @copydoc at(const K& key, std::size_t precalculated_hash)
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   const T& at(const K& key, std::size_t precalculated_hash) const {
     return m_ht.at(key, precalculated_hash);
   }
@@ -472,9 +466,8 @@ class robin_map {
    * KeyEqual::is_transparent exists. If so, K must be hashable and comparable
    * to Key.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   size_type count(const K& key) const {
     return m_ht.count(key);
   }
@@ -486,9 +479,8 @@ class robin_map {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   size_type count(const K& key, std::size_t precalculated_hash) const {
     return m_ht.count(key, precalculated_hash);
   }
@@ -518,9 +510,8 @@ class robin_map {
    * KeyEqual::is_transparent exists. If so, K must be hashable and comparable
    * to Key.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   iterator find(const K& key) {
     return m_ht.find(key);
   }
@@ -532,9 +523,8 @@ class robin_map {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   iterator find(const K& key, std::size_t precalculated_hash) {
     return m_ht.find(key, precalculated_hash);
   }
@@ -542,9 +532,8 @@ class robin_map {
   /**
    * @copydoc find(const K& key)
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   const_iterator find(const K& key) const {
     return m_ht.find(key);
   }
@@ -556,9 +545,8 @@ class robin_map {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   const_iterator find(const K& key, std::size_t precalculated_hash) const {
     return m_ht.find(key, precalculated_hash);
   }
@@ -579,9 +567,8 @@ class robin_map {
    * KeyEqual::is_transparent exists. If so, K must be hashable and comparable
    * to Key.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   bool contains(const K& key) const {
     return m_ht.contains(key);
   }
@@ -593,9 +580,8 @@ class robin_map {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   bool contains(const K& key, std::size_t precalculated_hash) const {
     return m_ht.contains(key, precalculated_hash);
   }
@@ -631,9 +617,8 @@ class robin_map {
    * KeyEqual::is_transparent exists. If so, K must be hashable and comparable
    * to Key.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   std::pair<iterator, iterator> equal_range(const K& key) {
     return m_ht.equal_range(key);
   }
@@ -645,9 +630,8 @@ class robin_map {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   std::pair<iterator, iterator> equal_range(const K& key,
                                             std::size_t precalculated_hash) {
     return m_ht.equal_range(key, precalculated_hash);
@@ -656,9 +640,8 @@ class robin_map {
   /**
    * @copydoc equal_range(const K& key)
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   std::pair<const_iterator, const_iterator> equal_range(const K& key) const {
     return m_ht.equal_range(key);
   }
@@ -666,9 +649,8 @@ class robin_map {
   /**
    * @copydoc equal_range(const K& key, std::size_t precalculated_hash)
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  template <class K, class KE = KeyEqual,
+            std::enable_if_t<has_is_transparent<KE>::value>* = nullptr>
   std::pair<const_iterator, const_iterator> equal_range(
       const K& key, std::size_t precalculated_hash) const {
     return m_ht.equal_range(key, precalculated_hash);

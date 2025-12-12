@@ -374,8 +374,7 @@ class serializer {
     serialize_impl(val.value());
   }
 
-  template <class T, typename std::enable_if<
-                         std::is_arithmetic<T>::value>::type* = nullptr>
+  template <class T, std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
   void serialize_impl(const T& val) {
     m_ostream.write(reinterpret_cast<const char*>(&val), sizeof(val));
   }
@@ -398,16 +397,15 @@ class deserializer {
   }
 
  private:
-  template <class T,
-            typename std::enable_if<is_pair<T>::value>::type* = nullptr>
+  template <class T, std::enable_if_t<is_pair<T>::value>* = nullptr>
   T deserialize_impl() {
     auto first = deserialize_impl<typename T::first_type>();
     return std::make_pair(std::move(first),
                           deserialize_impl<typename T::second_type>());
   }
 
-  template <class T, typename std::enable_if<
-                         std::is_same<std::string, T>::value>::type* = nullptr>
+  template <class T,
+            std::enable_if_t<std::is_same_v<std::string, T>>* = nullptr>
   T deserialize_impl() {
     const std::size_t str_size =
         tsl::detail_robin_hash::numeric_cast<std::size_t>(
@@ -421,14 +419,13 @@ class deserializer {
     return std::string(chars.data(), chars.size());
   }
 
-  template <class T, typename std::enable_if<std::is_same<
-                         move_only_test, T>::value>::type* = nullptr>
+  template <class T,
+            std::enable_if_t<std::is_same_v<move_only_test, T>>* = nullptr>
   move_only_test deserialize_impl() {
     return move_only_test(deserialize_impl<std::string>());
   }
 
-  template <class T, typename std::enable_if<
-                         std::is_arithmetic<T>::value>::type* = nullptr>
+  template <class T, std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
   T deserialize_impl() {
     T val;
     m_istream.read(reinterpret_cast<char*>(&val), sizeof(val));
