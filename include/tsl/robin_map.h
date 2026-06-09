@@ -244,6 +244,24 @@ class robin_map {
     return m_ht.insert(std::move(value));
   }
 
+  /**
+   * Use the hash value 'precalculated_hash' instead of hashing the key. The
+   * hash value should be the same as hash_function()(value.first). Useful to
+   * speed-up the insertion if you already have the hash.
+   */
+  std::pair<iterator, bool> insert_hash(std::size_t precalculated_hash,
+                                        const value_type& value) {
+    return m_ht.insert_hash(precalculated_hash, value);
+  }
+
+  /**
+   * @copydoc insert_hash(std::size_t precalculated_hash, const value_type& value)
+   */
+  std::pair<iterator, bool> insert_hash(std::size_t precalculated_hash,
+                                        value_type&& value) {
+    return m_ht.insert_hash(precalculated_hash, std::move(value));
+  }
+
   iterator insert(const_iterator hint, const value_type& value) {
     return m_ht.insert_hint(hint, value);
   }
@@ -288,6 +306,28 @@ class robin_map {
   }
 
   /**
+   * Use the hash value 'precalculated_hash' instead of hashing the key. The
+   * hash value should be the same as hash_function()(k). Useful to speed-up
+   * the insertion if you already have the hash.
+   */
+  template <class M>
+  std::pair<iterator, bool> insert_or_assign_hash(
+      std::size_t precalculated_hash, const key_type& k, M&& obj) {
+    return m_ht.insert_or_assign_hash(precalculated_hash, k,
+                                      std::forward<M>(obj));
+  }
+
+  /**
+   * @copydoc insert_or_assign_hash(std::size_t precalculated_hash, const key_type& k, M&& obj)
+   */
+  template <class M>
+  std::pair<iterator, bool> insert_or_assign_hash(
+      std::size_t precalculated_hash, key_type&& k, M&& obj) {
+    return m_ht.insert_or_assign_hash(precalculated_hash, std::move(k),
+                                      std::forward<M>(obj));
+  }
+
+  /**
    * Due to the way elements are stored, emplace will need to move or copy the
    * key-value once. The method is equivalent to
    * insert(value_type(std::forward<Args>(args)...));
@@ -329,6 +369,29 @@ class robin_map {
   template <class... Args>
   iterator try_emplace(const_iterator hint, key_type&& k, Args&&... args) {
     return m_ht.try_emplace_hint(hint, std::move(k),
+                                 std::forward<Args>(args)...);
+  }
+
+  /**
+   * Use the hash value 'precalculated_hash' instead of hashing the key. The
+   * hash value should be the same as hash_function()(k). Useful to speed-up
+   * the insertion if you already have the hash.
+   */
+  template <class... Args>
+  std::pair<iterator, bool> try_emplace_hash(std::size_t precalculated_hash,
+                                             const key_type& k,
+                                             Args&&... args) {
+    return m_ht.try_emplace_hash(precalculated_hash, k,
+                                 std::forward<Args>(args)...);
+  }
+
+  /**
+   * @copydoc try_emplace_hash(std::size_t precalculated_hash, const key_type& k, Args&&... args)
+   */
+  template <class... Args>
+  std::pair<iterator, bool> try_emplace_hash(std::size_t precalculated_hash,
+                                             key_type&& k, Args&&... args) {
+    return m_ht.try_emplace_hash(precalculated_hash, std::move(k),
                                  std::forward<Args>(args)...);
   }
 

@@ -171,4 +171,53 @@ BOOST_AUTO_TEST_CASE(test_erase_fast) {
   BOOST_CHECK(set.size() == 0);
 }
 
+BOOST_AUTO_TEST_CASE(test_precalculated_hash) {
+  tsl::robin_set<int, identity_hash<int>> set = {1, 2, 3, 4, 5, 6};
+  const tsl::robin_set<int, identity_hash<int>> set_const = set;
+
+  /**
+   * find
+   */
+  BOOST_REQUIRE(set.find(3, set.hash_function()(3)) != set.end());
+  BOOST_CHECK_EQUAL(*set.find(3, set.hash_function()(3)), 3);
+
+  BOOST_REQUIRE(set_const.find(3, set_const.hash_function()(3)) !=
+                set_const.end());
+
+  BOOST_REQUIRE_NE(set.hash_function()(2), set.hash_function()(3));
+  BOOST_CHECK(set.find(3, set.hash_function()(2)) == set.end());
+
+  /**
+   * contains
+   */
+  BOOST_CHECK(set.contains(3, set.hash_function()(3)));
+  BOOST_CHECK(!set.contains(3, set.hash_function()(2)));
+
+  /**
+   * count
+   */
+  BOOST_CHECK_EQUAL(set.count(3, set.hash_function()(3)), 1);
+  BOOST_CHECK_EQUAL(set.count(3, set.hash_function()(2)), 0);
+
+  /**
+   * insert_hash
+   */
+  auto it_ins = set.insert_hash(set.hash_function()(7), 7);
+  BOOST_CHECK(it_ins.second);
+  BOOST_CHECK_EQUAL(*it_ins.first, 7);
+
+  // Value already present: no insert.
+  it_ins = set.insert_hash(set.hash_function()(7), 7);
+  BOOST_CHECK(!it_ins.second);
+  BOOST_CHECK_EQUAL(*it_ins.first, 7);
+
+  /**
+   * erase
+   */
+  BOOST_CHECK_EQUAL(set.erase(3, set.hash_function()(3)), 1);
+
+  BOOST_REQUIRE_NE(set.hash_function()(2), set.hash_function()(4));
+  BOOST_CHECK_EQUAL(set.erase(4, set.hash_function()(2)), 0);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
