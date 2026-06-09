@@ -1440,6 +1440,45 @@ BOOST_AUTO_TEST_CASE(test_precalculated_hash) {
   BOOST_CHECK_EQUAL(std::distance(it_range.first, it_range.second), 0);
 
   /**
+   * try_emplace_hash
+   */
+  auto it_te = map.try_emplace_hash(map.hash_function()(7), 7, -7);
+  BOOST_CHECK(it_te.second);
+  BOOST_CHECK_EQUAL(it_te.first->first, 7);
+  BOOST_CHECK_EQUAL(it_te.first->second, -7);
+
+  // Key already present: no insert, value left untouched.
+  it_te = map.try_emplace_hash(map.hash_function()(7), 7, -70);
+  BOOST_CHECK(!it_te.second);
+  BOOST_CHECK_EQUAL(it_te.first->second, -7);
+
+  /**
+   * insert_or_assign_hash
+   */
+  auto it_ioa = map.insert_or_assign_hash(map.hash_function()(8), 8, -8);
+  BOOST_CHECK(it_ioa.second);
+  BOOST_CHECK_EQUAL(it_ioa.first->first, 8);
+  BOOST_CHECK_EQUAL(it_ioa.first->second, -8);
+
+  // Key already present: no insert, but value is overwritten.
+  it_ioa = map.insert_or_assign_hash(map.hash_function()(8), 8, -80);
+  BOOST_CHECK(!it_ioa.second);
+  BOOST_CHECK_EQUAL(it_ioa.first->second, -80);
+
+  /**
+   * insert_hash
+   */
+  auto it_ins = map.insert_hash(map.hash_function()(9), {9, -9});
+  BOOST_CHECK(it_ins.second);
+  BOOST_CHECK_EQUAL(it_ins.first->first, 9);
+  BOOST_CHECK_EQUAL(it_ins.first->second, -9);
+
+  // Key already present: no insert, value left untouched.
+  it_ins = map.insert_hash(map.hash_function()(9), {9, -90});
+  BOOST_CHECK(!it_ins.second);
+  BOOST_CHECK_EQUAL(it_ins.first->second, -9);
+
+  /**
    * erase
    */
   BOOST_CHECK_EQUAL(map.erase(3, map.hash_function()(3)), 1);
