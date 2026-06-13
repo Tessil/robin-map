@@ -220,17 +220,17 @@ class robin_set {
    * hash value should be the same as hash_function()(value). Useful to speed-up
    * the insertion if you already have the hash.
    */
-  std::pair<iterator, bool> insert_hash(std::size_t precalculated_hash,
-                                        const value_type& value) {
-    return m_ht.insert_hash(precalculated_hash, value);
+  std::pair<iterator, bool> insert_with_hash(std::size_t precalculated_hash,
+                                             const value_type& value) {
+    return m_ht.insert_with_hash(precalculated_hash, value);
   }
 
   /**
-   * @copydoc insert_hash(std::size_t precalculated_hash, const value_type& value)
+   * @copydoc insert_with_hash(std::size_t precalculated_hash, const value_type& value)
    */
-  std::pair<iterator, bool> insert_hash(std::size_t precalculated_hash,
-                                        value_type&& value) {
-    return m_ht.insert_hash(precalculated_hash, std::move(value));
+  std::pair<iterator, bool> insert_with_hash(std::size_t precalculated_hash,
+                                             value_type&& value) {
+    return m_ht.insert_with_hash(precalculated_hash, std::move(value));
   }
 
   iterator insert(const_iterator hint, const value_type& value) {

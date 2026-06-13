@@ -249,17 +249,17 @@ class robin_map {
    * hash value should be the same as hash_function()(value.first). Useful to
    * speed-up the insertion if you already have the hash.
    */
-  std::pair<iterator, bool> insert_hash(std::size_t precalculated_hash,
-                                        const value_type& value) {
-    return m_ht.insert_hash(precalculated_hash, value);
+  std::pair<iterator, bool> insert_with_hash(std::size_t precalculated_hash,
+                                             const value_type& value) {
+    return m_ht.insert_with_hash(precalculated_hash, value);
   }
 
   /**
-   * @copydoc insert_hash(std::size_t precalculated_hash, const value_type& value)
+   * @copydoc insert_with_hash(std::size_t precalculated_hash, const value_type& value)
    */
-  std::pair<iterator, bool> insert_hash(std::size_t precalculated_hash,
-                                        value_type&& value) {
-    return m_ht.insert_hash(precalculated_hash, std::move(value));
+  std::pair<iterator, bool> insert_with_hash(std::size_t precalculated_hash,
+                                             value_type&& value) {
+    return m_ht.insert_with_hash(precalculated_hash, std::move(value));
   }
 
   iterator insert(const_iterator hint, const value_type& value) {
@@ -311,20 +311,20 @@ class robin_map {
    * the insertion if you already have the hash.
    */
   template <class M>
-  std::pair<iterator, bool> insert_or_assign_hash(
+  std::pair<iterator, bool> insert_or_assign_with_hash(
       std::size_t precalculated_hash, const key_type& k, M&& obj) {
-    return m_ht.insert_or_assign_hash(precalculated_hash, k,
-                                      std::forward<M>(obj));
+    return m_ht.insert_or_assign_with_hash(precalculated_hash, k,
+                                           std::forward<M>(obj));
   }
 
   /**
-   * @copydoc insert_or_assign_hash(std::size_t precalculated_hash, const key_type& k, M&& obj)
+   * @copydoc insert_or_assign_with_hash(std::size_t precalculated_hash, const key_type& k, M&& obj)
    */
   template <class M>
-  std::pair<iterator, bool> insert_or_assign_hash(
+  std::pair<iterator, bool> insert_or_assign_with_hash(
       std::size_t precalculated_hash, key_type&& k, M&& obj) {
-    return m_ht.insert_or_assign_hash(precalculated_hash, std::move(k),
-                                      std::forward<M>(obj));
+    return m_ht.insert_or_assign_with_hash(precalculated_hash, std::move(k),
+                                           std::forward<M>(obj));
   }
 
   /**
@@ -378,21 +378,20 @@ class robin_map {
    * the insertion if you already have the hash.
    */
   template <class... Args>
-  std::pair<iterator, bool> try_emplace_hash(std::size_t precalculated_hash,
-                                             const key_type& k,
-                                             Args&&... args) {
-    return m_ht.try_emplace_hash(precalculated_hash, k,
-                                 std::forward<Args>(args)...);
+  std::pair<iterator, bool> try_emplace_with_hash(
+      std::size_t precalculated_hash, const key_type& k, Args&&... args) {
+    return m_ht.try_emplace_with_hash(precalculated_hash, k,
+                                      std::forward<Args>(args)...);
   }
 
   /**
-   * @copydoc try_emplace_hash(std::size_t precalculated_hash, const key_type& k, Args&&... args)
+   * @copydoc try_emplace_with_hash(std::size_t precalculated_hash, const key_type& k, Args&&... args)
    */
   template <class... Args>
-  std::pair<iterator, bool> try_emplace_hash(std::size_t precalculated_hash,
-                                             key_type&& k, Args&&... args) {
-    return m_ht.try_emplace_hash(precalculated_hash, std::move(k),
-                                 std::forward<Args>(args)...);
+  std::pair<iterator, bool> try_emplace_with_hash(
+      std::size_t precalculated_hash, key_type&& k, Args&&... args) {
+    return m_ht.try_emplace_with_hash(precalculated_hash, std::move(k),
+                                      std::forward<Args>(args)...);
   }
 
   iterator erase(iterator pos) { return m_ht.erase(pos); }

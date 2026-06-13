@@ -200,14 +200,14 @@ BOOST_AUTO_TEST_CASE(test_precalculated_hash) {
   BOOST_CHECK_EQUAL(set.count(3, set.hash_function()(2)), 0);
 
   /**
-   * insert_hash
+   * insert_with_hash
    */
-  auto it_ins = set.insert_hash(set.hash_function()(7), 7);
+  auto it_ins = set.insert_with_hash(set.hash_function()(7), 7);
   BOOST_CHECK(it_ins.second);
   BOOST_CHECK_EQUAL(*it_ins.first, 7);
 
   // Value already present: no insert.
-  it_ins = set.insert_hash(set.hash_function()(7), 7);
+  it_ins = set.insert_with_hash(set.hash_function()(7), 7);
   BOOST_CHECK(!it_ins.second);
   BOOST_CHECK_EQUAL(*it_ins.first, 7);
 
