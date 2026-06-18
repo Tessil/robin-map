@@ -81,8 +81,7 @@
 
 #define TSL_RH_UNUSED(x) static_cast<void>(x)
 
-namespace tsl {
-namespace rh {
+namespace tsl::rh {
 
 /**
  * Grow the hash table by a factor of GrowthFactor keeping the bucket count to a
@@ -409,7 +408,6 @@ class prime_growth_policy {
                 "The type of m_iprime is not big enough.");
 };
 
-}  // namespace rh
-}  // namespace tsl
+}  // namespace tsl::rh
 
 #endif
