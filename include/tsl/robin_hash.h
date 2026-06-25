@@ -686,6 +686,18 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return insert_impl(KeySelect()(value), std::forward<P>(value));
   }
 
+  /**
+   * Use the hash value 'precalculated_hash' instead of hashing the key. The
+   * hash value should be the same as hash_function()(KeySelect()(value)),
+   * otherwise the behaviour is undefined.
+   */
+  template <typename P>
+  std::pair<iterator, bool> insert_with_hash(std::size_t precalculated_hash,
+                                             P&& value) {
+    return insert_impl_with_hash(precalculated_hash, KeySelect()(value),
+                                 std::forward<P>(value));
+  }
+
   template <typename P>
   iterator insert_hint(const_iterator hint, P&& value) {
     if (hint != cend() &&
@@ -726,6 +738,23 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return it;
   }
 
+  /**
+   * Use the hash value 'precalculated_hash' instead of hashing the key. The
+   * hash value should be the same as hash_function()(key), otherwise the
+   * behaviour is undefined.
+   */
+  template <class K, class M>
+  std::pair<iterator, bool> insert_or_assign_with_hash(
+      std::size_t precalculated_hash, K&& key, M&& obj) {
+    auto it = try_emplace_with_hash(precalculated_hash, std::forward<K>(key),
+                                    std::forward<M>(obj));
+    if (!it.second) {
+      it.first.value() = std::forward<M>(obj);
+    }
+
+    return it;
+  }
+
   template <class K, class M>
   iterator insert_or_assign(const_iterator hint, K&& key, M&& obj) {
     if (hint != cend() && compare_keys(KeySelect()(*hint), key)) {
@@ -753,6 +782,20 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return insert_impl(key, std::piecewise_construct,
                        std::forward_as_tuple(std::forward<K>(key)),
                        std::forward_as_tuple(std::forward<Args>(args)...));
+  }
+
+  /**
+   * Use the hash value 'precalculated_hash' instead of hashing the key. The
+   * hash value should be the same as hash_function()(key), otherwise the
+   * behaviour is undefined.
+   */
+  template <class K, class... Args>
+  std::pair<iterator, bool> try_emplace_with_hash(
+      std::size_t precalculated_hash, K&& key, Args&&... args) {
+    return insert_impl_with_hash(
+        precalculated_hash, key, std::piecewise_construct,
+        std::forward_as_tuple(std::forward<K>(key)),
+        std::forward_as_tuple(std::forward<Args>(args)...));
   }
 
   template <class K, class... Args>
@@ -1185,7 +1228,14 @@ iterator erase(const_iterator first, const_iterator last) {
   template <class K, class... Args>
   std::pair<iterator, bool> insert_impl(const K& key,
                                         Args&&... value_type_args) {
-    const std::size_t hash = hash_key(key);
+    return insert_impl_with_hash(hash_key(key), key,
+                                 std::forward<Args>(value_type_args)...);
+  }
+
+  template <class K, class... Args>
+  std::pair<iterator, bool> insert_impl_with_hash(
+      std::size_t hash, const K& key, Args&&... value_type_args) {
+    tsl_rh_assert(hash == hash_key(key));
 
     std::size_t ibucket = bucket_for_hash(hash);
     distance_type dist_from_ideal_bucket = 0;
