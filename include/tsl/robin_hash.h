@@ -832,68 +832,65 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
   iterator erase(const_iterator pos) { return erase(mutable_iterator(pos)); }
 
-  iterator erase(const_iterator first, const_iterator last) {
-    if (first == last) {
-      return mutable_iterator(first);
-    }
-
-    auto first_mutable = mutable_iterator(first);
-    auto last_mutable = mutable_iterator(last);
-    for (auto it = first_mutable.m_bucket; it != last_mutable.m_bucket; ++it) {
-      if (!it->empty()) {
-        it->clear();
-        m_nb_elements--;
-      }
-    }
-
-    if (last_mutable == end()) {
-      m_try_shrink_on_next_insert = true;
-      return end();
-    }
-
-    /*
-     * Backward shift on the values which come after the deleted values.
-     * We try to move the values closer to their ideal bucket.
-     */
-    std::size_t icloser_bucket =
-        static_cast<std::size_t>(first_mutable.m_bucket - m_buckets);
-    std::size_t ito_move_closer_value =
-        static_cast<std::size_t>(last_mutable.m_bucket - m_buckets);
-    tsl_rh_assert(ito_move_closer_value > icloser_bucket);
-
-    const std::size_t ireturn_bucket =
-        ito_move_closer_value -
-        std::min(
-            ito_move_closer_value - icloser_bucket,
-            std::size_t(
-                m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
-
-    while (ito_move_closer_value < m_bucket_count &&
-           m_buckets[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
-      icloser_bucket =
-          ito_move_closer_value -
-          std::min(
-              ito_move_closer_value - icloser_bucket,
-              std::size_t(
-                  m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
-
-      tsl_rh_assert(m_buckets[icloser_bucket].empty());
-      const distance_type new_distance = distance_type(
-          m_buckets[ito_move_closer_value].dist_from_ideal_bucket() -
-          (ito_move_closer_value - icloser_bucket));
-      m_buckets[icloser_bucket].set_value_of_empty_bucket(
-          new_distance, m_buckets[ito_move_closer_value].truncated_hash(),
-          std::move(m_buckets[ito_move_closer_value].value()));
-      m_buckets[ito_move_closer_value].clear();
-
-      ++icloser_bucket;
-      ++ito_move_closer_value;
-    }
-
-    m_try_shrink_on_next_insert = true;
-
-    return iterator(m_buckets + ireturn_bucket);
+iterator erase(const_iterator first, const_iterator last) {
+  if (first == last) {
+    return mutable_iterator(first);
   }
+
+  auto first_mutable = mutable_iterator(first);
+  auto last_mutable = mutable_iterator(last);
+  for (auto it = first_mutable.m_bucket; it != last_mutable.m_bucket; ++it) {
+    if (!it->empty()) {
+      it->clear();
+      m_nb_elements--;
+    }
+  }
+
+  /*
+   * Backward shift on the values which come after the deleted values. The
+   * probe sequence is circular, so continue scanning with next_bucket() even
+   * if the cluster wraps at the end of the bucket array.
+   */
+  std::size_t icloser_bucket =
+      static_cast<std::size_t>(first_mutable.m_bucket - m_buckets);
+  std::size_t ito_move_closer_value =
+      (last_mutable == end()) ? 0
+                              : static_cast<std::size_t>(last_mutable.m_bucket -
+                                                         m_buckets);
+  std::size_t ireturn_bucket = ito_move_closer_value;
+
+  while (m_buckets[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
+    const std::size_t distance_to_closer_bucket =
+        cyclic_distance(icloser_bucket, ito_move_closer_value);
+    const std::size_t move_closer_value =
+        std::min(distance_to_closer_bucket,
+                 std::size_t(
+                     m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
+    const std::size_t inew_bucket = next_bucket(
+        icloser_bucket, distance_to_closer_bucket - move_closer_value);
+
+    tsl_rh_assert(m_buckets[inew_bucket].empty());
+    const distance_type new_distance = distance_type(
+        m_buckets[ito_move_closer_value].dist_from_ideal_bucket() -
+        move_closer_value);
+    m_buckets[inew_bucket].set_value_of_empty_bucket(
+        new_distance, m_buckets[ito_move_closer_value].truncated_hash(),
+        std::move(m_buckets[ito_move_closer_value].value()));
+    m_buckets[ito_move_closer_value].clear();
+
+    if (ito_move_closer_value == ireturn_bucket) {
+      ireturn_bucket = inew_bucket;
+    }
+
+    icloser_bucket = next_bucket(inew_bucket);
+    ito_move_closer_value = next_bucket(ito_move_closer_value);
+  }
+
+  m_try_shrink_on_next_insert = true;
+
+  return (last_mutable == end()) ? end() : iterator(m_buckets + ireturn_bucket);
+}
+
 
   template <class K>
   size_type erase(const K& key) {
@@ -1141,6 +1138,33 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
     index++;
     return (index != bucket_count()) ? index : 0;
+  }
+  template <class U = GrowthPolicy,
+            typename std::enable_if<is_power_of_two_policy<U>::value>::type* =
+                nullptr>
+  std::size_t next_bucket(std::size_t index, std::size_t offset) const noexcept {
+    tsl_rh_assert(index < bucket_count());
+    tsl_rh_assert(offset < bucket_count());
+
+    return (index + offset) & this->m_mask;
+  }
+
+  template <class U = GrowthPolicy,
+            typename std::enable_if<!is_power_of_two_policy<U>::value>::type* =
+                nullptr>
+  std::size_t next_bucket(std::size_t index, std::size_t offset) const noexcept {
+    tsl_rh_assert(index < bucket_count());
+    tsl_rh_assert(offset < bucket_count());
+
+    index += offset;
+    return (index < bucket_count()) ? index : index - bucket_count();
+  }
+
+  std::size_t cyclic_distance(std::size_t ifrom, std::size_t ito) const noexcept {
+    tsl_rh_assert(ifrom < bucket_count());
+    tsl_rh_assert(ito < bucket_count());
+
+    return (ito >= ifrom) ? ito - ifrom : bucket_count() - ifrom + ito;
   }
 
   template <class K>
