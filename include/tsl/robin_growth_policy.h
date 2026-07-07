@@ -233,7 +233,7 @@ class mod_growth_policy {
  private:
   static constexpr double REHASH_SIZE_MULTIPLICATION_FACTOR =
       1.0 * GrowthFactor::num / GrowthFactor::den;
-  static const std::size_t MAX_BUCKET_COUNT =
+  static constexpr std::size_t MAX_BUCKET_COUNT =
       std::size_t(double(std::numeric_limits<std::size_t>::max() /
                          REHASH_SIZE_MULTIPLICATION_FACTOR));
 
