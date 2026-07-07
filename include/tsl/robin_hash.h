@@ -143,6 +143,11 @@ class bucket_entry_hash<true> {
 };
 
 /**
+ * Tag type to select the constexpr bucket_entry constructor.
+ */
+struct constexpr_last_bucket_t {};
+
+/**
  * Each bucket entry has:
  * - A value of type `ValueType`.
  * - An integer to store how far the value of the bucket, if any, is from its
@@ -181,6 +186,12 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
         m_last_bucket(last_bucket) {
     tsl_rh_assert(empty());
   }
+
+  constexpr bucket_entry(constexpr_last_bucket_t /* ignored */) noexcept
+      : bucket_hash(),
+        m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
+        m_last_bucket(true),
+        m_value() {}
 
   bucket_entry(const bucket_entry& other) noexcept(
       std::is_nothrow_copy_constructible<value_type>::value)
@@ -233,16 +244,19 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
 
   bucket_entry& operator=(bucket_entry&&) = delete;
 
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201907L
+  constexpr
+#endif
   ~bucket_entry() noexcept { clear(); }
 
-  void clear() noexcept {
+  constexpr void clear() noexcept {
     if (!empty()) {
       destroy_value();
       m_dist_from_ideal_bucket = EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET;
     }
   }
 
-  bool empty() const noexcept {
+  constexpr bool empty() const noexcept {
     return m_dist_from_ideal_bucket == EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET;
   }
 
@@ -311,8 +325,8 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
   }
 
  public:
-  static const distance_type EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET = -1;
-  static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 8192;
+  static constexpr distance_type EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET = -1;
+  static constexpr distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 8192;
   static_assert(DIST_FROM_IDEAL_BUCKET_LIMIT <=
                     std::numeric_limits<distance_type>::max() - 1,
                 "DIST_FROM_IDEAL_BUCKET_LIMIT must be <= "
@@ -1560,7 +1574,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   }
 
  public:
-  static const size_type DEFAULT_INIT_BUCKETS_SIZE = 0;
+  static constexpr size_type DEFAULT_INIT_BUCKETS_SIZE = 0;
 
   static constexpr float DEFAULT_MAX_LOAD_FACTOR = 0.5f;
   static constexpr float MINIMUM_MAX_LOAD_FACTOR = 0.2f;
@@ -1581,16 +1595,20 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   /**
    * Protocol version currenlty used for serialization.
    */
-  static const slz_size_type SERIALIZATION_PROTOCOL_VERSION = 1;
+  static constexpr slz_size_type SERIALIZATION_PROTOCOL_VERSION = 1;
 
   /**
    * Return an always valid pointer to an static empty bucket_entry with
-   * last_bucket() == true.
+   * last_bucket() == true. The bucket_entry must be treated as `const`.
    */
   bucket_entry* static_empty_bucket_ptr() noexcept {
-    static bucket_entry empty_bucket(true);
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201907L
+    static constexpr bucket_entry empty_bucket(constexpr_last_bucket_t{});
+#else
+    static const bucket_entry empty_bucket(constexpr_last_bucket_t{});
+#endif
     tsl_rh_assert(empty_bucket.empty());
-    return &empty_bucket;
+    return const_cast<bucket_entry*>(&empty_bucket);
   }
 
  private:
