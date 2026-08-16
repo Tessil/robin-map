@@ -139,8 +139,12 @@ class power_of_two_growth_policy {
 
   /**
    * Return the maximum number of buckets supported by the policy.
+   *
+   * Static: does not depend on instance state. Calling the non-static form
+   * from the constructor made GCC 16 emit -Wmaybe-uninitialized on the
+   * implicit this pointer (see Tessil/robin-map#93).
    */
-  std::size_t max_bucket_count() const {
+  static constexpr std::size_t max_bucket_count() noexcept {
     // Largest power of two.
     return (std::numeric_limits<std::size_t>::max() / 2) + 1;
   }
