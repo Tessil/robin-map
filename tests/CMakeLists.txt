@@ -24,3 +24,11 @@ target_link_libraries(tsl_robin_map_tests PRIVATE Boost::unit_test_framework)
 # tsl::robin_map
 add_subdirectory(../ ${CMAKE_CURRENT_BINARY_DIR}/tsl)
 target_link_libraries(tsl_robin_map_tests PRIVATE tsl::robin_map)  
+
+# The public target must raise a consumer's lower requested language standard.
+add_executable(tsl_robin_map_cmake_test "cmake_target_test.cpp")
+set_target_properties(tsl_robin_map_cmake_test PROPERTIES
+                      CXX_STANDARD 14
+                      CXX_STANDARD_REQUIRED ON
+                      CXX_EXTENSIONS OFF)
+target_link_libraries(tsl_robin_map_cmake_test PRIVATE tsl::robin_map)
