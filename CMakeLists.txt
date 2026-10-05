@@ -18,6 +18,8 @@ add_library(robin_map INTERFACE)
 # Use tsl::robin_map as target, more consistent with other libraries conventions (Boost, Qt, ...)
 add_library(tsl::robin_map ALIAS robin_map)
 
+target_compile_features(robin_map INTERFACE cxx_std_17)
+
 target_include_directories(robin_map INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
