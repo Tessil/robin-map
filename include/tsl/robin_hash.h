@@ -67,8 +67,7 @@ struct is_power_of_two_policy<tsl::rh::power_of_two_growth_policy<GrowthFactor>>
     : std::true_type {};
 
 template <typename T, typename U>
-static T numeric_cast(U value,
-                      const char* error_message = "numeric_cast() failed.") {
+T numeric_cast(U value, const char* error_message = "numeric_cast() failed.") {
   T ret = static_cast<T>(value);
   if (static_cast<U>(ret) != value) {
     TSL_RH_THROW_OR_TERMINATE(std::runtime_error, error_message);
@@ -87,7 +86,7 @@ static T numeric_cast(U value,
 }
 
 template <class T, class Deserializer>
-static T deserialize_value(Deserializer& deserializer) {
+T deserialize_value(Deserializer& deserializer) {
   // MSVC < 2017 is not conformant, circumvent the problem by removing the
   // template keyword
 #if defined(_MSC_VER) && _MSC_VER < 1910
